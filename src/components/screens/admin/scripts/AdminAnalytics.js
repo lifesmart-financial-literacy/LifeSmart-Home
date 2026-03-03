@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
-import { analytics } from '../../../../firebase/initFirebase';
-import { 
-  FaChartLine, 
-  FaUsers, 
+import {
+  FaChartLine,
+  FaUsers,
   FaExclamationTriangle,
   FaClock,
   FaArrowLeft
@@ -22,15 +21,17 @@ import {
   Legend,
   ArcElement
 } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { 
+import { Line, Doughnut } from 'react-chartjs-2';
+import {
   getAnalytics,
   logEvent,
   setAnalyticsCollectionEnabled,
   setUserId,
   setUserProperties
 } from 'firebase/analytics';
-import '../styles/AdminAnalytics.css';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 // Register ChartJS components
 ChartJS.register(
@@ -62,13 +63,13 @@ const AdminAnalytics = () => {
     const fetchAnalyticsData = async () => {
       try {
         trackFeatureView('admin_analytics');
-        
+
         // Get Analytics instance
         const analyticsInstance = getAnalytics();
-        
+
         // Enable analytics collection
         await setAnalyticsCollectionEnabled(analyticsInstance, true);
-        
+
         // Set admin user properties
         if (currentUser) {
           setUserId(analyticsInstance, currentUser.uid);
@@ -77,13 +78,13 @@ const AdminAnalytics = () => {
             admin_section: 'analytics'
           });
         }
-        
+
         // Log admin analytics view
         logEvent(analyticsInstance, 'admin_analytics_view', {
           timestamp: new Date().toISOString(),
           admin_id: currentUser?.uid
         });
-        
+
         // For now, we'll use mock data since we can't directly query analytics data
         // In a real implementation, this would come from your backend API
         const mockData = {
@@ -99,7 +100,7 @@ const AdminAnalytics = () => {
           dailyActiveUsers: [150, 180, 200, 170, 220, 190, 210],
           sessionTimes: 25 // Average session time in minutes
         };
-        
+
         setAnalyticsData(mockData);
         setLoading(false);
       } catch (error) {
@@ -182,90 +183,125 @@ const AdminAnalytics = () => {
 
   if (loading) {
     return (
-      <div className="adminanalytics-loading">
-        <div className="adminanalytics-loading-spinner"></div>
+      <div className="min-h-screen flex justify-center items-center bg-zinc-900 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200">
+        <div className="w-12 h-12 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="adminanalytics-container">
-      <header className="adminanalytics-header">
-        <button 
-          onClick={() => navigate('/admin')} 
-          className="adminanalytics-back-button"
+    <div className="min-h-screen bg-zinc-900 text-white p-4 md:p-8 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200 [data-theme=light]:text-zinc-900">
+      <header className="max-w-[1400px] mx-auto mb-12 pb-8 border-b border-white/10 [data-theme=light]:border-zinc-200">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/admin')}
+          className="mb-8 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-0 [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-zinc-300"
         >
           <FaArrowLeft size={20} />
           <span>Back to Admin Panel</span>
-        </button>
-        <div className="adminanalytics-header-content">
-          <h1 className="adminanalytics-title">
-            <FaChartLine className="adminanalytics-title-icon" />
+        </Button>
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl mb-4 flex items-center justify-center gap-4">
+            <FaChartLine className="text-blue-500 [data-theme=light]:text-blue-600" />
             Analytics Dashboard
           </h1>
-          <p className="adminanalytics-subtitle">Monitor platform performance and user engagement</p>
+          <p className="text-zinc-300 text-lg [data-theme=light]:text-zinc-600">Monitor platform performance and user engagement</p>
         </div>
       </header>
 
-      <main className="adminanalytics-main">
+      <main className="max-w-[1400px] mx-auto">
         {/* Summary Cards */}
-        <div className="adminanalytics-summary">
-          <div className="adminanalytics-card">
-            <FaUsers className="adminanalytics-card-icon" />
-            <div className="adminanalytics-card-content">
-              <h3>Daily Active Users</h3>
-              <p className="adminanalytics-card-value">{analyticsData.dailyActiveUsers[6]}</p>
-              <span className={`adminanalytics-card-trend ${calculateTrend(analyticsData.dailyActiveUsers) >= 0 ? 'positive' : 'negative'}`}>
-                {calculateTrend(analyticsData.dailyActiveUsers) >= 0 ? '+' : ''}{calculateTrend(analyticsData.dailyActiveUsers).toFixed(1)}% this week
-              </span>
-            </div>
-          </div>
-          <div className="adminanalytics-card">
-            <FaClock className="adminanalytics-card-icon" />
-            <div className="adminanalytics-card-content">
-              <h3>Avg. Session Time</h3>
-              <p className="adminanalytics-card-value">{analyticsData.sessionTimes}m</p>
-              <span className="adminanalytics-card-trend positive">Last 7 days</span>
-            </div>
-          </div>
-          <div className="adminanalytics-card">
-            <FaExclamationTriangle className="adminanalytics-card-icon" />
-            <div className="adminanalytics-card-content">
-              <h3>Error Rate</h3>
-              <p className="adminanalytics-card-value">{analyticsData.errorRates[6]}</p>
-              <span className={`adminanalytics-card-trend ${calculateTrend(analyticsData.errorRates) <= 0 ? 'positive' : 'negative'}`}>
-                {calculateTrend(analyticsData.errorRates) >= 0 ? '+' : ''}{calculateTrend(analyticsData.errorRates).toFixed(1)}% this week
-              </span>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 hover:-translate-y-1 transition-all duration-300 hover:bg-white/10 [data-theme=light]:hover:bg-zinc-50">
+            <CardContent className="flex items-center gap-6 p-6">
+              <div className="text-3xl text-blue-500 bg-blue-500/10 p-4 rounded-xl [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-600">
+                <FaUsers />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-zinc-300 text-base m-0 [data-theme=light]:text-zinc-600">Daily Active Users</h3>
+                <p className="text-2xl font-bold my-2 m-0">{analyticsData.dailyActiveUsers[6]}</p>
+                <span className={cn(
+                  "text-sm inline-block px-2 py-1 rounded",
+                  calculateTrend(analyticsData.dailyActiveUsers) >= 0
+                    ? "bg-green-500/10 text-green-500 [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700"
+                    : "bg-red-500/10 text-red-500 [data-theme=light]:bg-red-100 [data-theme=light]:text-red-700"
+                )}>
+                  {calculateTrend(analyticsData.dailyActiveUsers) >= 0 ? '+' : ''}{calculateTrend(analyticsData.dailyActiveUsers).toFixed(1)}% this week
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 hover:-translate-y-1 transition-all duration-300 hover:bg-white/10 [data-theme=light]:hover:bg-zinc-50">
+            <CardContent className="flex items-center gap-6 p-6">
+              <div className="text-3xl text-blue-500 bg-blue-500/10 p-4 rounded-xl [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-600">
+                <FaClock />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-zinc-300 text-base m-0 [data-theme=light]:text-zinc-600">Avg. Session Time</h3>
+                <p className="text-2xl font-bold my-2 m-0">{analyticsData.sessionTimes}m</p>
+                <span className="text-sm inline-block px-2 py-1 rounded bg-green-500/10 text-green-500 [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700">Last 7 days</span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 hover:-translate-y-1 transition-all duration-300 hover:bg-white/10 [data-theme=light]:hover:bg-zinc-50">
+            <CardContent className="flex items-center gap-6 p-6">
+              <div className="text-3xl text-blue-500 bg-blue-500/10 p-4 rounded-xl [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-600">
+                <FaExclamationTriangle />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-zinc-300 text-base m-0 [data-theme=light]:text-zinc-600">Error Rate</h3>
+                <p className="text-2xl font-bold my-2 m-0">{analyticsData.errorRates[6]}</p>
+                <span className={cn(
+                  "text-sm inline-block px-2 py-1 rounded",
+                  calculateTrend(analyticsData.errorRates) <= 0
+                    ? "bg-green-500/10 text-green-500 [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700"
+                    : "bg-red-500/10 text-red-500 [data-theme=light]:bg-red-100 [data-theme=light]:text-red-700"
+                )}>
+                  {calculateTrend(analyticsData.errorRates) >= 0 ? '+' : ''}{calculateTrend(analyticsData.errorRates).toFixed(1)}% this week
+                </span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Charts */}
-        <div className="adminanalytics-charts">
-          <div className="adminanalytics-chart-container">
-            <h2>User Engagement</h2>
-            <div className="adminanalytics-chart">
-              <Line options={chartOptions} data={userEngagementData} />
-            </div>
-          </div>
-          
-          <div className="adminanalytics-chart-container">
-            <h2>Feature Usage</h2>
-            <div className="adminanalytics-chart">
-              <Doughnut options={chartOptions} data={featureUsageData} />
-            </div>
-          </div>
-          
-          <div className="adminanalytics-chart-container">
-            <h2>Error Rates</h2>
-            <div className="adminanalytics-chart">
-              <Line options={chartOptions} data={errorRatesData} />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-white m-0 [data-theme=light]:text-zinc-900">User Engagement</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] md:h-[250px] relative">
+                <Line options={chartOptions} data={userEngagementData} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-white m-0 [data-theme=light]:text-zinc-900">Feature Usage</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] md:h-[250px] relative">
+                <Doughnut options={chartOptions} data={featureUsageData} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 lg:col-span-2 xl:col-span-1">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-white m-0 [data-theme=light]:text-zinc-900">Error Rates</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] md:h-[250px] relative">
+                <Line options={chartOptions} data={errorRatesData} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
   );
 };
 
-export default AdminAnalytics; 
+export default AdminAnalytics;

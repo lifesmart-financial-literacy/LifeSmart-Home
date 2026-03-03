@@ -5,7 +5,8 @@ import { FaGoogle, FaApple } from 'react-icons/fa';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/initFirebase';
 import Modal from '../../widgets/modals/Modal';
-import '../../styles/HomeScreen.css';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Register = ({ onClose }) => {
   const [email, setEmail] = useState('');
@@ -13,242 +14,169 @@ const Register = ({ onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loginCode, setLoginCode] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalConfig, setModalConfig] = useState({
-    title: '',
-    message: '',
-    type: 'success'
-  });
-  
+  const [modalConfig, setModalConfig] = useState({ title: '', message: '', type: 'success' });
+
   const navigate = useNavigate();
   const { register, signInWithGoogle, signInWithApple } = useAuth();
 
   const validateLoginCode = async (code) => {
-    try {
-      const codeRef = doc(db, 'Login Codes', code);
-      const codeDoc = await getDoc(codeRef);
-      
-      if (!codeDoc.exists()) {
-        throw new Error('Invalid login code');
-      }
-      
-      const codeData = codeDoc.data();
-      if (!codeData.active) {
-        throw new Error('This login code is no longer active');
-      }
-      
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    const codeRef = doc(db, 'Login Codes', code);
+    const codeDoc = await getDoc(codeRef);
+    if (!codeDoc.exists()) throw new Error('Invalid login code');
+    const codeData = codeDoc.data();
+    if (!codeData.active) throw new Error('This login code is no longer active');
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (password !== confirmPassword) {
-      setModalConfig({
-        title: 'Error',
-        message: 'Passwords do not match!',
-        type: 'error'
-      });
+      setModalConfig({ title: 'Error', message: 'Passwords do not match!', type: 'error' });
       setModalOpen(true);
       return;
     }
-
     try {
-      // Validate login code first
       await validateLoginCode(loginCode);
-
-      // If code is valid, proceed with registration
       const user = await register(email, password);
-      console.log("Registered user:", user);
-      
-      // Add initial funds to the user's account
-      await setDoc(doc(db, user.uid, 'Total Funds'), {
-        totalFunds: 10000
-      });
-
-      // Initialize login streak
+      await setDoc(doc(db, user.uid, 'Total Funds'), { totalFunds: 10000 });
       const currentDate = new Date().toISOString().split('T')[0];
-      await setDoc(doc(db, user.uid, 'Login Streak'), {
-        lastLogin: currentDate,
-        streak: 1
-      });
-
-      // Update the login code with the last used information
-      const codeRef = doc(db, 'Login Codes', loginCode);
-      await setDoc(codeRef, {
-        lastUsedBy: user.uid,
-        active: true
-      }, { merge: true });
-
-      setModalConfig({
-        title: 'Welcome to LifeSmart!',
-        message: 'Your account has been successfully created with £10,000 initial funds.',
-        type: 'success'
-      });
+      await setDoc(doc(db, user.uid, 'Login Streak'), { lastLogin: currentDate, streak: 1 });
+      await setDoc(doc(db, 'Login Codes', loginCode), { lastUsedBy: user.uid, active: true }, { merge: true });
+      setModalConfig({ title: 'Welcome to LifeSmart!', message: 'Your account has been successfully created with £10,000 initial funds.', type: 'success' });
       setModalOpen(true);
-      setTimeout(() => {
-        navigate('/select');
-      }, 2000);
+      setTimeout(() => navigate('/select'), 2000);
     } catch (error) {
-      console.error("Authentication error:", error.message);
-      setModalConfig({
-        title: 'Authentication Error',
-        message: error.message,
-        type: 'error'
-      });
+      setModalConfig({ title: 'Authentication Error', message: error.message, type: 'error' });
       setModalOpen(true);
     }
   };
 
   const handleSocialSignIn = async (provider) => {
     try {
-      // Validate login code first
-      if (!loginCode) {
-        throw new Error('Please enter a valid login code');
-      }
+      if (!loginCode) throw new Error('Please enter a valid login code');
       await validateLoginCode(loginCode);
-
-      let user;
-      if (provider === 'google') {
-        user = await signInWithGoogle();
-      } else if (provider === 'apple') {
-        user = await signInWithApple();
-      }
-      
-      // Initialize login streak for new social sign-ins
+      const user = provider === 'google' ? await signInWithGoogle() : await signInWithApple();
       const currentDate = new Date().toISOString().split('T')[0];
-      await setDoc(doc(db, user.uid, 'Login Streak'), {
-        lastLogin: currentDate,
-        streak: 1
-      });
-
-      // Update the login code with the last used information
-      const codeRef = doc(db, 'Login Codes', loginCode);
-      await setDoc(codeRef, {
-        lastUsedBy: user.uid,
-        active: true
-      }, { merge: true });
-      
-      console.log(`${provider} signed in user:`, user);
-      setModalConfig({
-        title: 'Welcome!',
-        message: `You have successfully signed in with ${provider}.`,
-        type: 'success'
-      });
+      await setDoc(doc(db, user.uid, 'Login Streak'), { lastLogin: currentDate, streak: 1 });
+      await setDoc(doc(db, 'Login Codes', loginCode), { lastUsedBy: user.uid, active: true }, { merge: true });
+      setModalConfig({ title: 'Welcome!', message: `You have successfully signed in with ${provider}.`, type: 'success' });
       setModalOpen(true);
-      setTimeout(() => {
-        navigate('/select');
-      }, 2000);
+      setTimeout(() => navigate('/select'), 2000);
     } catch (error) {
-      console.error(`${provider} sign-in error:`, error.message);
-      setModalConfig({
-        title: 'Authentication Error',
-        message: error.message,
-        type: 'error'
-      });
+      setModalConfig({ title: 'Authentication Error', message: error.message, type: 'error' });
       setModalOpen(true);
     }
   };
 
   return (
     <>
-      <div className="homescreen-form-container">
-        <form onSubmit={handleSubmit} className="homescreen-modern-form">
-          <h2 className="homescreen-form-title">Join Us</h2>
-          
-          <div className="homescreen-input-group">
-            <label htmlFor="loginCode">Login Code</label>
-            <input
+      <div className="w-full max-w-[420px]">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl [data-theme=light]:bg-white/95 [data-theme=light]:border-gray-200 [data-theme=light]:shadow-lg animate-in fade-in duration-500"
+        >
+          <h2 className="text-white text-2xl font-semibold mb-6 text-center [data-theme=light]:text-[#181a1b]">Join Us</h2>
+
+          <div className="mb-6">
+            <label htmlFor="loginCode" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+              Login Code
+            </label>
+            <Input
               id="loginCode"
               type="text"
               value={loginCode}
               onChange={(e) => setLoginCode(e.target.value)}
               placeholder="Enter your login code"
               required
-              className="homescreen-modern-input"
+              className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
             />
           </div>
 
-          <div className="homescreen-social-buttons">
-            <button 
+          <div className="flex flex-col gap-4 mb-6">
+            <button
               type="button"
-              onClick={() => handleSocialSignIn('google')} 
-              className="homescreen-social-button homescreen-google-button"
+              onClick={() => handleSocialSignIn('google')}
+              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white font-medium cursor-pointer transition-all hover:bg-white/10 hover:-translate-y-0.5 w-full [data-theme=light]:bg-white [data-theme=light]:text-gray-800 [data-theme=light]:border-gray-200 [data-theme=light]:hover:bg-gray-50"
             >
-              <FaGoogle className="homescreen-social-icon" />
+              <FaGoogle className="w-5 h-5" />
               <span>Continue with Google</span>
             </button>
-            
-            <button 
+            <button
               type="button"
-              onClick={() => handleSocialSignIn('apple')} 
-              className="homescreen-social-button homescreen-apple-button"
+              onClick={() => handleSocialSignIn('apple')}
+              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-white/10 bg-black text-white font-medium cursor-pointer transition-all hover:bg-gray-900 hover:-translate-y-0.5 w-full"
             >
-              <FaApple className="homescreen-social-icon" />
+              <FaApple className="w-5 h-5" />
               <span>Continue with Apple</span>
             </button>
           </div>
 
-          <div className="homescreen-divider">
-            <span>or</span>
+          <div className="flex items-center my-6 text-white/50 [data-theme=light]:text-gray-400">
+            <div className="flex-1 border-b border-white/10 [data-theme=light]:border-gray-200" />
+            <span className="px-4 text-sm">or</span>
+            <div className="flex-1 border-b border-white/10 [data-theme=light]:border-gray-200" />
           </div>
 
-          <div className="homescreen-input-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="homescreen-modern-input"
-            />
+          <div className="space-y-4 mb-6">
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+                Confirm Password
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                required
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
+              />
+            </div>
           </div>
-          <div className="homescreen-input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              className="homescreen-modern-input"
-            />
-          </div>
-          <div className="homescreen-input-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
-              required
-              className="homescreen-modern-input"
-            />
-          </div>
-          <div className="homescreen-form-actions">
-            <button type="submit" className="homescreen-modern-button homescreen-submit-button">
+
+          <div className="flex flex-col gap-4 mt-8">
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 [data-theme=light]:from-indigo-300 [data-theme=light]:to-indigo-200 [data-theme=light]:hover:from-indigo-400 [data-theme=light]:hover:to-indigo-300"
+            >
               Create Account
-            </button>
-            <button type="button" onClick={onClose} className="homescreen-modern-button homescreen-cancel-button">
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="w-full border-white/20 [data-theme=light]:border-gray-200 [data-theme=light]:text-[#181a1b]">
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>
 
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-      />
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalConfig.title} message={modalConfig.message} type={modalConfig.type} />
     </>
   );
 };

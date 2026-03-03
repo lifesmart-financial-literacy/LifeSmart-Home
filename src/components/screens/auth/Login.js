@@ -5,81 +5,39 @@ import { FaGoogle, FaApple } from 'react-icons/fa';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/initFirebase';
 import Modal from '../../widgets/modals/Modal';
-import '../../styles/HomeScreen.css';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Login = ({ onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [modalConfig, setModalConfig] = useState({
-    title: '',
-    message: '',
-    type: 'success'
-  });
+  const [modalConfig, setModalConfig] = useState({ title: '', message: '', type: 'success' });
   const [modalOpen, setModalOpen] = useState(false);
-  
+
   const navigate = useNavigate();
   const { signIn, signInWithGoogle, signInWithApple } = useAuth();
 
   const updateLoginStreak = async (userId) => {
     try {
-      const streakRef = doc(db, userId, "Login Streak");
+      const streakRef = doc(db, userId, 'Login Streak');
       const streakDoc = await getDoc(streakRef);
-      
-      // Get current date in user's local timezone
       const now = new Date();
       const currentDate = now.toISOString();
-      
-      console.log("Updating login streak with current date:", currentDate);
-      
+
       if (streakDoc.exists()) {
         const { lastLogin, streak } = streakDoc.data();
-        console.log("Previous login data:", { lastLogin, streak });
-        
-        // Convert lastLogin to Date object
         const lastLoginDate = new Date(lastLogin);
-        
-        // Set both dates to midnight for comparison
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const lastDay = new Date(lastLoginDate.getFullYear(), lastLoginDate.getMonth(), lastLoginDate.getDate());
-        
-        const timeDiff = today.getTime() - lastDay.getTime();
-        const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-        
-        console.log("Days difference:", daysDiff);
-        
-        let newStreak;
-        
-        // Only increment streak if last login was yesterday
-        if (daysDiff === 1) {
-          newStreak = streak + 1;
-          console.log("Incrementing streak to:", newStreak);
-        } else if (daysDiff === 0) {
-          // Same day login, maintain streak
-          newStreak = streak;
-          console.log("Same day login, maintaining streak at:", newStreak);
-        } else {
-          // More than 1 day gap, reset streak
-          newStreak = 1;
-          console.log("Resetting streak to 1 due to gap of", daysDiff, "days");
-        }
-        
-        // Always update lastLogin to current timestamp
-        await setDoc(streakRef, {
-          lastLogin: currentDate,
-          streak: newStreak
-        });
-        
-        console.log("Updated login streak:", { lastLogin: currentDate, streak: newStreak });
+        const daysDiff = Math.floor((today.getTime() - lastDay.getTime()) / (1000 * 3600 * 24));
+
+        const newStreak = daysDiff === 1 ? streak + 1 : daysDiff === 0 ? streak : 1;
+        await setDoc(streakRef, { lastLogin: currentDate, streak: newStreak });
       } else {
-        // First time login, start streak at 1
-        console.log("First time login, creating streak document");
-        await setDoc(streakRef, {
-          lastLogin: currentDate,
-          streak: 1
-        });
+        await setDoc(streakRef, { lastLogin: currentDate, streak: 1 });
       }
     } catch (error) {
-      console.error("Error updating login streak:", error);
+      console.error('Error updating login streak:', error);
     }
   };
 
@@ -87,138 +45,113 @@ const Login = ({ onClose }) => {
     e.preventDefault();
     try {
       const user = await signIn(email, password);
-      console.log("Signed in user:", user);
-      
-      // Update login streak
       await updateLoginStreak(user.uid);
-      
-      setModalConfig({
-        title: 'Welcome Back!',
-        message: 'You have successfully signed in.',
-        type: 'success'
-      });
+      setModalConfig({ title: 'Welcome Back!', message: 'You have successfully signed in.', type: 'success' });
       setModalOpen(true);
-      
-      // Wait for modal to be visible before navigating
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       navigate('/select', { replace: true });
     } catch (error) {
-      console.error("Authentication error:", error.message);
-      setModalConfig({
-        title: 'Authentication Error',
-        message: error.message,
-        type: 'error'
-      });
+      setModalConfig({ title: 'Authentication Error', message: error.message, type: 'error' });
       setModalOpen(true);
     }
   };
 
   const handleSocialSignIn = async (provider) => {
     try {
-      let user;
-      if (provider === 'google') {
-        user = await signInWithGoogle();
-      } else if (provider === 'apple') {
-        user = await signInWithApple();
-      }
-      
-      // Update login streak for social sign-in
+      const user = provider === 'google' ? await signInWithGoogle() : await signInWithApple();
       await updateLoginStreak(user.uid);
-      
-      console.log(`${provider} signed in user:`, user);
-      setModalConfig({
-        title: 'Welcome!',
-        message: `You have successfully signed in with ${provider}.`,
-        type: 'success'
-      });
+      setModalConfig({ title: 'Welcome!', message: `You have successfully signed in with ${provider}.`, type: 'success' });
       setModalOpen(true);
-      
-      // Wait for modal to be visible before navigating
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       navigate('/select', { replace: true });
     } catch (error) {
-      console.error(`${provider} sign-in error:`, error.message);
-      setModalConfig({
-        title: 'Authentication Error',
-        message: error.message,
-        type: 'error'
-      });
+      setModalConfig({ title: 'Authentication Error', message: error.message, type: 'error' });
       setModalOpen(true);
     }
   };
 
   return (
     <>
-      <div className="homescreen-form-container">
-        <form onSubmit={handleSubmit} className="homescreen-modern-form">
-          <h2 className="homescreen-form-title">Welcome Back</h2>
-          
-          <div className="homescreen-social-buttons">
-            <button 
+      <div className="w-full max-w-[420px]">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl [data-theme=light]:bg-white/95 [data-theme=light]:border-gray-200 [data-theme=light]:shadow-lg animate-in fade-in duration-500"
+        >
+          <h2 className="text-white text-2xl font-semibold mb-6 text-center [data-theme=light]:text-[#181a1b]">
+            Welcome Back
+          </h2>
+
+          <div className="flex flex-col gap-4 mb-6">
+            <button
               type="button"
-              onClick={() => handleSocialSignIn('google')} 
-              className="homescreen-social-button homescreen-google-button"
+              onClick={() => handleSocialSignIn('google')}
+              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white font-medium cursor-pointer transition-all hover:bg-white/10 hover:-translate-y-0.5 w-full [data-theme=light]:bg-white [data-theme=light]:text-gray-800 [data-theme=light]:border-gray-200 [data-theme=light]:hover:bg-gray-50"
             >
-              <FaGoogle className="homescreen-social-icon" />
+              <FaGoogle className="w-5 h-5" />
               <span>Continue with Google</span>
             </button>
-            
-            <button 
+            <button
               type="button"
-              onClick={() => handleSocialSignIn('apple')} 
-              className="homescreen-social-button homescreen-apple-button"
+              onClick={() => handleSocialSignIn('apple')}
+              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-white/10 bg-black text-white font-medium cursor-pointer transition-all hover:bg-gray-900 hover:-translate-y-0.5 w-full"
             >
-              <FaApple className="homescreen-social-icon" />
+              <FaApple className="w-5 h-5" />
               <span>Continue with Apple</span>
             </button>
           </div>
 
-          <div className="homescreen-divider">
-            <span>or</span>
+          <div className="flex items-center my-6 text-white/50 [data-theme=light]:text-gray-400">
+            <div className="flex-1 border-b border-white/10 [data-theme=light]:border-gray-200" />
+            <span className="px-4 text-sm">or</span>
+            <div className="flex-1 border-b border-white/10 [data-theme=light]:border-gray-200" />
           </div>
 
-          <div className="homescreen-input-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="homescreen-modern-input"
-            />
+          <div className="space-y-4 mb-6">
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
+              />
+            </div>
           </div>
-          <div className="homescreen-input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              className="homescreen-modern-input"
-            />
-          </div>
-          <div className="homescreen-form-actions">
-            <button type="submit" className="homescreen-modern-button homescreen-submit-button">
+
+          <div className="flex flex-col gap-4 mt-8">
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 [data-theme=light]:from-indigo-300 [data-theme=light]:to-indigo-200 [data-theme=light]:hover:from-indigo-400 [data-theme=light]:hover:to-indigo-300"
+            >
               Sign In
-            </button>
-            <button type="button" onClick={onClose} className="homescreen-modern-button homescreen-cancel-button">
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="w-full border-white/20 [data-theme=light]:border-gray-200 [data-theme=light]:text-[#181a1b]">
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>
-      
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-      />
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalConfig.title} message={modalConfig.message} type={modalConfig.type} />
     </>
   );
 };

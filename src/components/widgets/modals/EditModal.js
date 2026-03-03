@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/initFirebase';
-import './styles/EditModal.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const EditModal = ({ isOpen, onClose, userId, onSave }) => {
   const [loading, setLoading] = useState(true);
@@ -16,39 +23,32 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
     admin: false,
     developer: false,
     user: true,
-    totalFunds: 0
+    totalFunds: 0,
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!userId) return;
-      
       try {
         setLoading(true);
-        // Fetch main user document
         const userRef = doc(db, 'Users', userId);
-        const userSnap = await getDoc(userRef);
-        
-        // Fetch profile document
         const profileRef = doc(db, userId, 'Profile');
-        const profileSnap = await getDoc(profileRef);
+        const [userSnap, profileSnap] = await Promise.all([getDoc(userRef), getDoc(profileRef)]);
 
         if (userSnap.exists() && profileSnap.exists()) {
-          const userData = userSnap.data();
-          const profileData = profileSnap.data();
-          
+          const ud = userSnap.data();
           setUserData({
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
-            email: userData.email || '',
-            school: userData.school || '',
-            class: userData.class || '',
-            groupCode: userData.groupCode || '',
-            isActive: userData.isActive !== false,
-            admin: userData.admin || false,
-            developer: userData.developer || false,
-            user: userData.user !== false,
-            totalFunds: userData.totalFunds || 0
+            firstName: ud.firstName || '',
+            lastName: ud.lastName || '',
+            email: ud.email || '',
+            school: ud.school || '',
+            class: ud.class || '',
+            groupCode: ud.groupCode || '',
+            isActive: ud.isActive !== false,
+            admin: ud.admin || false,
+            developer: ud.developer || false,
+            user: ud.user !== false,
+            totalFunds: ud.totalFunds || 0,
           });
         }
       } catch (error) {
@@ -57,32 +57,20 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
         setLoading(false);
       }
     };
-
-    if (isOpen && userId) {
-      fetchUserData();
-    }
+    if (isOpen && userId) fetchUserData();
   }, [isOpen, userId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setUserData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setUserData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Update main user document
-      const userRef = doc(db, 'Users', userId);
-      await updateDoc(userRef, userData);
-      
-      // Update profile document
-      const profileRef = doc(db, userId, 'Profile');
-      await updateDoc(profileRef, userData);
-
-      onSave && onSave(userData);
+      await updateDoc(doc(db, 'Users', userId), userData);
+      await updateDoc(doc(db, userId, 'Profile'), userData);
+      onSave?.(userData);
       onClose();
     } catch (error) {
       console.error('Error updating user:', error);
@@ -90,156 +78,80 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="edit-modal-overlay">
-      <div className="edit-modal">
-        <button className="edit-modal-close" onClick={onClose}>×</button>
-        
-        <div className="edit-modal-content">
-          <h2 className="edit-modal-title">Edit User Details</h2>
-          
-          {loading ? (
-            <div className="edit-modal-loading">Loading...</div>
-          ) : (
-            <form onSubmit={handleSubmit} className="edit-modal-form">
-              <div className="edit-modal-section">
-                <h3>Personal Information</h3>
-                <div className="edit-modal-field">
-                  <label htmlFor="firstName">First Name</label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={userData.firstName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="edit-modal-field">
-                  <label htmlFor="lastName">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={userData.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="edit-modal-field">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={userData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="edit-modal-field">
-                  <label htmlFor="totalFunds">Total Funds (£)</label>
-                  <input
-                    type="number"
-                    id="totalFunds"
-                    name="totalFunds"
-                    value={userData.totalFunds}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[600px] max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-700">
+        <DialogHeader>
+          <DialogTitle className="text-white text-center text-2xl">Edit User Details</DialogTitle>
+        </DialogHeader>
 
-              <div className="edit-modal-section">
-                <h3>School Information</h3>
-                <div className="edit-modal-field">
-                  <label htmlFor="school">School</label>
-                  <input
-                    type="text"
-                    id="school"
-                    name="school"
-                    value={userData.school}
-                    onChange={handleChange}
-                  />
+        {loading ? (
+          <div className="py-8 text-center text-zinc-300">Loading...</div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+            <div className="space-y-4 border-b border-white/10 pb-6">
+              <h3 className="text-lg font-medium text-blue-400">Personal Information</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label htmlFor="firstName" className="block text-sm font-medium text-zinc-300">First Name</label>
+                  <Input id="firstName" name="firstName" value={userData.firstName} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
                 </div>
-                <div className="edit-modal-field">
-                  <label htmlFor="class">Class</label>
-                  <input
-                    type="text"
-                    id="class"
-                    name="class"
-                    value={userData.class}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="edit-modal-field">
-                  <label htmlFor="groupCode">Group Code</label>
-                  <input
-                    type="text"
-                    id="groupCode"
-                    name="groupCode"
-                    value={userData.groupCode}
-                    onChange={handleChange}
-                  />
+                <div className="space-y-2">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-zinc-300">Last Name</label>
+                  <Input id="lastName" name="lastName" value={userData.lastName} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
                 </div>
               </div>
+              <div className="space-y-2">
+                <label htmlFor="email" className="block text-sm font-medium text-zinc-300">Email</label>
+                <Input id="email" type="email" name="email" value={userData.email} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="totalFunds" className="block text-sm font-medium text-zinc-300">Total Funds (£)</label>
+                <Input id="totalFunds" type="number" name="totalFunds" value={userData.totalFunds} onChange={handleChange} min="0" step="0.01" className="bg-white/5 border-white/20 text-white font-mono" />
+              </div>
+            </div>
 
-              <div className="edit-modal-section">
-                <h3>Account Status</h3>
-                <div className="edit-modal-checkboxes">
-                  <label className="edit-modal-checkbox">
-                    <input
-                      type="checkbox"
-                      name="isActive"
-                      checked={userData.isActive}
-                      onChange={handleChange}
-                    />
-                    Active Account
-                  </label>
-                  <label className="edit-modal-checkbox">
-                    <input
-                      type="checkbox"
-                      name="admin"
-                      checked={userData.admin}
-                      onChange={handleChange}
-                    />
-                    Admin
-                  </label>
-                  <label className="edit-modal-checkbox">
-                    <input
-                      type="checkbox"
-                      name="developer"
-                      checked={userData.developer}
-                      onChange={handleChange}
-                    />
-                    Developer
-                  </label>
-                  <label className="edit-modal-checkbox">
-                    <input
-                      type="checkbox"
-                      name="user"
-                      checked={userData.user}
-                      onChange={handleChange}
-                    />
-                    Regular User
-                  </label>
+            <div className="space-y-4 border-b border-white/10 pb-6">
+              <h3 className="text-lg font-medium text-blue-400">School Information</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label htmlFor="school" className="block text-sm font-medium text-zinc-300">School</label>
+                  <Input id="school" name="school" value={userData.school} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="class" className="block text-sm font-medium text-zinc-300">Class</label>
+                  <Input id="class" name="class" value={userData.class} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
                 </div>
               </div>
-
-              <div className="edit-modal-actions">
-                <button type="button" className="edit-modal-button cancel" onClick={onClose}>
-                  Cancel
-                </button>
-                <button type="submit" className="edit-modal-button save">
-                  Save Changes
-                </button>
+              <div className="space-y-2">
+                <label htmlFor="groupCode" className="block text-sm font-medium text-zinc-300">Group Code</label>
+                <Input id="groupCode" name="groupCode" value={userData.groupCode} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
               </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-blue-400">Account Status</h3>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {['isActive', 'admin', 'developer', 'user'].map((key, i) => (
+                  <label key={key} className="flex items-center gap-2 p-2 rounded-md hover:bg-white/5 cursor-pointer">
+                    <input type="checkbox" name={key} checked={userData[key]} onChange={handleChange} className="w-4 h-4 cursor-pointer" />
+                    <span className="text-zinc-300">{key === 'isActive' ? 'Active Account' : key === 'user' ? 'Regular User' : key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-blue-500 hover:bg-blue-600">Save Changes</Button>
+            </div>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default EditModal; 
+export default EditModal;

@@ -54,9 +54,31 @@ module.exports = {
           '50%': { transform: 'translate(0, 100px) rotate(180deg)' },
           '75%': { transform: 'translate(-50px, 50px) rotate(270deg)' },
         },
+        'homescreen-float': {
+          '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+          '33%': { transform: 'translate(2%, 2%) rotate(5deg)' },
+          '66%': { transform: 'translate(-2%, 1%) rotate(-5deg)' },
+          '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'slide-up': {
+          from: { opacity: '0', transform: 'translateY(20px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         float: 'float 20s infinite',
+        'homescreen-float': 'homescreen-float 15s ease-in-out infinite',
+        'fade-in': 'fade-in 1s ease-in forwards',
+        'slide-up': 'slide-up 0.5s ease-out forwards',
+      },
+      animationDelay: {
+        300: '300ms',
+        600: '600ms',
+        900: '900ms',
       },
     },
   },

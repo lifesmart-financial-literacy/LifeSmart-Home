@@ -17,6 +17,15 @@ The foundation for React + Tailwind + shadcn/ui is in place:
 | `Navigation.js` | ✅ Tailwind classes |
 | `Modal.js` | ✅ Uses shadcn Dialog |
 | `SelectScreen.js` | ✅ Full Tailwind conversion |
+| `HomeScreen.js` | ✅ Tailwind + shadcn Button |
+| `Login.js` | ✅ Tailwind + shadcn Input, Button |
+| `Register.js` | ✅ Tailwind + shadcn Input, Button |
+| `NotFound.js` | ✅ Tailwind + shadcn Button |
+| `EditModal.js` | ✅ shadcn Dialog, Input, Button |
+| `ConfirmModal.js` | ✅ shadcn Dialog, Button |
+| `ProfileScreen.js` | ✅ Tailwind + shadcn Input, Button |
+| `SettingsScreen.js` | ✅ Tailwind + shadcn Button |
+| **Admin screens** | ✅ AdminHome, AdminAnalytics, AdminUserManagement, AdminSystemSettings, AdminDatabaseManagement, AdminLoginCodes |
 
 ### Theme Support
 - `data-theme="light"` and `data-theme="dark"` still work

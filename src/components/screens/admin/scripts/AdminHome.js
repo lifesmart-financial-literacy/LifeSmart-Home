@@ -4,16 +4,17 @@ import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase/initFirebase';
-import { 
-  FaUsers, 
-  FaChartLine, 
-  FaCog, 
+import {
+  FaUsers,
+  FaChartLine,
+  FaCog,
   FaDatabase,
   FaUserShield,
   FaArrowLeft,
   FaKey
 } from 'react-icons/fa';
-import '../styles/AdminHome.css';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const AdminHome = () => {
   const navigate = useNavigate();
@@ -104,8 +105,8 @@ const AdminHome = () => {
 
   if (loading || authLoading) {
     return (
-      <div className="adminhome-loading">
-        <div className="adminhome-loading-spinner"></div>
+      <div className="min-h-screen flex justify-center items-center bg-zinc-900 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200">
+        <div className="w-12 h-12 border-2 border-white/10 border-t-amber-400 rounded-full animate-spin" />
       </div>
     );
   }
@@ -115,52 +116,68 @@ const AdminHome = () => {
   }
 
   return (
-    <div className="adminhome-container">
-      <header className="adminhome-header">
-        <button 
+    <div className="min-h-screen bg-zinc-900 text-white p-4 md:p-8 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200 [data-theme=light]:text-zinc-900">
+      <header className="max-w-[1400px] mx-auto mb-12 pb-8 border-b border-white/10 [data-theme=light]:border-zinc-200">
+        <Button
+          variant="ghost"
           onClick={handleBackClick}
-          className="adminhome-back-button"
+          className="mb-8 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-0 [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-zinc-300"
         >
           <FaArrowLeft size={20} />
           <span>Back to Dashboard</span>
-        </button>
-        <div className="adminhome-header-content">
-          <h1 className="adminhome-title">
-            <FaUserShield className="adminhome-title-icon" />
+        </Button>
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl mb-4 flex items-center justify-center gap-4">
+            <FaUserShield className="text-amber-400 [data-theme=light]:text-amber-600" />
             Admin Control Panel
           </h1>
-          <p className="adminhome-subtitle">Manage and monitor your platform</p>
+          <p className="text-zinc-300 text-lg [data-theme=light]:text-zinc-600">Manage and monitor your platform</p>
         </div>
       </header>
 
-      <main className="adminhome-main">
-        <div className="adminhome-features-grid">
+      <main className="max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
           {adminFeatures.map((feature, index) => (
             <button
               key={index}
               onClick={() => !feature.inDevelopment && handleFeatureClick(feature)}
-              className={`adminhome-feature-card ${feature.inDevelopment ? 'in-development' : ''}`}
+              className={cn(
+                "relative overflow-hidden text-left flex flex-col items-start gap-4 rounded-xl p-8 transition-all duration-300",
+                "bg-white/5 border border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:shadow-md",
+                feature.inDevelopment
+                  ? "cursor-not-allowed opacity-80 bg-white/[0.03] [data-theme=light]:bg-zinc-50"
+                  : "cursor-pointer hover:bg-white/10 hover:-translate-y-1 hover:shadow-xl [data-theme=light]:hover:bg-zinc-50 [data-theme=light]:hover:shadow-lg"
+              )}
             >
               {feature.inDevelopment && (
-                <div className="adminhome-development-banner">
+                <div className="absolute top-4 -right-8 bg-amber-400 text-black px-10 py-2 text-sm font-semibold rotate-45 shadow-md z-10">
                   In Development
                 </div>
               )}
-              <div className="adminhome-feature-icon">
+              <div className={cn(
+                "p-4 rounded-xl bg-amber-400/10 text-amber-400 [data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-600",
+                feature.inDevelopment && "opacity-70"
+              )}>
                 {feature.icon}
               </div>
-              <h2 className="adminhome-feature-title">{feature.title}</h2>
-              <p className="adminhome-feature-description">{feature.description}</p>
+              <h2 className={cn(
+                "text-xl font-semibold text-white [data-theme=light]:text-zinc-900",
+                feature.inDevelopment && "text-white/70 [data-theme=light]:text-zinc-600"
+              )}>{feature.title}</h2>
+              <p className={cn(
+                "text-zinc-300 text-base leading-relaxed m-0 [data-theme=light]:text-zinc-600",
+                feature.inDevelopment && "text-zinc-300/70 [data-theme=light]:text-zinc-500"
+              )}>{feature.description}</p>
             </button>
           ))}
         </div>
       </main>
 
-      <footer className="adminhome-footer">
+      <footer className="max-w-[1400px] mx-auto mt-12 pt-8 border-t border-white/10 text-center text-zinc-300 text-sm [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-600">
         <p>Admin Panel v1.0 • {new Date().getFullYear()} Life Smart</p>
       </footer>
     </div>
   );
 };
 
-export default AdminHome; 
+export default AdminHome;
