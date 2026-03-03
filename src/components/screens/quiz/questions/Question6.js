@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question6.css';
 import equitiesIcon from '../../../../assets/icons/equities.png';
 import bondsIcon from '../../../../assets/icons/bonds.png';
 import realEstateIcon from '../../../../assets/icons/real_estate.png';

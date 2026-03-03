@@ -9,7 +9,6 @@ import Question4 from './questions/Question4';
 import Question5 from './questions/Question5';
 import Question6 from './questions/Question6';
 import ResultsScreen from './ResultsScreen';
-import '../../styles/FinancialQuiz.css';
 
 const FinancialQuiz = () => {
   const navigate = useNavigate();
@@ -22,40 +21,27 @@ const FinancialQuiz = () => {
   const db = getFirestore();
   const auth = getAuth();
 
-  const questions = [
-    Question1,
-    Question2,
-    Question3,
-    Question4,
-    Question5,
-    Question6
-  ];
-
-  // Get the current question component (using PascalCase)
+  const questions = [Question1, Question2, Question3, Question4, Question5, Question6];
   const CurrentQuestionComponent = questions[currentQuestionIndex];
-
-  // Calculate sorted teams
   const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
 
   useEffect(() => {
-    // Get current user's UID
     const currentUser = auth.currentUser;
     if (currentUser) {
       setUid(currentUser.uid);
     } else {
-      console.error("No user is logged in.");
+      console.error('No user is logged in.');
       navigate('/');
     }
 
-    // Parse teams from URL query parameters
     const searchParams = new URLSearchParams(location.search);
     const teamsParam = searchParams.get('teams');
-    
+
     if (teamsParam) {
-      const teamsList = teamsParam.split(',').map(name => ({
+      const teamsList = teamsParam.split(',').map((name) => ({
         name,
         points: 0,
-        taskScores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }
+        taskScores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
       }));
       setTeams(teamsList);
     } else {
@@ -64,86 +50,75 @@ const FinancialQuiz = () => {
   }, [location.search, navigate, auth.currentUser]);
 
   const handleAnswer = (answer) => {
-    console.log("Team answered:", answer);
+    console.log('Team answered:', answer);
   };
 
   const updateScores = (scores) => {
-    setTeams(prevTeams => {
-      return prevTeams.map((team, index) => {
-        const currentTask = currentQuestionIndex + 1;
-        return {
-          ...team,
-          points: team.points + (scores[index] || 0),
-          taskScores: {
-            ...team.taskScores,
-            [currentTask]: scores[index] || 0
-          }
-        };
-      });
-    });
+    setTeams((prev) =>
+      prev.map((team, index) => ({
+        ...team,
+        points: team.points + (scores[index] || 0),
+        taskScores: {
+          ...team.taskScores,
+          [currentQuestionIndex + 1]: scores[index] || 0,
+        },
+      }))
+    );
   };
 
   const nextQuestion = () => {
     setShowResults(false);
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     } else {
       setQuizComplete(true);
       saveResultsAndShowResults();
     }
   };
 
-  const goHome = () => {
-    navigate('/');
-  };
-
   const saveResultsAndShowResults = async () => {
     if (!uid) {
-      alert("No user is logged in. Please sign in.");
+      alert('No user is logged in. Please sign in.');
       navigate('/');
       return;
     }
 
-    const teamsCollectionRef = collection(db, uid, "Quiz Simulations", "Teams");
+    const teamsCollectionRef = collection(db, uid, 'Quiz Simulations', 'Teams');
 
     try {
       const snapshot = await getDocs(teamsCollectionRef);
-      const deletePromises = snapshot.docs.map(docSnapshot =>
-        deleteDoc(docSnapshot.ref)
+      await Promise.all(snapshot.docs.map((d) => deleteDoc(d.ref)));
+
+      await Promise.all(
+        sortedTeams.map((team) =>
+          setDoc(doc(teamsCollectionRef, team.name), {
+            name: team.name,
+            points: team.points,
+            taskScores: team.taskScores,
+          })
+        )
       );
-      await Promise.all(deletePromises);
-
-      const savePromises = sortedTeams.map(team => {
-        const teamDocRef = doc(teamsCollectionRef, team.name);
-        return setDoc(teamDocRef, {
-          name: team.name,
-          points: team.points,
-          taskScores: team.taskScores
-        });
-      });
-
-      await Promise.all(savePromises);
 
       setShowResults(true);
     } catch (error) {
-      console.error("Error during saving results to Firebase:", error);
+      console.error('Error during saving results to Firebase:', error);
       setShowResults(true);
     }
   };
 
   if (teams.length === 0) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen text-xl text-[#003F91]">
+        Loading...
+      </div>
+    );
   }
 
   return (
-    <div className="financial-quiz">
-      <main className="main-content">
+    <div className="flex flex-col min-h-screen bg-[#f5f7fa]">
+      <main className="flex-1">
         {showResults ? (
-          <ResultsScreen
-            teams={sortedTeams}
-            quizComplete={quizComplete}
-            onNextQuestion={nextQuestion}
-          />
+          <ResultsScreen teams={sortedTeams} quizComplete={quizComplete} onNextQuestion={nextQuestion} />
         ) : (
           <CurrentQuestionComponent
             teams={teams}
@@ -153,12 +128,11 @@ const FinancialQuiz = () => {
           />
         )}
       </main>
-
-      <footer className="footer">
-        <p className="footer-text">© 2024 Our App. All rights reserved.</p>
+      <footer className="py-4 text-center text-sm text-zinc-400">
+        <p>© 2024 Our App. All rights reserved.</p>
       </footer>
     </div>
   );
 };
 
-export default FinancialQuiz; 
+export default FinancialQuiz;

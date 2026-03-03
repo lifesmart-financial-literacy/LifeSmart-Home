@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question3.css';
 import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
 import blueCash from '../../../../assets/icons/bluecash.png';
 

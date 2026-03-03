@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question2.css';
 import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
 
 const Question2 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
