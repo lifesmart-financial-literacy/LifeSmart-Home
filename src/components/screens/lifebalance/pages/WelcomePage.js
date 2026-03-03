@@ -1,58 +1,61 @@
 import React, { useState } from 'react';
-import '../styles/WelcomePage.css';
+import { Button } from '@/components/ui/button';
 
 const WelcomePage = ({ onNext }) => {
   const [showJourneyScreen, setShowJourneyScreen] = useState(false);
 
   if (showJourneyScreen) {
     return (
-      <div className="welcome-page journey-screen">
-        <h1 className="journey-title">Are you ready?</h1>
-        <p className="journey-description">
+      <div className="flex flex-col justify-center items-center gap-8 h-[60vh] text-center p-8">
+        <h1 className="text-3xl font-bold text-[#97A1FF] m-0">Are you ready?</h1>
+        <p className="text-white max-w-[400px] text-2xl leading-8 m-0">
           This takes less than 3 minutes. No right answers.
           <br />
           Just honest reflection.
         </p>
-        <button 
-          className="btn btn-primary-active"
+        <Button
           onClick={onNext}
+          className="bg-gradient-to-b from-[#B79BFF] to-[#4E3BD3] hover:from-[#c4afff] hover:to-[#5e4bdd] text-white font-semibold px-12 py-4 rounded-xl border border-[#8872C6] shadow-md hover:-translate-y-0.5 hover:shadow-lg"
         >
           Start my journey
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="welcome-page">
-      <h1 className="welcome-title">Welcome to Life Balance</h1>
-      
-      <div className="welcome-content">
-        <p className="welcome-description">
-          In just a few minutes, you'll map the key areas of your life — and discover how your <span className="highlight-text">time and money</span> influence each one.
+    <div className="text-center text-white p-8">
+      <h1 className="text-3xl font-bold text-[#97A1FF] mb-6">Welcome to Life Balance</h1>
+
+      <div className="flex flex-col gap-10 items-center">
+        <p className="text-xl leading-8 text-[#BDBDBD] max-w-[650px] mx-auto">
+          In just a few minutes, you'll map the key areas of your life — and discover how your{' '}
+          <span className="text-[#97A1FF]">time and money</span> influence each one.
         </p>
 
-        <div className="welcome-section-container">
-          <div className="welcome-section matters">
-            <h2>Why it matters</h2>
-            <p>Clearer picture = smarter financial decisions</p>
+        <div className="flex flex-col gap-6 w-full max-w-[600px]">
+          <div className="p-6 rounded-2xl text-left border border-white/10 bg-gradient-to-b from-orange-500/30 to-amber-900/30 border-orange-600/50">
+            <h2 className="text-2xl font-bold text-[#FF9264] mb-3 text-center uppercase tracking-wide">Why it matters</h2>
+            <p className="text-[#E0E0E0] text-xl leading-8 text-center m-0">Clearer picture = smarter financial decisions</p>
           </div>
-
-          <div className="welcome-section get">
-            <h2>What you'll get</h2>
-            <p>A personalized LifeBalance Snapshot to guide your financial-literacy journey and build a life that reflects your values.</p>
+          <div className="p-6 rounded-2xl text-left border border-white/10 bg-gradient-to-b from-emerald-400/30 to-emerald-900/30 border-teal-500/50">
+            <h2 className="text-2xl font-bold text-[#64FFD0] mb-3 text-center uppercase tracking-wide">What you'll get</h2>
+            <p className="text-[#E0E0E0] text-xl leading-8 text-center m-0">
+              A personalized LifeBalance Snapshot to guide your financial-literacy journey and build a life that reflects your values.
+            </p>
           </div>
         </div>
 
-        <button 
-          className="btn btn-primary-inactive"
+        <Button
           onClick={() => setShowJourneyScreen(true)}
+          variant="outline"
+          className="mt-4 bg-gradient-to-b from-[#1C1E32] to-[#555B98] border-white/15 text-white font-semibold px-11 py-4 rounded-xl hover:from-[#2b2e4a] hover:to-[#676cba] hover:-translate-y-0.5"
         >
           Lets Begin
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
 
-export default WelcomePage; 
+export default WelcomePage;
