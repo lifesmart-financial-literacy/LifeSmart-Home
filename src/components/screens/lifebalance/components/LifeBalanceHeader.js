@@ -1,15 +1,14 @@
 import React from 'react';
-import '../styles/LifeBalanceHeader.css';
 
 const LifeBalanceHeader = ({ currentStep, totalSteps }) => {
   return (
-    <div className="life-balance-header">
-      <div className="logo-container">
-        <div className="logo-icon">💡</div>
-        <span className="logo-text">LifeSmart</span>
+    <div className="flex justify-start items-center py-2 px-6 w-full max-w-[1200px] mx-auto mb-4 bg-[#19153a] rounded-[25px] border border-white/10 relative">
+      <div className="flex items-center gap-2">
+        <span className="text-3xl">💡</span>
+        <span className="text-xl font-semibold text-white">LifeSmart</span>
       </div>
       {currentStep && totalSteps && (
-        <div className="question-progress">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2c265e] text-[#d1c8ff] py-2 px-4 rounded-[15px] text-sm font-semibold">
           Q {currentStep}/{totalSteps}
         </div>
       )}
@@ -17,4 +16,4 @@ const LifeBalanceHeader = ({ currentStep, totalSteps }) => {
   );
 };
 
-export default LifeBalanceHeader; 
+export default LifeBalanceHeader;

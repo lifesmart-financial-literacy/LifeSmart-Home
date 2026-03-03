@@ -1,6 +1,6 @@
 import React from 'react';
-import '../styles/BudgetSpreadsheet.css';
 import ExcelJS from 'exceljs';
+import { Button } from '@/components/ui/button';
 
 // Define categories at component level
 const needsCategories = [
@@ -327,23 +327,23 @@ const BudgetSpreadsheet = ({ formData }) => {
   const months = getNextMonths();
 
   return (
-    <div className="budgetspreadsheet-container">
-      <div className="budgetspreadsheet-content">
-        <header className="budgetspreadsheet-header">
-          <h1>6-Month Budget Projection</h1>
-          <p>Track your finances across the next 6 months</p>
-          <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <button 
-              className="budgettool-button budgettool-button-primary"
+    <div className="min-h-screen p-8 md:p-4 bg-[#393939] rounded-xl">
+      <div className="max-w-[1200px] mx-auto bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.12)] py-10 px-8">
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl md:text-[2rem] text-slate-800 mb-2">6-Month Budget Projection</h1>
+          <p className="text-slate-500 text-base">Track your finances across the next 6 months</p>
+          <div className="mt-4 flex justify-center items-center">
+            <Button
               onClick={handleDownload}
+              className="bg-gradient-to-br from-[#4CAF50] to-[#2196F3] text-white hover:opacity-90"
             >
               Download Excel Spreadsheet
-            </button>
+            </Button>
           </div>
         </header>
 
-        <div className="budgetspreadsheet-table-wrapper">
-          <table className="budgetspreadsheet-table">
+        <div className="overflow-x-auto mb-8 border border-slate-200 rounded-md w-full">
+          <table className="w-full min-w-[1200px] border-collapse text-[0.95rem]">
             <colgroup>
               <col style={{ width: '250px' }} /> {/* Category column */}
               {months.map((_, index) => (
@@ -355,9 +355,9 @@ const BudgetSpreadsheet = ({ formData }) => {
             </colgroup>
             <thead>
               <tr>
-                <th className="fixed-column">Category</th>
+                <th className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200">Category</th>
                 {months.map((month, index) => (
-                  <th key={index}>
+                  <th key={index} className="sticky top-0 bg-slate-100 font-semibold text-slate-800 py-3 px-4 text-right border border-slate-200 z-10">
                     {month}
                   </th>
                 ))}
@@ -365,158 +365,158 @@ const BudgetSpreadsheet = ({ formData }) => {
             </thead>
             <tbody>
               {/* INCOME SECTION */}
-              <tr className="section-header">
-                <td colSpan={7}>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">
                   TOTAL INCOME: {formatCurrency(Number(formData.monthlyIncome || 0) + Number(formData.additionalIncome || 0))}
                 </td>
               </tr>
-              <tr>
-                <td className="fixed-column">Salary</td>
+              <tr className="hover:bg-slate-50">
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200">Salary</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(Number(formData.monthlyIncome || 0))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(Number(formData.monthlyIncome || 0))}</td>
                 ))}
               </tr>
-              <tr>
-                <td className="fixed-column">Other</td>
+              <tr className="hover:bg-slate-50">
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200">Other</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(Number(formData.additionalIncome || 0))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(Number(formData.additionalIncome || 0))}</td>
                 ))}
               </tr>
 
               {/* NEEDS SECTION */}
-              <tr className="section-header">
-                <td colSpan={7}>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">
                   TOTAL "NEEDS" SPENDING: {formatCurrency(needsCategories.reduce((total, { key }) => 
                     total + Number(getPredictedValue(0, 'needs', key) || 0), 0))}
                 </td>
               </tr>
               <tr>
-                <td className="fixed-column">Housing cost (rent / mortgage)</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Housing cost (rent / mortgage)</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'needs', 'housingPayment'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'needs', 'housingPayment'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Bills (utilities, bills, internet)</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Bills (utilities, bills, internet)</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'needs', 'utilities'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'needs', 'utilities'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Transport</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Transport</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'needs', 'transportation'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'needs', 'transportation'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Groceries (basic)</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Groceries (basic)</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'needs', 'groceries'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'needs', 'groceries'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Health costs</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Health costs</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'needs', 'healthInsurance'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'needs', 'healthInsurance'))}</td>
                 ))}
               </tr>
 
               {/* WANTS SECTION */}
-              <tr className="section-header">
-                <td colSpan={7}>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">
                   TOTAL "WANTS" SPENDING: {formatCurrency(wantsCategories.reduce((total, { key }) => 
                     total + Number(getPredictedValue(0, 'wants', key) || 0), 0))}
                 </td>
               </tr>
               <tr>
-                <td className="fixed-column">Subscriptions</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Subscriptions</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'subscriptions'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'wants', 'subscriptions'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Takeaway/eating out</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Takeaway/eating out</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'diningOut'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'wants', 'diningOut'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Gym and sport</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Gym and sport</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'gymMembership'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'wants', 'gymMembership'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Shopping</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Shopping</td>
                 {months.map((_, index) => (
                   <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'shopping'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Entertainment (events and activities)</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Entertainment (events and activities)</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'entertainment'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'wants', 'entertainment'))}</td>
                 ))}
               </tr>
               <tr>
-                <td className="fixed-column">Gifts, charity and other</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Gifts, charity and other</td>
                 {months.map((_, index) => (
-                  <td key={index}>{formatCurrency(getPredictedValue(index, 'wants', 'charity'))}</td>
+                  <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(getPredictedValue(index, 'wants', 'charity'))}</td>
                 ))}
               </tr>
 
               {/* FUNDS REMAINING */}
-              <tr className="section-header">
-                <td colSpan={7}>Funds remaining</td>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">Funds remaining</td>
               </tr>
               <tr>
-                <td className="fixed-column">Funds remaining</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Funds remaining</td>
                 {months.map((_, index) => {
                   const totals = calculateTotals(index);
                   return (
-                    <td key={index}>{formatCurrency(totals.fundsRemaining)}</td>
+                    <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(totals.fundsRemaining)}</td>
                   );
                 })}
               </tr>
 
               {/* DISTRIBUTION SECTION */}
-              <tr className="section-header">
-                <td colSpan={7}>Distribution</td>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">Distribution</td>
               </tr>
               <tr>
-                <td className="fixed-column">Needs %</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Needs %</td>
                 {months.map((_, index) => {
                   const totals = calculateTotals(index);
                   return (
-                    <td key={index}>{totals.distribution.needs.toFixed(1)}%</td>
+                    <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{totals.distribution.needs.toFixed(1)}%</td>
                   );
                 })}
               </tr>
               <tr>
-                <td className="fixed-column">Wants %</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Wants %</td>
                 {months.map((_, index) => {
                   const totals = calculateTotals(index);
                   return (
-                    <td key={index}>{totals.distribution.wants.toFixed(1)}%</td>
+                    <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{totals.distribution.wants.toFixed(1)}%</td>
                   );
                 })}
               </tr>
               <tr>
-                <td className="fixed-column">Remaining %</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Remaining %</td>
                 {months.map((_, index) => {
                   const totals = calculateTotals(index);
                   return (
-                    <td key={index}>{totals.distribution.remaining.toFixed(1)}%</td>
+                    <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{totals.distribution.remaining.toFixed(1)}%</td>
                   );
                 })}
               </tr>
 
               {/* FUND BALANCES */}
-              <tr className="section-header">
-                <td colSpan={7}>Fund Balances</td>
+              <tr className="bg-blue-100 font-bold text-slate-900">
+                <td colSpan={7} className="text-left pl-4 py-3 border border-slate-200">Fund Balances</td>
               </tr>
               <tr>
-                <td className="fixed-column">Total Savings balance</td>
+                <td className="sticky left-0 bg-slate-200 z-[5] text-left font-medium text-slate-800 py-3 px-4 border border-slate-200 hover:bg-slate-100">Total Savings balance</td>
                 {months.map((_, index) => {
                   // Start with initial savings
                   let cumulativeBalance = Number(formData.totalSavings || 0);
@@ -528,7 +528,7 @@ const BudgetSpreadsheet = ({ formData }) => {
                   }
                   
                   return (
-                    <td key={index}>{formatCurrency(cumulativeBalance)}</td>
+                    <td key={index} className="py-3 px-4 text-right border border-slate-200 text-slate-800">{formatCurrency(cumulativeBalance)}</td>
                   );
                 })}
               </tr>

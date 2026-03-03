@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question4.css';
 import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
 import moneyBars from '../../../../assets/icons/moneybars.png';
 import InvestmentCalculator from '../../../widgets/InvestmentCalculator';
@@ -44,6 +43,7 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term hovers
   const showHoverModal = (title, content, event) => {
     if (!event) return;
     setHoverModal({
@@ -55,10 +55,12 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     });
   };
 
+  // eslint-disable-next-line no-unused-vars -- pairs with showHoverModal
   const hideHoverModal = () => {
     setHoverModal(prev => ({ ...prev, show: false }));
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term clicks
   const openGlossary = (term) => {
     setShowGlossary(true);
     if (term === 'stocksFundPortfolio') {
@@ -94,20 +96,20 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
   };
 
   return (
-    <div className="question4-container">
+    <div className="p-5 mx-auto font-[Arial,sans-serif] bg-white rounded-[10px] shadow-[0_0_10px_rgba(0,0,0,0.1)] max-w-[1000px]">
       {/* Header and Progress Bar */}
-      <div className="question4-progress-bar-container">
-        <div className="question4-progress-bar">
-          <div className="question4-progress" style={{ width: `${progressBarWidth}%` }}></div>
+      <div className="flex justify-between items-center mb-5">
+        <div className="w-[80%] h-1.5 bg-gray-200 rounded-[5px] relative">
+          <div className="h-full bg-blue-500 rounded-[5px]" style={{ width: `${progressBarWidth}%` }}></div>
         </div>
 
-        <div className="question4-timer-container">
+        <div className="flex justify-center items-center">
           {!timerStarted ? (
-            <button onClick={startTimer} className="question4-start-timer-button">
+            <button onClick={startTimer} className="text-base py-0.5 px-1 bg-transparent text-black border-2 border-[#45a04933] rounded-[10px] cursor-pointer transition-colors hover:bg-[#45a04933]">
               ⏳ {minutes}:{seconds < 10 ? '0' + seconds : seconds} Start Timer
             </button>
           ) : (
-            <div className="question4-timer">
+            <div className="text-2xl font-bold text-black">
               ⏳ {minutes}:{seconds < 10 ? '0' + seconds : seconds}
             </div>
           )}
@@ -115,43 +117,43 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
       </div>
 
       {/* Task Description */}
-      <div className="question4-task-header">
-        <div className="question4-top-layer">
-          <div className="question4-points-section">
-            <h3>Challenge 4</h3>
-            <img src={lightningBolt} alt="Lightning Bolt" className="question4-lightning-bolt" />
-            <p className="question4-points">5 points</p>
+      <div className="flex flex-col items-start mt-5 text-black">
+        <div className="flex justify-between items-baseline w-full">
+          <div className="flex flex-row justify-center mt-2.5">
+            <h3 className="text-[2rem]">Challenge 4</h3>
+            <img src={lightningBolt} alt="Lightning Bolt" className="w-10 h-10" />
+            <p className="text-[1.3rem] text-blue-500 font-bold">5 points</p>
           </div>
-          <div className="question4-button-container">
-            <button className="question4-hint-button" onClick={() => setShowHintModal(true)}>Hint?</button>
+          <div className="flex gap-2.5">
+            <button className="bg-[#f0f4ff] border border-gray-200 text-[#003F91] font-bold text-[1.1rem] py-2 px-4 rounded-[20px] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#dbe9ff]" onClick={() => setShowHintModal(true)}>Hint?</button>
           </div>
         </div>
-        <div className="question4-task-header-question">
-          <p>Ben wants to save money for his future. He has £1,000 to invest.</p>
-          <img src={moneyBars} alt="Task 4 Image" className="question4-task-image" />
+        <div className="flex flex-row items-center">
+          <p className="text-[#555] text-[1.3rem] mt-1.5 font-bold">Ben wants to save money for his future. He has £1,000 to invest.</p>
+          <img src={moneyBars} alt="Task 4 scenario" className="w-[200px] mr-5" />
         </div>
       </div>
 
       {/* Glossary Sidebar */}
       {showGlossary && (
-        <div className="question4-glossary-sidebar">
-          <div className="question4-glossary-header">
-            <h2>{glossaryTitle}</h2>
-            <button className="question4-close-button" onClick={() => setShowGlossary(false)}>X</button>
+        <div className="quiz-glossary-sidebar transition-transform duration-300 ease-in-out">
+          <div className="flex justify-between items-baseline border-b border-gray-200 pb-2.5">
+            <h2 className="text-[1.5rem] text-[#003F91]">{glossaryTitle}</h2>
+            <button className="bg-transparent border-none text-[1.5rem] cursor-pointer text-[#003F91]" onClick={() => setShowGlossary(false)}>X</button>
           </div>
-          <div className="question4-glossary-content">
-            <p>{glossaryContent}</p>
+          <div>
+            <p className="text-base text-[#555] mt-1.5 leading-relaxed">{glossaryContent}</p>
           </div>
         </div>
       )}
 
       {/* Hint Modal */}
       {showHintModal && (
-        <div className="question4-hint-modal-overlay">
-          <div className="question4-hint-modal">
-            <h3>Hint</h3>
-            <p>Consider the risk and potential return of each investment option.</p>
-            <button onClick={() => setShowHintModal(false)} className="question4-close-modal-button">Close</button>
+        <div className="quiz-hint-overlay">
+          <div className="bg-white p-5 rounded-[10px] shadow-[0_0_10px_rgba(0,0,0,0.2)] w-[500px] text-center">
+            <h3 className="text-[1.5rem] mb-2.5 text-black">Hint</h3>
+            <p className="text-[1.2rem] mb-5 text-gray-600">Consider the risk and potential return of each investment option.</p>
+            <button onClick={() => setShowHintModal(false)} className="bg-blue-500 text-white border-none py-2.5 px-5 rounded-[5px] cursor-pointer hover:bg-blue-600">Close</button>
           </div>
         </div>
       )}
@@ -160,30 +162,30 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
       {!showResults ? (
         <div>
           {/* Question and Points Section */}
-          <div className="question4-question-section">
-            <p className="question4-question-text">What should he invest in?</p>
+          <div className="text-center mt-5">
+            <p className="text-[1.6rem] font-bold text-black">What should he invest in?</p>
           </div>
 
           {/* Multiple Choice Options */}
-          <div className="question4-choices-container">
-            <button className="question4-choice-button">A. High-risk stocks</button>
-            <button className="question4-choice-button">B. Government bonds</button>
-            <button className="question4-choice-button">C. Savings account</button>
-            <button className="question4-choice-button">D. Cryptocurrency</button>
-            <button className="question4-choice-button">E. Real estate</button>
+          <div className="flex justify-center gap-2.5 mt-5">
+            <button className="bg-[#B8CEF0] py-2.5 px-5 border-none rounded-[25px] text-black font-bold text-[1.3rem] hover:bg-[#bae6fd]">A. High-risk stocks</button>
+            <button className="bg-[#B8CEF0] py-2.5 px-5 border-none rounded-[25px] text-black font-bold text-[1.3rem] hover:bg-[#bae6fd]">B. Government bonds</button>
+            <button className="bg-[#B8CEF0] py-2.5 px-5 border-none rounded-[25px] text-black font-bold text-[1.3rem] hover:bg-[#bae6fd]">C. Savings account</button>
+            <button className="bg-[#B8CEF0] py-2.5 px-5 border-none rounded-[25px] text-black font-bold text-[1.3rem] hover:bg-[#bae6fd]">D. Cryptocurrency</button>
+            <button className="bg-[#B8CEF0] py-2.5 px-5 border-none rounded-[25px] text-black font-bold text-[1.3rem] hover:bg-[#bae6fd]">E. Real estate</button>
           </div>
 
           {/* Team Answer Section */}
-          <div className="question4-team-answer-section">
-            <h4>Your answers</h4>
-            <div className="question4-team-answer-container">
+          <div className="mt-8">
+            <h4 className="text-center">Your answers</h4>
+            <div className="flex justify-center gap-5 mt-2.5">
               {teams.map((team, index) => (
-                <div key={team.name} className="question4-team-answer-box">
-                  <p>{team.name}</p>
+                <div key={team.name} className="flex flex-col items-center">
+                  <p className="mb-1.5 font-bold text-black">{team.name}</p>
                   <select
                     value={teamAnswers[index]}
                     onChange={(e) => handleTeamAnswerChange(index, e.target.value)}
-                    className="question4-answer-select"
+                    className="p-2 rounded-[10px] border border-gray-300 bg-[#e0f2ff] text-[1.4rem] text-center"
                   >
                     <option value="" disabled>Select answer</option>
                     <option value="A">A</option>
@@ -198,61 +200,61 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
           </div>
 
           {/* Submit Button */}
-          <button className="question4-submit-button" onClick={submitAnswers}>Submit</button>
+          <button className="w-[20%] bg-[#003F91] text-white border-none py-2.5 rounded-[30px] text-[1.4rem] cursor-pointer mt-5 hover:bg-blue-600" onClick={submitAnswers}>Submit</button>
         </div>
       ) : (
-        <div className="question4-result-section">
+        <div className="text-center mt-5">
           <h4>Correct Answer:</h4>
-          <p className="question4-correct-answer">B. Government bonds</p>
-          <p onClick={toggleDetailedAnswer} className="question4-toggle-detailed-answer">
+          <p className="inline-block text-[1.8rem] font-bold text-black m-5 bg-[#B3E3D3] rounded-[50px] w-[25%] py-4 text-center">B. Government bonds</p>
+          <p onClick={toggleDetailedAnswer} className="text-black text-2xl font-bold cursor-pointer transition-all duration-200 ease-in-out hover:text-[2.5rem]">
             Click to {detailedAnswerShown ? 'hide detailed answer ⬆️' : 'see detailed answer ⬇️'}
           </p>
 
           {/* Expanded Answer with Investment Calculator */}
           {detailedAnswerShown && (
-            <div className="question4-expanded-answer">
-              <p>Government bonds are a good choice for Ben because:</p>
-              <ul>
-                <li>They are low-risk investments</li>
-                <li>They provide steady returns</li>
-                <li>They are backed by the government</li>
-                <li>They are suitable for long-term savings</li>
+            <div className="bg-white/5 rounded-[15px] p-6 my-5 text-black shadow-[0_4px_6px_rgba(0,0,0,0.1)] md:p-5">
+              <p className="text-[1.2rem] mb-4">Government bonds are a good choice for Ben because:</p>
+              <ul className="list-disc ml-5 mb-8">
+                <li className="text-[1.1rem] mb-2.5">They are low-risk investments</li>
+                <li className="text-[1.1rem] mb-2.5">They provide steady returns</li>
+                <li className="text-[1.1rem] mb-2.5">They are backed by the government</li>
+                <li className="text-[1.1rem] mb-2.5">They are suitable for long-term savings</li>
               </ul>
-              
+
               {/* Investment Calculator Widget */}
-              <div className="question4-calculator-widget">
-                <h3>Try our Investment Calculator</h3>
-                <p>See how different investment strategies could grow your money over time:</p>
+              <div className="mt-8 pt-8 border-t border-black/10">
+                <h3 className="text-[1.4rem] text-black mb-2.5 text-center md:text-[1.2rem]">Try our Investment Calculator</h3>
+                <p className="text-[1.1rem] text-[#555] text-center mb-6 md:text-base">See how different investment strategies could grow your money over time:</p>
                 <InvestmentCalculator />
               </div>
             </div>
           )}
 
           {/* Display each team's answer with comparison */}
-          <div className="question4-team-answer-comparison">
+          <div className="flex justify-center gap-5 mt-5">
             {teams.map((team, index) => (
-              <div key={team.name} className="question4-team-answer-box">
-                <p>{team.name}</p>
-                <div className={teamAnswers[index] === correctAnswer ? 'question4-correct' : 'question4-incorrect'}>
+              <div key={team.name} className="flex flex-col items-center">
+                <p className="mb-1.5 font-bold text-black">{team.name}</p>
+                <div className={`w-[50px] h-[50px] rounded-[10px] flex items-center justify-center text-[1.5rem] font-bold ${teamAnswers[index] === correctAnswer ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
                   {teamAnswers[index] || '-'}
                 </div>
               </div>
             ))}
           </div>
 
-          <button className="question4-next-button" onClick={nextQuestion}>Next</button>
+          <button className="w-[20%] bg-[#003F91] text-white border-none py-2.5 rounded-[30px] text-[1.4rem] cursor-pointer mt-5 hover:bg-blue-600" onClick={nextQuestion}>Next</button>
         </div>
       )}
 
       {/* Hover Modal */}
       {hoverModal.show && (
-        <div className="question4-hover-modal" style={{ top: hoverModal.y + 'px', left: hoverModal.x + 'px' }}>
-          <h3>{hoverModal.title}</h3>
-          <p>{hoverModal.content}</p>
+        <div className="quiz-hover-modal pointer-events-none" style={{ top: hoverModal.y + 'px', left: hoverModal.x + 'px' }}>
+          <h3 className="text-[1.5rem] text-gray-600 mb-2">{hoverModal.title}</h3>
+          <p className="text-[1.2rem] text-gray-500 m-0">{hoverModal.content}</p>
         </div>
       )}
     </div>
   );
 };
 
-export default Question4; 
+export default Question4;

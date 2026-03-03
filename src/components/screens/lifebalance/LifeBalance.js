@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/LifeBalance.css';
-import './styles/buttons.css';
 import WelcomePage from './pages/WelcomePage';
 import Page2 from './pages/Page2';
 import Page3 from './pages/Page3';
@@ -21,15 +19,14 @@ const LIFE_AREAS = [
 
 const LifeBalance = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [baseScores, setBaseScores] = useState([]); // Page 2
-  const [cashScores, setCashScores] = useState([]); // Page 3
-  const [timeScores, setTimeScores] = useState([]); // Page 4
-  const [page2Step, setPage2Step] = useState(1); // For progressive reveal
-  const [page3Step, setPage3Step] = useState(1); // For progressive reveal on Page 3
-  const [page4Step, setPage4Step] = useState(1); // For progressive reveal on Page 4
+  const [baseScores, setBaseScores] = useState([]);
+  const [cashScores, setCashScores] = useState([]);
+  const [timeScores, setTimeScores] = useState([]);
+  const [page2Step, setPage2Step] = useState(1);
+  const [page3Step, setPage3Step] = useState(1);
+  const [page4Step, setPage4Step] = useState(1);
   const navigate = useNavigate();
 
-  // Navigation handlers
   const handleWelcomeNext = () => setCurrentPage(2);
   const handlePage2Submit = (scores) => {
     setBaseScores(scores);
@@ -43,20 +40,11 @@ const LifeBalance = () => {
     setTimeScores(scores);
     setCurrentPage(5);
   };
-  const handlePage5Submit = () => {
-    // End of flow or redirect
-    navigate('/');
-  };
+  const handlePage5Submit = () => navigate('/');
 
-  // Calculate averages
-  const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : '-';
-  const averages = {
-    now: avg(baseScores),
-    money: avg(cashScores),
-    time: avg(timeScores),
-  };
+  const avg = (arr) => (arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : '-');
+  const averages = { now: avg(baseScores), money: avg(cashScores), time: avg(timeScores) };
 
-  // Calculate biggest jumps
   let biggestMoney = { area: '', value: 0 };
   let biggestTime = { area: '', value: 0 };
   if (baseScores.length && cashScores.length) {
@@ -80,34 +68,21 @@ const LifeBalance = () => {
     });
   }
 
-  // Add action text for biggest jumps (optional: could be dynamic)
   const moneyActions = {
     'Housing, Safety & Security': 'Build or top-up an emergency fund (3-6 months expenses) or pay down high-interest debt. This single move reduces financial anxiety quickly.',
-    // ...add more if you want custom actions
   };
   const timeActions = {
     'Family & Connections': 'Schedule a weekly device-free meal or call with loved ones. Consistency matters more than extravagant plans.',
-    // ...add more if you want custom actions
   };
   biggestMoney.action = moneyActions[biggestMoney.area] || '';
   biggestTime.action = timeActions[biggestTime.area] || '';
 
-  // Calculate currentStep for progress bar
   let currentStep = 1;
-  let totalSteps = 7;
-  if (currentPage === 2) {
-    currentStep = page2Step;
-    totalSteps = 7;
-  } else if (currentPage === 3) {
-    currentStep = page3Step;
-    totalSteps = 7;
-  } else if (currentPage === 4) {
-    currentStep = page4Step;
-    totalSteps = 7;
-  } else if (currentPage === 5) {
-    currentStep = 7;
-    totalSteps = 7;
-  }
+  const totalSteps = 7;
+  if (currentPage === 2) currentStep = page2Step;
+  else if (currentPage === 3) currentStep = page3Step;
+  else if (currentPage === 4) currentStep = page4Step;
+  else if (currentPage === 5) currentStep = 7;
 
   const renderPage = () => {
     switch (currentPage) {
@@ -127,13 +102,11 @@ const LifeBalance = () => {
   };
 
   return (
-    <div className="lifebalance-container">
+    <div className="min-h-screen flex flex-col justify-start items-center pt-8 bg-[radial-gradient(70.76%_70.76%_at_44.55%_9.17%,#21203D_0%,#13112F_31.23%,#110F29_41.06%,#0D0C20_59.28%,#000_100%)]">
       <LifeBalanceHeader currentStep={currentStep} totalSteps={totalSteps} />
-      <div className="lifebalance-content">
-        {renderPage()}
-      </div>
+      <div className="w-full p-4 md:p-8 md:m-4">{renderPage()}</div>
     </div>
   );
 };
 
-export default LifeBalance; 
+export default LifeBalance;

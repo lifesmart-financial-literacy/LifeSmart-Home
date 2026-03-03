@@ -1,24 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FaUserCircle, 
-  FaLock, 
-  FaEnvelope, 
-  FaPhone, 
-  FaBell,
-  FaArrowLeft,
-  FaSave,
-  FaEye,
-  FaEyeSlash,
-  FaSchool,
-  FaUserTag,
-  FaPoundSign,
-  FaFire
-} from 'react-icons/fa';
+import { FaUserCircle, FaLock, FaEnvelope, FaArrowLeft, FaSave, FaEye, FaEyeSlash, FaSchool, FaUserTag, FaPoundSign, FaFire } from 'react-icons/fa';
 import { firebaseAuth, db } from '../../../firebase/initFirebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import '../../styles/ProfileScreen.css';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const ProfileScreen = () => {
   const navigate = useNavigate();
@@ -29,104 +16,58 @@ const ProfileScreen = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    class: '',
-    school: '',
-    groupCode: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    totalFunds: 0,
-    loginStreak: 0
+    firstName: '', lastName: '', email: '', class: '', school: '', groupCode: '',
+    currentPassword: '', newPassword: '', confirmPassword: '',
+    totalFunds: 0, loginStreak: 0,
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const user = firebaseAuth.currentUser;
-        if (!user) {
-          navigate('/login');
-          return;
-        }
-
-        // Get user document from Firestore
-        const userDoc = await getDoc(doc(db, user.userUID || user.uid, "Profile"));
-        const fundsDoc = await getDoc(doc(db, user.userUID || user.uid, "Total Funds"));
-        const streakDoc = await getDoc(doc(db, user.userUID || user.uid, "Login Streak"));
-        
+        if (!user) { navigate('/'); return; }
+        const uid = user.userUID || user.uid;
+        const [userDoc, fundsDoc, streakDoc] = await Promise.all([
+          getDoc(doc(db, uid, 'Profile')),
+          getDoc(doc(db, uid, 'Total Funds')),
+          getDoc(doc(db, uid, 'Login Streak')),
+        ]);
         if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setFormData(prev => ({
-            ...prev,
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
-            email: userData.email || '',
-            class: userData.class || userData.Y12 || '',
-            school: userData.school || userData.WCGS || '',
-            groupCode: userData.groupCode || userData.DEVELOPER || '',
-          }));
+          const ud = userDoc.data();
+          setFormData((prev) => ({ ...prev, firstName: ud.firstName || '', lastName: ud.lastName || '', email: ud.email || '', class: ud.class || ud.Y12 || '', school: ud.school || ud.WCGS || '', groupCode: ud.groupCode || ud.DEVELOPER || '' }));
         }
-
-        if (fundsDoc.exists()) {
-          setFormData(prev => ({
-            ...prev,
-            totalFunds: fundsDoc.data().totalFunds || 0
-          }));
-        }
-
-        if (streakDoc.exists()) {
-          setFormData(prev => ({
-            ...prev,
-            loginStreak: streakDoc.data().streak || 0
-          }));
-        }
+        if (fundsDoc.exists()) setFormData((prev) => ({ ...prev, totalFunds: fundsDoc.data().totalFunds || 0 }));
+        if (streakDoc.exists()) setFormData((prev) => ({ ...prev, loginStreak: streakDoc.data().streak || 0 }));
       } catch (err) {
         setError('Error loading profile data');
-        console.error('Error fetching user data:', err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-
     try {
       const user = firebaseAuth.currentUser;
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-
-      // Update user profile in Firestore
-      await updateDoc(doc(db, user.userUID || user.uid, "Profile"), {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        class: formData.class,
-        school: formData.school,
-        groupCode: formData.groupCode,
-        email: formData.email,
+      if (!user) { navigate('/'); return; }
+      await updateDoc(doc(db, user.userUID || user.uid, 'Profile'), {
+        firstName: formData.firstName, lastName: formData.lastName, class: formData.class,
+        school: formData.school, groupCode: formData.groupCode, email: formData.email,
       });
-
       setSuccess('Profile updated successfully');
     } catch (err) {
       setError('Error updating profile');
-      console.error('Error updating profile:', err);
+      console.error(err);
     }
   };
 
@@ -134,276 +75,100 @@ const ProfileScreen = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-
     if (formData.newPassword !== formData.confirmPassword) {
       setError('New passwords do not match!');
       return;
     }
-
     try {
       const user = firebaseAuth.currentUser;
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-
-      // Reauthenticate user before password change
-      const credential = EmailAuthProvider.credential(
-        user.email,
-        formData.currentPassword
-      );
-
+      if (!user) { navigate('/'); return; }
+      const credential = EmailAuthProvider.credential(user.email, formData.currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, formData.newPassword);
-
       setSuccess('Password updated successfully');
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
+      setFormData((prev) => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
     } catch (err) {
       setError('Error changing password. Please check your current password.');
-      console.error('Error changing password:', err);
+      console.error(err);
     }
   };
 
   if (loading) {
     return (
-      <div className="profilescreen-container">
-        <div className="profilescreen-content">
-          <div className="profilescreen-loading">Loading...</div>
-        </div>
+      <div className="min-h-screen flex justify-center items-start p-8 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
+        <div className="w-full max-w-[800px] flex justify-center items-center min-h-[200px] text-zinc-400 text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="profilescreen-container">
-      <div className="profilescreen-content">
-        <header className="profilescreen-header">
-          <button 
-            className="profilescreen-back-button"
-            onClick={() => navigate('/select')}
-          >
+    <div className="min-h-screen flex justify-center items-start p-4 md:p-8 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] text-white">
+      <div className="w-full max-w-[800px] bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-2xl border border-white/10">
+        <header className="text-center mb-8 relative">
+          <button onClick={() => navigate('/select')} className="absolute left-0 top-0 flex items-center gap-2 text-white text-base cursor-pointer p-2 rounded-lg transition-all hover:bg-white/10 hover:-translate-x-1">
             <FaArrowLeft /> Back to Home
           </button>
-          <h1 className="profilescreen-title">Profile Settings</h1>
-          <div className="profilescreen-avatar">
-            <FaUserCircle size={80} />
-          </div>
+          <h1 className="text-2xl md:text-3xl mb-4 bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">Profile Settings</h1>
+          <div className="my-4 text-blue-400"><FaUserCircle size={80} /></div>
         </header>
 
-        {error && (
-          <div className="profilescreen-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-4 text-center">{error}</div>}
+        {success && <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg mb-4 text-center">{success}</div>}
 
-        {success && (
-          <div className="profilescreen-success">
-            {success}
-          </div>
-        )}
-
-        <div className="profilescreen-sections">
-          {/* Personal Information Section */}
-          <section className="profilescreen-section">
-            <h2>Personal Information</h2>
-            <form onSubmit={handleSubmit} className="profilescreen-form">
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaUserCircle className="profilescreen-icon" />
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="profilescreen-input"
-                />
+        <div className="flex flex-col gap-8">
+          <section className="bg-white/[0.03] rounded-xl p-6 border border-white/10">
+            <h2 className="text-xl mb-6 text-white">Personal Information</h2>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+              {[
+                { icon: FaUserCircle, label: 'First Name', name: 'firstName' },
+                { icon: FaUserCircle, label: 'Last Name', name: 'lastName' },
+                { icon: FaEnvelope, label: 'Email Address', name: 'email', disabled: true },
+                { icon: FaSchool, label: 'School', name: 'school' },
+                { icon: FaUserTag, label: 'Class', name: 'class' },
+                { icon: FaUserTag, label: 'Group Code', name: 'groupCode' },
+              ].map(({ icon: Icon, label, name, disabled }) => (
+                <div key={name} className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-zinc-300 text-base">
+                    <Icon className="text-blue-400" size={18} /> {label}
+                  </label>
+                  <Input name={name} value={formData[name]} onChange={handleInputChange} disabled={disabled} type={name === 'email' ? 'email' : 'text'} className={`bg-white/5 border-white/10 text-white ${disabled ? 'opacity-70 cursor-not-allowed' : ''}`} />
+                </div>
+              ))}
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 text-zinc-300"><FaPoundSign className="text-blue-400" size={18} /> Total Funds</label>
+                <Input value={`£${formData.totalFunds.toLocaleString()}`} disabled className="bg-white/5 border-white/10 text-white opacity-70 cursor-not-allowed" />
               </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaUserCircle className="profilescreen-icon" />
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="profilescreen-input"
-                />
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 text-zinc-300"><FaFire className="text-blue-400" size={18} /> Login Streak</label>
+                <Input value={`${formData.loginStreak} days`} disabled className="bg-white/5 border-white/10 text-white opacity-70 cursor-not-allowed" />
               </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaEnvelope className="profilescreen-icon" />
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  disabled
-                  className="profilescreen-input profilescreen-input-disabled"
-                />
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaSchool className="profilescreen-icon" />
-                  School
-                </label>
-                <input
-                  type="text"
-                  name="school"
-                  value={formData.school}
-                  onChange={handleInputChange}
-                  className="profilescreen-input"
-                />
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaUserTag className="profilescreen-icon" />
-                  Class
-                </label>
-                <input
-                  type="text"
-                  name="class"
-                  value={formData.class}
-                  onChange={handleInputChange}
-                  className="profilescreen-input"
-                />
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaUserTag className="profilescreen-icon" />
-                  Group Code
-                </label>
-                <input
-                  type="text"
-                  name="groupCode"
-                  value={formData.groupCode}
-                  onChange={handleInputChange}
-                  className="profilescreen-input"
-                />
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaPoundSign className="profilescreen-icon" />
-                  Total Funds
-                </label>
-                <input
-                  type="text"
-                  value={`£${formData.totalFunds.toLocaleString()}`}
-                  disabled
-                  className="profilescreen-input profilescreen-input-disabled"
-                />
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaFire className="profilescreen-icon" />
-                  Login Streak
-                </label>
-                <input
-                  type="text"
-                  value={`${formData.loginStreak} days`}
-                  disabled
-                  className="profilescreen-input profilescreen-input-disabled"
-                />
-              </div>
-
-              <button type="submit" className="profilescreen-save-button">
-                <FaSave /> Save Changes
-              </button>
+              <Button type="submit" className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600">
+                <FaSave className="mr-2" /> Save Changes
+              </Button>
             </form>
           </section>
 
-          {/* Password Change Section */}
-          <section className="profilescreen-section">
-            <h2>Change Password</h2>
-            <form onSubmit={handlePasswordChange} className="profilescreen-form">
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaLock className="profilescreen-icon" />
-                  Current Password
-                </label>
-                <div className="profilescreen-password-input">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleInputChange}
-                    className="profilescreen-input"
-                  />
-                  <button
-                    type="button"
-                    className="profilescreen-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
+          <section className="bg-white/[0.03] rounded-xl p-6 border border-white/10">
+            <h2 className="text-xl mb-6 text-white">Change Password</h2>
+            <form onSubmit={handlePasswordChange} className="flex flex-col gap-6">
+              {[
+                { label: 'Current Password', name: 'currentPassword', show: showPassword, setShow: setShowPassword },
+                { label: 'New Password', name: 'newPassword', show: showNewPassword, setShow: setShowNewPassword },
+                { label: 'Confirm New Password', name: 'confirmPassword', show: showConfirmPassword, setShow: setShowConfirmPassword },
+              ].map(({ label, name, show, setShow }) => (
+                <div key={name} className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-zinc-300"><FaLock className="text-blue-400" size={18} /> {label}</label>
+                  <div className="relative flex items-center">
+                    <Input type={show ? 'text' : 'password'} name={name} value={formData[name]} onChange={handleInputChange} className="bg-white/5 border-white/10 text-white pr-12" />
+                    <button type="button" onClick={() => setShow(!show)} className="absolute right-3 text-zinc-400 hover:text-white p-1 cursor-pointer">
+                      {show ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaLock className="profilescreen-icon" />
-                  New Password
-                </label>
-                <div className="profilescreen-password-input">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleInputChange}
-                    className="profilescreen-input"
-                  />
-                  <button
-                    type="button"
-                    className="profilescreen-password-toggle"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="profilescreen-form-group">
-                <label>
-                  <FaLock className="profilescreen-icon" />
-                  Confirm New Password
-                </label>
-                <div className="profilescreen-password-input">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="profilescreen-input"
-                  />
-                  <button
-                    type="button"
-                    className="profilescreen-password-toggle"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-
-              <button type="submit" className="profilescreen-save-button">
-                <FaLock /> Change Password
-              </button>
+              ))}
+              <Button type="submit" className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600">
+                <FaLock className="mr-2" /> Change Password
+              </Button>
             </form>
           </section>
         </div>

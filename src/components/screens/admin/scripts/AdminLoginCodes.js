@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { db } from '../../../../firebase/initFirebase';
 import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
-import { 
+import {
   FaArrowLeft,
   FaPlus,
   FaTrash,
@@ -14,11 +13,21 @@ import {
   FaKey,
   FaFire
 } from 'react-icons/fa';
-import '../styles/AdminLoginCodes.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 const AdminLoginCodes = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const { trackFeatureView, trackAdminAction, trackError } = useAnalytics();
   const [loading, setLoading] = useState(true);
   const [codes, setCodes] = useState([]);
@@ -31,6 +40,7 @@ const AdminLoginCodes = () => {
   useEffect(() => {
     trackFeatureView('admin_login_codes');
     fetchCodes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const fetchCodes = async () => {
@@ -38,22 +48,22 @@ const AdminLoginCodes = () => {
       const codesRef = collection(db, 'Login Codes');
       const codesQuery = query(codesRef);
       const codesSnap = await getDocs(codesQuery);
-      
+
       const codesData = [];
-      
+
       for (const codeDoc of codesSnap.docs) {
         const codeData = codeDoc.data();
-        
+
         // Fetch the last login and streak from Login Streak subcollection
         let lastLogin = null;
         let streak = 0;
-        
+
         if (codeData.lastUsedBy) {
           try {
             const loginStreakRef = collection(db, codeData.lastUsedBy, 'Login Streak');
             const loginQuery = query(loginStreakRef, orderBy('lastLogin', 'desc'), limit(1));
             const loginSnap = await getDocs(loginQuery);
-            
+
             if (!loginSnap.empty) {
               const loginData = loginSnap.docs[0].data();
               lastLogin = loginData.lastLogin;
@@ -63,7 +73,7 @@ const AdminLoginCodes = () => {
             console.error('Error fetching login streak for code:', codeDoc.id, error);
           }
         }
-        
+
         codesData.push({
           id: codeDoc.id,
           active: codeData.active,
@@ -72,7 +82,7 @@ const AdminLoginCodes = () => {
           lastUsedBy: codeData.lastUsedBy || null
         });
       }
-      
+
       setCodes(codesData);
       setLoading(false);
     } catch (error) {
@@ -139,165 +149,182 @@ const AdminLoginCodes = () => {
 
   if (loading) {
     return (
-      <div className="adminlogincodes-loading">
-        <div className="adminlogincodes-loading-spinner"></div>
+      <div className="min-h-screen flex justify-center items-center bg-zinc-900 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200">
+        <div className="w-12 h-12 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="adminlogincodes-container">
-      <header className="adminlogincodes-header">
-        <button 
-          onClick={() => navigate('/admin')} 
-          className="adminlogincodes-back-button"
+    <div className="min-h-screen bg-zinc-900 text-white p-4 md:p-8 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200 [data-theme=light]:text-zinc-900">
+      <header className="max-w-[1400px] mx-auto mb-12 pb-8 border-b border-white/10 [data-theme=light]:border-zinc-200">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/admin')}
+          className="mb-8 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-0 [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-zinc-300"
         >
           <FaArrowLeft size={20} />
           <span>Back to Admin Panel</span>
-        </button>
-        <div className="adminlogincodes-header-content">
-          <h1 className="adminlogincodes-title">
-            <FaKey className="adminlogincodes-title-icon" />
+        </Button>
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl mb-4 flex items-center justify-center gap-4 font-semibold">
+            <FaKey className="text-blue-500 [data-theme=light]:text-blue-600" />
             Login Codes Management
           </h1>
-          <p className="adminlogincodes-subtitle">Manage login codes for user access</p>
+          <p className="text-zinc-300 text-lg [data-theme=light]:text-zinc-600">Manage login codes for user access</p>
         </div>
       </header>
 
-      <main className="adminlogincodes-main">
-        <div className="adminlogincodes-controls">
-          <button 
+      <main className="max-w-[1400px] mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-8">
+          <Button
             onClick={() => setShowCreateModal(true)}
-            className="adminlogincodes-create-button"
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white [data-theme=light]:bg-blue-600 [data-theme=light]:hover:bg-blue-700"
           >
             <FaPlus size={16} />
             Create New Code
-          </button>
-          <div className="adminlogincodes-stats">
-            <div className="adminlogincodes-stat">
-              <strong>{codes.length}</strong> Total Codes
+          </Button>
+          <div className="flex gap-8 justify-around md:justify-start">
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{codes.length}</strong> Total Codes
             </div>
-            <div className="adminlogincodes-stat">
-              <strong>{codes.filter(c => c.active).length}</strong> Active Codes
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{codes.filter(c => c.active).length}</strong> Active Codes
             </div>
           </div>
         </div>
 
-        <div className="adminlogincodes-table-container">
-          <table className="adminlogincodes-table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Status</th>
-                <th>Last Used</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {codes.map(code => (
-                <tr key={code.id}>
-                  <td>
-                    <div className="adminlogincodes-code-cell">
-                      <span className="adminlogincodes-code">{code.id}</span>
-                      <button
-                        onClick={() => copyToClipboard(code.id)}
-                        className="adminlogincodes-copy-button"
-                        title="Copy code"
-                      >
-                        <FaCopy size={14} />
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`adminlogincodes-status ${code.active ? 'active' : 'inactive'}`}>
-                      {code.active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="adminlogincodes-login-info">
-                      <span className="adminlogincodes-last-login">
-                        {code.lastLogin ? 
-                          new Date(code.lastLogin.seconds * 1000).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })
-                          : 'Never'
-                        }
-                      </span>
-                      {code.streak > 0 && (
-                        <span className="adminlogincodes-streak" title="Current login streak">
-                          <FaFire /> {code.streak} days
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="adminlogincodes-actions">
-                    <button
-                      onClick={() => handleToggleCode(code.id, code.active)}
-                      className={`adminlogincodes-action-button ${code.active ? 'deactivate' : 'activate'}`}
-                      title={code.active ? 'Deactivate Code' : 'Activate Code'}
-                    >
-                      {code.active ? <FaBan /> : <FaCheck />}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCode(code.id)}
-                      className="adminlogincodes-action-button delete"
-                      title="Delete Code"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
+        <Card className="bg-white/5 border-white/10 overflow-hidden mb-8 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[800px]">
+              <thead>
+                <tr>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Code</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Status</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Last Used</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {codes.map(code => (
+                  <tr key={code.id} className="hover:bg-white/5 [data-theme=light]:hover:bg-zinc-50">
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-base tracking-wide text-green-500 [data-theme=light]:text-green-700">{code.id}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyToClipboard(code.id)}
+                          title="Copy code"
+                          className="h-8 w-8 text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 [data-theme=light]:text-zinc-400 [data-theme=light]:hover:text-blue-600"
+                        >
+                          <FaCopy size={14} />
+                        </Button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <span className={cn(
+                        "inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold",
+                        code.active
+                          ? "bg-green-500/15 text-green-400 [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700"
+                          : "bg-red-500/15 text-red-400 [data-theme=light]:bg-red-100 [data-theme=light]:text-red-700"
+                      )}>
+                        {code.active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex flex-col gap-2">
+                        <span className="text-zinc-300 [data-theme=light]:text-zinc-600">
+                          {code.lastLogin ?
+                            new Date(code.lastLogin.seconds * 1000).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                            : 'Never'
+                          }
+                        </span>
+                        {code.streak > 0 && (
+                          <span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-400 [data-theme=light]:text-amber-700" title="Current login streak">
+                            <FaFire /> {code.streak} days
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleCode(code.id, code.active)}
+                          title={code.active ? 'Deactivate Code' : 'Activate Code'}
+                          className={cn(
+                            "h-8 w-8 text-white [data-theme=light]:text-zinc-900",
+                            code.active ? "bg-white/10 hover:bg-red-500" : "bg-white/10 hover:bg-green-500"
+                          )}
+                        >
+                          {code.active ? <FaBan /> : <FaCheck />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteCode(code.id)}
+                          title="Delete Code"
+                          className="h-8 w-8 bg-white/10 hover:bg-red-500 text-white [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-red-500 [data-theme=light]:hover:text-white"
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </main>
 
-      {showCreateModal && (
-        <div className="adminlogincodes-modal-overlay">
-          <div className="adminlogincodes-modal">
-            <button 
-              className="adminlogincodes-modal-close"
-              onClick={() => setShowCreateModal(false)}
-            >
-              ×
-            </button>
-            <h2>Create New Login Code</h2>
-            <form onSubmit={handleCreateCode}>
-              <div className="adminlogincodes-modal-field">
-                <label htmlFor="codeName">Code Name</label>
-                <input
-                  type="text"
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="bg-zinc-900 border-white/10 text-white [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900">
+          <DialogHeader>
+            <DialogTitle className="text-xl [data-theme=light]:text-zinc-900">Create New Login Code</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateCode}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="codeName" className="text-zinc-300 [data-theme=light]:text-zinc-600">Code Name</Label>
+                <Input
                   id="codeName"
+                  type="text"
                   value={newCode.name}
                   onChange={(e) => setNewCode({ ...newCode, name: e.target.value })}
                   required
                   placeholder="Enter code name"
+                  className="bg-white/5 border-white/20 text-white placeholder:text-white/50 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900"
                 />
               </div>
-              <div className="adminlogincodes-modal-actions">
-                <button 
-                  type="button" 
-                  className="adminlogincodes-modal-button cancel"
-                  onClick={() => setShowCreateModal(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="adminlogincodes-modal-button create"
-                >
-                  Create Code
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCreateModal(false)}
+                className="bg-white/10 border-white/10 text-white hover:bg-white/20 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200 [data-theme=light]:hover:bg-zinc-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white [data-theme=light]:bg-blue-600 [data-theme=light]:hover:bg-blue-700"
+              >
+                Create Code
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

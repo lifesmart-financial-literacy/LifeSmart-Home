@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { 
-  FaCalculator, 
   FaCog, 
   FaCalendarAlt, 
-  FaPencilAlt, 
-  FaTrashAlt, 
   FaArrowRight,
   FaPlus,
   FaDice,
@@ -17,7 +14,6 @@ import {
 } from 'react-icons/fa';
 import SimulationControls from './SimulationControls';
 import SimulationHistory from './PastSimulations';
-import './styles/SimSetup.css';
 import LifeSmartLogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 Chart.register(ArcElement, Tooltip, Legend, Title);
@@ -240,23 +236,23 @@ const SimSetup = () => {
   };
 
   if (isLoading) {
-    return <div className="GroupCreation-loading">Loading...</div>;
+    return <div className="text-center py-10 text-lg text-gray-600">Loading...</div>;
   }
 
   return (
-    <div className="GroupCreation-dashboard">
-      <header className="GroupCreation-header">
+    <div className="grid min-h-screen fq-fade-in bg-gradient-to-br from-[#f6f2ee] to-[#e9e4e0] font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif] m-0 p-0">
+      <header className="col-span-full flex justify-between items-center p-4 bg-gradient-to-br from-[#102454] to-[#1a3a7a] rounded-b-[25px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] relative overflow-hidden h-[200px]">
         <button 
           onClick={() => navigate('/select')} 
-          className="GroupCreation-logo-button"
+          className="bg-none border-none p-0 cursor-pointer transition-transform duration-300 ease-out hover:scale-105"
         >
-          <img src={LifeSmartLogo} alt="LifeSmart Logo" className="GroupCreation-logo" />
+          <img src={LifeSmartLogo} alt="LifeSmart Logo" className="h-[200px] w-auto block ml-0 [clip-path:polygon(0_0,60%_0,60%_100%,0_100%)]" />
         </button>
-        <div className="GroupCreation-header-icons">
-          <button onClick={() => setShowSimulationControls(!showSimulationControls)} className="GroupCreation-simulation-controls-toggle">
+        <div className="relative flex justify-end items-center gap-4">
+          <button onClick={() => setShowSimulationControls(!showSimulationControls)} className="bg-white/10 border-none rounded-full p-3 m-0 mx-2 cursor-pointer text-white transition-all duration-300 backdrop-blur-[5px] hover:bg-white/20 hover:-translate-y-1 hover:rotate-360 [&_svg]:w-6 [&_svg]:h-6">
             <FaCog />
           </button>
-          <button onClick={() => setShowSimulationHistory(!showSimulationHistory)} className="GroupCreation-simulation-history-toggle">
+          <button onClick={() => setShowSimulationHistory(!showSimulationHistory)} className="bg-white/10 border-none rounded-full p-3 m-0 mx-2 cursor-pointer text-white transition-all duration-300 backdrop-blur-[5px] hover:bg-white/20 hover:-translate-y-1 hover:rotate-360 [&_svg]:w-6 [&_svg]:h-6">
             <FaCalendarAlt />
           </button>
         </div>
@@ -268,15 +264,15 @@ const SimSetup = () => {
       <main>
         {!currentSimulationIndex && (
           <>
-            <div className="GroupCreation-settings">
-              <div className="GroupCreation-settings-group">
+            <div className="bg-white/90 backdrop-blur-[10px] p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] my-5 flex items-center justify-between max-md:flex-col max-md:gap-4">
+              <div className="flex items-center gap-5">
                 <label htmlFor="max-value-input">Max Portfolio Value:</label>
                 <input
                   id="max-value-input"
                   type="number"
                   value={maxPortfolioValue}
                   onChange={(e) => setMaxPortfolioValue(Number(e.target.value))}
-                  className="GroupCreation-modern-input"
+                  className="bg-white/90 border-2 border-transparent rounded-lg py-2.5 px-4 text-base transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.05)] focus:border-[#082148] focus:shadow-[0_4px_15px_rgba(0,0,0,0.1)] focus:outline-none"
                   step="5000"
                 />
                 <label htmlFor="round-to-input">Round Up To:</label>
@@ -285,78 +281,78 @@ const SimSetup = () => {
                   type="number"
                   value={roundTo}
                   onChange={(e) => setRoundTo(Number(e.target.value))}
-                  className="GroupCreation-modern-input"
+                  className="bg-white/90 border-2 border-transparent rounded-lg py-2.5 px-4 text-base transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.05)] focus:border-[#082148] focus:shadow-[0_4px_15px_rgba(0,0,0,0.1)] focus:outline-none"
                   step="1000"
                 />
               </div>
-              <div className="GroupCreation-settings-group">
-                <label className="GroupCreation-toggle-label">
+              <div className="flex items-center gap-5">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={enableRandomGeneration}
                     onChange={(e) => setEnableRandomGeneration(e.target.checked)}
-                    className="GroupCreation-toggle-input"
+                    className="relative w-[50px] h-6 appearance-none bg-[#e2e8f0] rounded-xl transition-all duration-300 cursor-pointer checked:bg-[#4CAF50]"
                   />
-                  <span className="GroupCreation-toggle-text">Enable Random Generation</span>
+                  <span className="font-medium text-[#2c3e50]">Enable Random Generation</span>
                 </label>
               </div>
             </div>
 
-            <h1 className="GroupCreation-header-content">
-              <FaChartLine className="GroupCreation-blueline" />
-              <span>Group Management</span>
+            <h1 className="flex items-center justify-items-start mt-5 mb-5 text-black">
+              <FaChartLine className="h-[50px]" />
+              <span className="text-2xl font-bold ml-2">Group Management</span>
             </h1>
 
-            <div className="GroupCreation-allocation-image">
+            <div className="flex justify-center my-5">
               <FaChartPie size={100} />
             </div>
 
-            <div className="GroupCreation-groups">
+            <div className="flex flex-wrap justify-center items-center gap-5">
               {groups.map((group, index) => (
-                <div key={index} className="GroupCreation-group">
-                  <div className="GroupCreation-group-header">
-                    <h2>
+                <div key={index} className="mr-5 mb-5 bg-white/90 backdrop-blur-[10px] rounded-[15px] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all duration-300 border border-white/20 fq-fade-in hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
+                  <div className="flex justify-between items-center mb-5 pb-4 border-b-2 border-black/10">
+                    <h2 className="text-[#2c3e50] text-[1.4em] m-0 font-semibold">
                       {group.name}
-                      <span className="GroupCreation-group-points">({group.points} points)</span>
+                      <span className="text-[0.9rem] text-[#888] ml-2.5">({group.points} points)</span>
                     </h2>
-                    <div className="GroupCreation-group-actions">
+                    <div className="flex items-center gap-1">
                       <button 
                         onClick={() => generateRandomValues(index)} 
-                        className="GroupCreation-random-btn"
+                        className="bg-white/10 border-none rounded-full p-2 cursor-pointer transition-all duration-300 m-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none hover:bg-[#4CAF50]/10 hover:rotate-360"
                         title="Generate Random Values"
                         disabled={!enableRandomGeneration}
                       >
-                        <FaDice />
+                        <FaDice className="text-[#4CAF50]" />
                       </button>
-                      <button onClick={() => editGroupName(index)} className="GroupCreation-edit-group-btn">
-                        <FaEdit />
+                      <button onClick={() => editGroupName(index)} className="bg-white/10 border-none rounded-full p-2 cursor-pointer transition-all duration-300 m-0 hover:bg-[#4CAF50]/10 hover:rotate-15">
+                        <FaEdit className="text-[#082148]" />
                       </button>
-                      <button onClick={() => removeGroup(index)} className="GroupCreation-remove-group-btn">
-                        <FaTimes />
+                      <button onClick={() => removeGroup(index)} className="bg-white/10 border-none rounded-full p-2 cursor-pointer transition-all duration-300 m-0 hover:bg-[#f44336]/10 hover:rotate-15">
+                        <FaTimes className="text-[#082148]" />
                       </button>
                     </div>
                   </div>
-                  <div className="GroupCreation-group-content">
-                    <div className="GroupCreation-inputs">
+                  <div className="flex flex-col">
+                    <div className="flex flex-col">
                       {Object.entries(group.assets).map(([key, value]) => (
-                        <div key={key} className="GroupCreation-input-row">
-                          <label htmlFor={`${key}-${index}`}>{key.charAt(0).toUpperCase() + key.slice(1)} (%):</label>
+                        <div key={key} className="flex items-center justify-between mb-2.5">
+                          <label htmlFor={`${key}-${index}`} className="mr-2.5 text-black">{key.charAt(0).toUpperCase() + key.slice(1)} (%):</label>
                           <input
                             type="number"
                             value={group.percentages[key]}
                             onChange={(e) => handleAssetInputChange(index, key, e.target.value)}
                             id={`${key}-${index}`}
-                            className="GroupCreation-modern-input"
+                            className="bg-white/90 border-2 border-transparent rounded-lg py-2.5 px-4 text-base transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.05)] focus:border-[#082148] focus:shadow-[0_4px_15px_rgba(0,0,0,0.1)] focus:outline-none text-center"
                             min="0"
                             max="100"
                             step="1"
                           />
-                          <span className="GroupCreation-amount-display">
+                          <span className="text-[#082148]">
                             (£{(value || 0).toLocaleString()})
                           </span>
                         </div>
                       ))}
-                      <div className="GroupCreation-total-value">
+                      <div className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white py-4 rounded-lg text-center text-base font-medium my-5 shadow-[0_4px_15px_rgba(0,0,0,0.1)]">
                         Total Spendable: £{getTotalSpendableAmount(group.points).toLocaleString()}
                         <br />
                         Remaining: £{getRemainingSpendableAmount(group).toLocaleString()}
@@ -365,13 +361,13 @@ const SimSetup = () => {
                   </div>
                 </div>
               ))}
-              <button onClick={addGroup} className="GroupCreation-add-group-btn">
+              <button onClick={addGroup} className="bg-gradient-to-br from-[#4CAF50] to-[#45a049] text-white border-none py-4 px-8 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)]">
                 <FaPlus /> Add Group
               </button>
             </div>
 
             <button 
-              className="GroupCreation-modern-button"
+              className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] relative overflow-hidden hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px"
               onClick={startSimulation}
             >
               Start Simulation
@@ -382,9 +378,9 @@ const SimSetup = () => {
       </main>
 
       {showModal && (
-        <div className="GroupCreation-modal">
-          <div className="GroupCreation-modal-content">
-            <span className="GroupCreation-close" onClick={() => setShowModal(false)}>&times;</span>
+        <div className="flex justify-center items-center fixed z-[1000] inset-0 overflow-auto bg-black/50 backdrop-blur-[5px]">
+          <div className="bg-white/95 backdrop-blur-[10px] rounded-[15px] shadow-[0_8px_32px_rgba(0,0,0,0.2)] fq-fade-in-fast m-auto p-5 border border-gray-500 w-4/5 max-w-[500px]">
+            <span className="text-[#aaaaaa] float-right text-[28px] font-bold cursor-pointer hover:text-black" onClick={() => setShowModal(false)}>&times;</span>
             <h3>Add a new group</h3>
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -397,8 +393,9 @@ const SimSetup = () => {
                 placeholder="Enter group name"
                 required
                 autoFocus
+                className="w-full py-2.5 my-2.5 border border-gray-300 rounded box-border"
               />
-              <button onClick={confirmAddGroup}>Confirm</button>
+              <button onClick={confirmAddGroup} className="w-full bg-gradient-to-br from-[#001f3f] to-[#000080] text-white py-3 px-6 my-2.5 border-none rounded-lg font-medium cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)]">Confirm</button>
             </form>
           </div>
         </div>
@@ -407,4 +404,4 @@ const SimSetup = () => {
   );
 };
 
-export default SimSetup; 
+export default SimSetup;

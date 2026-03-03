@@ -4,7 +4,6 @@ import { Chart } from 'chart.js/auto';
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db, auth } from '../../../../firebase/initFirebase';
-import './styles/Simulation.css';
 import lifesmartlogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 // Custom hook for chart management
@@ -472,19 +471,19 @@ const Simulation = () => {
 
   if (isLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading simulation...</p>
+      <div className="flex flex-col justify-center items-center min-h-screen text-[#003F91] text-xl">
+        <div className="w-12 h-12 border-4 border-[#003F91] border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4">Loading simulation...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="error-container">
+      <div className="flex flex-col items-center justify-center min-h-screen p-5 text-center bg-[#1a1a1a] text-white">
         <h2>Error</h2>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()} className="simulationpage-modern-button">
+        <button onClick={() => window.location.reload()} className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px">
           Retry
         </button>
       </div>
@@ -546,34 +545,23 @@ const Simulation = () => {
 
   return (
     <div>
-      <header className="simulationpage-header">
-        <img src={lifesmartlogo} alt="Logo" className="simulationpage-logo" />
+      <header className="bg-[#003F91] text-white py-5 text-center">
+        <img src={lifesmartlogo} alt="Logo" className="h-auto w-auto max-w-[200px]" />
       </header>
 
-      <div className="simulationpage-sim-chart-container">
-        <canvas id="portfolioChart" ref={chartRef}></canvas>
+      <div className="flex flex-col items-center gap-5 p-5 bg-white rounded-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)] my-5 mx-auto max-w-[1200px] w-[90%]">
+        <canvas id="portfolioChart" ref={chartRef} className="w-full h-[400px] mb-5 max-md:h-[300px]"></canvas>
         
-        {/* <div className="team-icons-container">
-          {groups.map((group) => (
-            <div 
-              key={group.id} 
-              className="team-icon-wrapper"
-            >
-              <span className="team-name">{group.name}</span>
-            </div>
-          ))}
-        </div> */}
-
         <button 
           onClick={nextQuarter} 
-          className="simulationpage-modern-button"
+          className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] min-w-[200px] max-md:min-w-[150px] max-md:text-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px"
           disabled={currentQuarterIndex >= simulationYears * 4 || isSimulating}
         >
           Next Quarter
         </button>
         <button 
           onClick={runFullSimulation} 
-          className="simulationpage-modern-button"
+          className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] min-w-[200px] max-md:min-w-[150px] max-md:text-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px"
           disabled={isSimulating || currentQuarterIndex >= simulationYears * 4}
         >
           Run Full Simulation
@@ -581,14 +569,14 @@ const Simulation = () => {
         {isSimulating ? (
           <button 
             onClick={setIsSimulating} 
-            className="simulationpage-modern-button"
+            className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] min-w-[200px] max-md:min-w-[150px] max-md:text-sm hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px"
           >
             Pause Simulation
           </button>
         ) : currentQuarterIndex > 0 && currentQuarterIndex < simulationYears * 4 ? (
           <button 
             onClick={runFullSimulation} 
-            className="simulationpage-modern-button"
+            className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] min-w-[200px] max-md:min-w-[150px] max-md:text-sm hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px"
           >
             Resume Simulation
           </button>
@@ -600,15 +588,15 @@ const Simulation = () => {
           min="100" 
           step="100" 
           title="Simulation Speed (ms)"
-          className="simulationpage-input"
+          className="py-2 px-3 border-2 border-gray-200 rounded-md text-sm w-[100px] text-center transition-all duration-300 focus:border-[#082148] focus:outline-none focus:shadow-[0_0_0_3px_rgba(8,33,72,0.1)]"
         />
       </div>
 
-      <button onClick={finishSimulation} className="simulationpage-modern-button">
+      <button onClick={finishSimulation} className="bg-gradient-to-br from-[#082148] to-[#0a015a] text-white border-none py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)] min-w-[200px] max-md:min-w-[150px] max-md:text-sm hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:translate-y-px">
         Finish Simulation
       </button>
     </div>
   );
 };
 
-export default Simulation; 
+export default Simulation;

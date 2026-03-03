@@ -1,14 +1,16 @@
 import React from 'react';
-import './styles/ConfirmModal.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '../../ui/dialog';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-const ConfirmModal = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  title, 
-  message, 
-  type = 'info' // can be 'info', 'warning', 'danger'
-}) => {
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, type = 'info' }) => {
   if (!isOpen) return null;
 
   const handleConfirm = () => {
@@ -16,33 +18,30 @@ const ConfirmModal = ({
     onClose();
   };
 
+  const confirmVariant = {
+    info: 'bg-blue-500 hover:bg-blue-600',
+    warning: 'bg-amber-500 hover:bg-amber-600',
+    danger: 'bg-red-500 hover:bg-red-600',
+  }[type];
+
   return (
-    <div className="confirm-modal-overlay">
-      <div className="confirm-modal">
-        <button className="confirm-modal-close" onClick={onClose}>×</button>
-        
-        <div className="confirm-modal-content">
-          <h2 className="confirm-modal-title">{title}</h2>
-          <p className="confirm-modal-message">{message}</p>
-          
-          <div className="confirm-modal-buttons">
-            <button 
-              className="confirm-modal-button confirm-modal-cancel" 
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button 
-              className={`confirm-modal-button confirm-modal-confirm confirm-modal-${type}`}
-              onClick={handleConfirm}
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[500px] bg-zinc-900 border-zinc-700">
+        <DialogHeader>
+          <DialogTitle className="text-white">{title}</DialogTitle>
+          <DialogDescription className="text-zinc-300">{message}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex justify-end gap-4 sm:justify-end">
+          <Button variant="outline" onClick={onClose} className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} className={cn('text-white', confirmVariant)}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default ConfirmModal; 
+export default ConfirmModal;

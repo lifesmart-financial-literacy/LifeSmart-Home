@@ -8,7 +8,6 @@ import Question5 from './questions/Question5';
 import Question6 from './questions/Question6';
 import Leaderboard from './Leaderboard';
 import FinanceQuestSimulation from '../financeQuest/FinanceQuestSimulation';
-import '../../styles/FinancialQuiz.css';
 
 const BASE_FUNDS = 100000;
 

@@ -1,42 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import ReactSlider from 'react-slider';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import '../styles/Page3.css';
-import '../styles/buttons.css';
-
-const TUTORIAL_SLIDE = {
-  title: "Now imagine a full year's salary lands in your bank account tomorrow.",
-};
+import { Button } from '@/components/ui/button';
 
 const LIFE_AREAS = [
-  {
-    label: 'Health & Well-being',
-    prompt: 'Better nutrition, gym/therapy, medical checks, or more harmful activities?'
-  },
-  {
-    label: 'Family & Connections',
-    prompt: 'Fun visits, shared trips, thoughtful gifts or higher expectations?'
-  },
-  {
-    label: 'Career & Income',
-    prompt: 'More likely to move towards the right career for you?'
-  },
-  {
-    label: 'Lifestyle, Spending & Fun',
-    prompt: 'Budget for meaningful hobbies & travel, or just more spending?'
-  },
-  {
-    label: 'Housing, Safety & Security',
-    prompt: 'Ability to build emergency fund, clear debt, improve home safety?'
-  },
-  {
-    label: 'Giving & Contribution',
-    prompt: 'Would your giving increase either in money, time or impact?'
-  },
-  {
-    label: 'Growth & Purpose',
-    prompt: 'Coaching, retreats, further study, purpose projects or less motivation?'
-  }
+  { label: 'Health & Well-being', prompt: 'Better nutrition, gym/therapy, medical checks, or more harmful activities?' },
+  { label: 'Family & Connections', prompt: 'Fun visits, shared trips, thoughtful gifts or higher expectations?' },
+  { label: 'Career & Income', prompt: 'More likely to move towards the right career for you?' },
+  { label: 'Lifestyle, Spending & Fun', prompt: 'Budget for meaningful hobbies & travel, or just more spending?' },
+  { label: 'Housing, Safety & Security', prompt: 'Ability to build emergency fund, clear debt, improve home safety?' },
+  { label: 'Giving & Contribution', prompt: 'Would your giving increase either in money, time or impact?' },
+  { label: 'Growth & Purpose', prompt: 'Coaching, retreats, further study, purpose projects or less motivation?' },
 ];
 
 const Page3 = ({ baseScores = [], onSubmit, onStepChange }) => {
@@ -67,62 +41,49 @@ const Page3 = ({ baseScores = [], onSubmit, onStepChange }) => {
     }
   };
 
-  // Only show the tutorial slide if tutorialStep === 0
+  const cardColorClass = (idx) => (idx % 3 === 0 ? 'lifebalance-card-dark' : idx % 3 === 1 ? 'lifebalance-card-green' : 'lifebalance-card-pink');
+
   if (tutorialStep === 0) {
     return (
-      <form className="page2-form" onSubmit={handleNext}>
-        <h2 className="page2-title" style={{marginBottom: '2.5rem'}}>
-          <span style={{color: '#97A1FF'}}>Now imagine a</span> full year's salary lands in your<br/>bank account <span style={{color: '#97A1FF'}}>tomorrow.</span>
+      <form onSubmit={handleNext} className="flex flex-col items-center w-full text-white min-h-[600px] relative">
+        <h2 className="mb-10 text-3xl font-semibold text-center">
+          <span className="text-[#97A1FF]">Now imagine a</span> full year's salary lands in your
+          <br />
+          bank account <span className="text-[#97A1FF]">tomorrow.</span>
         </h2>
-        <div className="page2-cards-wrapper" style={{minHeight: 'unset', margin: '0 auto 2.5rem auto', maxWidth: 500}}>
-          <div className="page2-card card-dark">
-            <div className="page2-slider-row" style={{margin: 0}}>
-              <div className="page2-slider-arrows">
-                <div className="page2-slider-arrow left">
-                  <div className="page2-slider-arrow-line"></div>
-                  <div className="page2-slider-arrow-down"></div>
-                </div>
-                <div className="page2-slider-arrow right">
-                  <div className="page2-slider-arrow-line"></div>
-                  <div className="page2-slider-arrow-down"></div>
-                </div>
-              </div>
-              <div style={{position: 'relative', width: '100%', height: '44px'}}>
+        <div className="flex flex-col gap-12 w-full max-w-[500px] mx-auto mb-10">
+          <div className="w-full p-6 pb-6 rounded-[17px] flex flex-col items-center border border-white/40 bg-gradient-to-b from-[rgba(30,33,53,0.3)] to-[rgba(93,93,97,0.3)] shadow-[0_2px_16px_rgba(0,0,0,0.18)] lifebalance-card-dark">
+            <div className="flex flex-col items-center w-full gap-3 mt-0 mb-2 relative min-h-[90px]">
+              <div className="relative w-full h-11">
                 <ReactSlider
                   min={0}
                   max={10}
                   value={4}
                   disabled
-                  className="page2-slider"
-                  thumbClassName="page2-slider-thumb"
-                  trackClassName="page2-slider-track"
+                  className="lifebalance-slider"
+                  thumbClassName="lifebalance-slider-thumb"
+                  trackClassName="lifebalance-slider-track"
                   renderThumb={(props, state) => (
-                    <div {...props} className="page2-slider-thumb">
-                      <span className="page2-slider-value-inside">{state.valueNow}</span>
+                    <div {...props} className="lifebalance-slider-thumb">
+                      <span className="lifebalance-slider-value">{state.valueNow}</span>
                     </div>
                   )}
                   renderTrack={(props, state) => (
-                    <div {...props} className={`page2-slider-track ${state.index === 0 ? 'filled' : 'unfilled'}`}></div>
+                    <div {...props} className={`lifebalance-slider-track ${state.index === 0 ? 'filled' : 'unfilled'}`} />
                   )}
                 />
               </div>
-              <div className="page2-slider-labels">
-                <span className="page2-slider-label">Needs work (0)</span>
-                <span className="page2-slider-label">Thriving (10)</span>
+              <div className="absolute bottom-[-1rem] w-[80%] left-[10%] flex justify-between pointer-events-none text-[#E0E0E0] text-base">
+                <span>Needs work (0)</span>
+                <span>Thriving (10)</span>
               </div>
             </div>
           </div>
         </div>
-        <div className="tutorial-instructions-text">
-          <div className="tutorial-arrow-container">
+        <div className="lifebalance-tutorial-text">
+          <div className="lifebalance-tutorial-arrow">
             <svg width="111" height="157" viewBox="-40 0 111 117" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M3 115 C-40 0, 40 0, 20 -3"
-                stroke="#fff"
-                strokeWidth="3"
-                fill="none"
-                markerEnd="url(#arrowhead)"
-              />
+              <path d="M3 115 C-40 0, 40 0, 20 -3" stroke="#fff" strokeWidth="3" fill="none" markerEnd="url(#arrowhead)" />
               <defs>
                 <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse" markerUnits="strokeWidth">
                   <polygon points="0 0, 8 4, 0 8" fill="#fff" transform="rotate(110 4 4)" />
@@ -130,135 +91,114 @@ const Page3 = ({ baseScores = [], onSubmit, onStepChange }) => {
               </defs>
             </svg>
           </div>
-          <div className="tutorial-instructions-content">
-            <div className="tutorial-instructions-main-text">
-              Slide to rate each part of your life from<br/>
-              <b className="tutorial-instructions-main-text-bold">0 (needs work) to 10 (thriving).</b>
+          <div className="lifebalance-tutorial-content">
+            <div className="lifebalance-tutorial-main">
+              Slide to rate each part of your life from
+              <br />
+              <b>0 (needs work) to 10 (thriving).</b>
             </div>
-            <div className="tutorial-instructions-sub-text">
-              Use the prompts to think deeply about the impact that the money could have.
-            </div>
+            <div className="lifebalance-tutorial-sub">Use the prompts to think deeply about the impact that the money could have.</div>
           </div>
         </div>
-        <button type="submit" className="btn btn-primary-active page2-next-btn page2-next-btn-absolute">
+        <Button type="submit" className="absolute right-10 bottom-10 z-[100] bg-gradient-to-b from-[#B79BFF] to-[#4E3BD3] hover:from-[#c4afff] hover:to-[#5e4bdd] text-white font-semibold px-12 py-4 rounded-xl border border-[#8872C6] shadow-md hover:-translate-y-0.5">
           Next
-        </button>
+        </Button>
       </form>
     );
   }
 
-  // Only show the questions if tutorialStep > 0
   return (
-    <form className="page2-form" onSubmit={handleNext}>
-      <h2 className="page2-title">For each area, ask yourself: if you put extra money into it, what score do you think you could reach?</h2>
-      <p className="page2-desc">
-      Now slide to rate what you think your score in each factor will be from
-      <br/>
-      <b style={{fontWeight: 700}}>0 (needs work) to 10 (thriving).</b>
+    <form onSubmit={handleNext} className="flex flex-col items-center w-full text-white min-h-[600px] relative">
+      <h2 className="mb-4 text-3xl font-semibold text-center text-white tracking-wide">
+        For each area, ask yourself: if you put extra money into it, what score do you think you could reach?
+      </h2>
+      <p className="mb-8 text-xl font-light text-center text-white leading-8">
+        Now slide to rate what you think your score in each factor will be from
+        <br />
+        <b className="font-bold">0 (needs work) to 10 (thriving).</b>
       </p>
-      <div className="page2-cards-wrapper" style={{minHeight: '340px', position: 'relative'}}>
+      <div className="flex flex-col gap-12 w-full max-w-[700px] mx-8 my-8 mb-10 relative" style={{ minHeight: '340px' }}>
         <TransitionGroup>
-          {LIFE_AREAS.slice(0, revealed).map((area, idx) => {
-            const colorClass = idx % 3 === 0 ? 'card-dark' : idx % 3 === 1 ? 'card-green' : 'card-pink';
-            return (
-              <CSSTransition
-                key={area.label}
-                timeout={400}
-                classNames="slide-card"
+          {LIFE_AREAS.slice(0, revealed).map((area, idx) => (
+            <CSSTransition key={area.label} timeout={400} classNames="slide-card">
+              <div
+                className={`w-full p-6 pb-6 rounded-[17px] flex flex-col items-center mb-6 border border-white/40 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(169,156,255,0.2)] hover:border-[rgba(169,156,255,0.6)] transition-all cursor-pointer ${cardColorClass(idx)} ${idx % 3 === 0 ? 'bg-gradient-to-b from-[rgba(30,33,53,0.3)] to-[rgba(93,93,97,0.3)]' : idx % 3 === 1 ? 'bg-gradient-to-b from-[rgba(112,196,142,0.2)] to-[rgba(14,76,47,0.2)]' : 'bg-gradient-to-b from-[rgba(255,176,188,0.2)] to-[rgba(246,111,149,0.186)]'} shadow-[0_2px_16px_rgba(0,0,0,0.18)]`}
               >
-                <div className={`page2-card ${colorClass}`}>
-                  <div className="page2-card-label">{area.label}</div>
-                  <div className="page2-card-prompt">{area.prompt}</div>
-                  <div className="page3-prev-label">Previous Selection</div>
-                  <div className="page2-slider-row">
-                    <div className="page2-slider-arrows">
-                      <div className="page2-slider-arrow left">
-                        <div className="page2-slider-arrow-line"></div>
-                        <div className="page2-slider-arrow-down"></div>
-                      </div>
-                      <div className="page2-slider-arrow right">
-                        <div className="page2-slider-arrow-line"></div>
-                        <div className="page2-slider-arrow-down"></div>
-                      </div>
-                    </div>
-                    <div style={{position: 'relative', width: '100%', height: '44px'}}>
-                      <ReactSlider
-                        min={0}
-                        max={10}
-                        value={typeof baseScores[idx] === 'number' ? baseScores[idx] : 0}
-                        disabled
-                        className="page2-slider page3-prev-slider"
-                        thumbClassName="page2-slider-thumb page3-prev-thumb"
-                        trackClassName="page2-slider-track"
-                        renderThumb={(props, state) => (
-                          <div {...props} className="page2-slider-thumb page3-prev-thumb">
-                            <span className="page2-slider-value-inside page3-prev-value">{state.valueNow}</span>
-                          </div>
-                        )}
-                        renderTrack={(props, state) => (
-                          <div {...props} className={`page2-slider-track ${state.index === 0 ? 'filled' : 'unfilled'} page3-prev-track`}></div>
-                        )}
-                      />
-                    </div>
-                    <div className="page2-slider-labels">
-                      <span className="page2-slider-label">Needs work (0)</span>
-                      <span className="page2-slider-label">Thriving (10)</span>
-                    </div>
+                <div className={`text-2xl font-bold text-center mb-2 ${idx % 3 === 0 ? 'text-[#A99CFF]' : idx % 3 === 1 ? 'text-[#97FFE8]' : 'text-[#FFB398]'}`}>{area.label}</div>
+                <div className="text-xl text-center text-white mb-4">{area.prompt}</div>
+                <div className="text-center text-[1.1rem] font-semibold text-[#bdbdbd] mb-1 mt-2">Previous Selection</div>
+                <div className="flex flex-col items-center w-full gap-3 mt-2 mb-2 relative min-h-[90px]">
+                  <div className="relative w-full h-11">
+                    <ReactSlider
+                      min={0}
+                      max={10}
+                      value={typeof baseScores[idx] === 'number' ? baseScores[idx] : 0}
+                      disabled
+                      className="lifebalance-slider lifebalance-prev-slider"
+                      thumbClassName="lifebalance-slider-thumb lifebalance-prev-thumb"
+                      trackClassName="lifebalance-slider-track"
+                      renderThumb={(props, state) => (
+                        <div {...props} className="lifebalance-slider-thumb lifebalance-prev-thumb">
+                          <span className="lifebalance-slider-value lifebalance-prev-value">{state.valueNow}</span>
+                        </div>
+                      )}
+                      renderTrack={(props, state) => (
+                        <div {...props} className={`lifebalance-slider-track ${state.index === 0 ? 'filled' : 'unfilled'}`} />
+                      )}
+                    />
                   </div>
-                  <div className="page2-slider-row">
-                    <div className="page2-slider-arrows">
-                      <div className="page2-slider-arrow left">
-                        <div className="page2-slider-arrow-line"></div>
-                        <div className="page2-slider-arrow-down"></div>
-                      </div>
-                      <div className="page2-slider-arrow right">
-                        <div className="page2-slider-arrow-line"></div>
-                        <div className="page2-slider-arrow-down"></div>
-                      </div>
-                    </div>
-                    <div style={{position: 'relative', width: '100%', height: '44px'}}>
-                      <ReactSlider
-                        min={0}
-                        max={10}
-                        value={newScores[idx]}
-                        onChange={val => handleSliderChange(idx, val)}
-                        className="page2-slider"
-                        thumbClassName="page2-slider-thumb"
-                        trackClassName="page2-slider-track"
-                        renderThumb={(props, state) => (
-                          <div {...props} className="page2-slider-thumb">
-                            <span className="page2-slider-value-inside">{state.valueNow}</span>
-                          </div>
-                        )}
-                        renderTrack={(props, state) => (
-                          <div {...props} className={`page2-slider-track ${state.index === 0 ? 'filled' : 'unfilled'}`}></div>
-                        )}
-                      />
-                    </div>
-                    <div className="page2-slider-labels">
-                      <span className="page2-slider-label">Needs work (0)</span>
-                      <span className="page2-slider-label">Thriving (10)</span>
-                    </div>
+                  <div className="absolute bottom-[-1rem] w-[80%] left-[10%] flex justify-between pointer-events-none text-[#E0E0E0] text-base">
+                    <span>Needs work (0)</span>
+                    <span>Thriving (10)</span>
                   </div>
                 </div>
-              </CSSTransition>
-            );
-          })}
+                <div className="flex flex-col items-center w-full gap-3 mt-5 mb-2 relative min-h-[90px]">
+                  <div className="relative w-full h-11">
+                    <ReactSlider
+                      min={0}
+                      max={10}
+                      value={newScores[idx]}
+                      onChange={(val) => handleSliderChange(idx, val)}
+                      className="lifebalance-slider"
+                      thumbClassName="lifebalance-slider-thumb"
+                      trackClassName="lifebalance-slider-track"
+                      renderThumb={(props, state) => (
+                        <div {...props} className="lifebalance-slider-thumb">
+                          <span className="lifebalance-slider-value">{state.valueNow}</span>
+                        </div>
+                      )}
+                      renderTrack={(props, state) => (
+                        <div {...props} className={`lifebalance-slider-track ${state.index === 0 ? 'filled' : 'unfilled'}`} />
+                      )}
+                    />
+                  </div>
+                  <div className="absolute bottom-[-1rem] w-[80%] left-[10%] flex justify-between pointer-events-none text-[#E0E0E0] text-base">
+                    <span>Needs work (0)</span>
+                    <span>Thriving (10)</span>
+                  </div>
+                </div>
+              </div>
+            </CSSTransition>
+          ))}
         </TransitionGroup>
-        <button type="submit" className="btn btn-primary-active page2-next-btn page2-next-btn-absolute">
-          {revealed < LIFE_AREAS.length ? 'Next' : 'Complete'}
-        </button>
       </div>
-      {/* Show the Remember box only for the first question */}
+      <Button
+        type="submit"
+        className="absolute right-10 bottom-10 z-[100] mt-10 mb-6 bg-gradient-to-b from-[#B79BFF] to-[#4E3BD3] hover:from-[#c4afff] hover:to-[#5e4bdd] text-white font-semibold px-12 py-4 rounded-xl border border-[#8872C6] shadow-md hover:-translate-y-0.5"
+      >
+        {revealed < LIFE_AREAS.length ? 'Next' : 'Complete'}
+      </Button>
       {revealed === 1 && (
-        <div className="page2-remember">
-          <b>Remember</b><br/>
-          Let the question under each heading guide your reflection<br/>
-          <span className="page2-desc-em">There are no right answers here.</span>
+        <div className="mt-10 mb-2 text-center text-white text-[1.05rem]">
+          <b>Remember</b>
+          <br />
+          Let the question under each heading guide your reflection
+          <br />
+          <span className="text-[#A99CFF] italic font-normal">There are no right answers here.</span>
         </div>
       )}
     </form>
   );
 };
 
-export default Page3; 
+export default Page3;

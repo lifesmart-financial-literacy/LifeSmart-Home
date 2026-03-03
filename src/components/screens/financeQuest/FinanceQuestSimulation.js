@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chart } from 'chart.js/auto';
-import './FinanceQuestSimulation.css';
 import QuestionHeader from './questions/QuestionHeader';
 import FinanceQuestResultsScreen from './FinanceQuestResultsScreen';
 
@@ -30,7 +29,6 @@ function simulateAllYears(teams, initialAllocations, baseFunds, yearsConfig) {
     const teamBase = baseFunds + (team.points || 0) * 1000;
     const alloc = initialAllocations[idx];
     // Year 0: initial allocation
-    let prev = {};
     let yearArr = [];
     let total = 0;
     let pots = {};
@@ -86,8 +84,8 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
   const chartInstanceRef = useRef(null);
   const runTimeout = useRef(null);
 
-  // Always show all years on the x-axis
-  const allLabels = ['Initial', ...yearsConfig.map(y => y.label)];
+  // Always show all years on the x-axis - memoized to avoid effect re-runs
+  const allLabels = useMemo(() => ['Initial', ...yearsConfig.map(y => y.label)], [yearsConfig]);
 
   useEffect(() => {
     // Prepare data for the chart
@@ -145,7 +143,8 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
         chartInstanceRef.current.destroy();
       }
     };
-  }, [results, year, restartKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- allLabels derived from yearsConfig
+  }, [results, year, restartKey, allLabels]);
 
   // Clean up timeout on unmount
   useEffect(() => {
@@ -210,10 +209,10 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
   return (
     <>
     <QuestionHeader />
-    <div className="financeQuest-simulation-root">
+    <div className="fq-sim-root-bg w-full min-h-screen text-[#FFD43B] font-['Press_Start_2P',monospace] pt-10 text-center">
       <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', maxWidth: 1100, margin: '0 auto' }}>
         <button
-          className="financeQuest-simulation-btn"
+          className="font-['Press_Start_2P',monospace] text-[1.01rem] rounded-lg border-[2.5px] border-[#CA70E3] bg-[#1C0032] text-[#FFD43B] py-2.5 px-[22px] mx-0.5 cursor-pointer shadow-[0_2px_0_#CA70E344] transition-all duration-150 hover:bg-[#FFD43B] hover:text-[#1C0032] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#CA70E3] active:text-[#FFD43B] active:border-[#CA70E3] active:scale-[0.98] disabled:bg-[#333] disabled:text-[#888] disabled:border-[#555] disabled:cursor-not-allowed disabled:shadow-none"
           style={{ marginBottom: 12, fontSize: '0.95rem', padding: '7px 18px' }}
           onClick={() => setDevMode(d => !d)}
         >
@@ -221,40 +220,40 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
         </button>
       </div>
       {devMode && (
-        <div className="financeQuest-dev-controls" style={{ background: '#1C0032', border: '2px solid #FFD43B', borderRadius: 12, padding: 18, marginBottom: 18, maxWidth: 1100, margin: '0 auto 18px auto' }}>
-          <h3 style={{ color: '#FFD43B', fontFamily: 'Press Start 2P', fontSize: '1.1rem', marginBottom: 12 }}>DEV: Edit Simulation Controls</h3>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', color: '#FFD43B', fontFamily: 'Montserrat, Arial, sans-serif', fontSize: '1.01rem', borderCollapse: 'collapse' }}>
+        <div className="bg-[#1C0032] border-2 border-[#FFD43B] rounded-xl p-[18px] mb-[18px] max-w-[1100px] mx-auto" style={{ marginBottom: 18 }}>
+          <h3 className="text-[#FFD43B] font-['Press_Start_2P'] text-[1.1rem] mb-3">DEV: Edit Simulation Controls</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[#FFD43B] font-['Montserrat',Arial,sans-serif] text-[1.01rem] border-collapse">
               <thead>
                 <tr>
-                  <th style={{ borderBottom: '2px solid #FFD43B', padding: 4 }}>Year</th>
-                  {potLetters.map(l => <th key={l + 'm'} style={{ borderBottom: '2px solid #FFD43B', padding: 4 }}>{potNames[l]}<br/>x</th>)}
-                  {potLetters.map(l => <th key={l + 'f'} style={{ borderBottom: '2px solid #FFD43B', padding: 4 }}>{potNames[l]}<br/>+/-</th>)}
+                  <th className="border-b-2 border-[#FFD43B] p-1">Year</th>
+                  {potLetters.map(l => <th key={l + 'm'} className="border-b-2 border-[#FFD43B] p-1">{potNames[l]}<br/>x</th>)}
+                  {potLetters.map(l => <th key={l + 'f'} className="border-b-2 border-[#FFD43B] p-1">{potNames[l]}<br/>+/-</th>)}
                 </tr>
               </thead>
               <tbody>
                 {editYears.map((y, yIdx) => (
                   <tr key={yIdx}>
-                    <td style={{ fontWeight: 700, padding: 4 }}>{y.label}</td>
+                    <td className="font-bold p-1">{y.label}</td>
                     {potLetters.map(l => (
-                      <td key={l + 'm'} style={{ padding: 2 }}>
+                      <td key={l + 'm'} className="p-0.5">
                         <input
                           type="number"
                           step="0.01"
                           value={y.changes[l] ?? ''}
                           onChange={e => handleDevEditChange(yIdx, 'changes', l, e.target.value)}
-                          style={{ width: 60, fontSize: '1rem', borderRadius: 4, border: '1.5px solid #FFD43B', background: '#2D0245', color: '#FFD43B', textAlign: 'center' }}
+                          className="w-[60px] text-base rounded border-[1.5px] border-[#FFD43B] bg-[#2D0245] text-[#FFD43B] text-center"
                         />
                       </td>
                     ))}
                     {potLetters.map(l => (
-                      <td key={l + 'f'} style={{ padding: 2 }}>
+                      <td key={l + 'f'} className="p-0.5">
                         <input
                           type="number"
                           step="1"
                           value={y.flat && y.flat[l] !== undefined ? y.flat[l] : ''}
                           onChange={e => handleDevEditChange(yIdx, 'flat', l, e.target.value)}
-                          style={{ width: 60, fontSize: '1rem', borderRadius: 4, border: '1.5px solid #FFD43B', background: '#2D0245', color: '#FFD43B', textAlign: 'center' }}
+                          className="w-[60px] text-base rounded border-[1.5px] border-[#FFD43B] bg-[#2D0245] text-[#FFD43B] text-center"
                         />
                       </td>
                     ))}
@@ -263,52 +262,52 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
               </tbody>
             </table>
           </div>
-          <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
-            <button className="financeQuest-simulation-btn" onClick={handleApplyDevControls}>Apply & Restart Simulation</button>
-            <button className="financeQuest-simulation-btn" onClick={handleResetDevControls}>Reset to Default</button>
+          <div className="mt-3 flex gap-3">
+            <button className="font-['Press_Start_2P',monospace] text-[1.01rem] rounded-lg border-[2.5px] border-[#CA70E3] bg-[#1C0032] text-[#FFD43B] py-2.5 px-[22px] cursor-pointer shadow-[0_2px_0_#CA70E344] transition-all duration-150 hover:bg-[#FFD43B] hover:text-[#1C0032] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#CA70E3] active:text-[#FFD43B] active:border-[#CA70E3] active:scale-[0.98]" onClick={handleApplyDevControls}>Apply & Restart Simulation</button>
+            <button className="font-['Press_Start_2P',monospace] text-[1.01rem] rounded-lg border-[2.5px] border-[#CA70E3] bg-[#1C0032] text-[#FFD43B] py-2.5 px-[22px] cursor-pointer shadow-[0_2px_0_#CA70E344] transition-all duration-150 hover:bg-[#FFD43B] hover:text-[#1C0032] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#CA70E3] active:text-[#FFD43B] active:border-[#CA70E3] active:scale-[0.98]" onClick={handleResetDevControls}>Reset to Default</button>
           </div>
         </div>
       )}
       <h2>Finance Quest Simulation</h2>
-      <div className="financeQuest-simulation-year-controls">
-        <button className="financeQuest-simulation-btn" onClick={() => setYear(y => Math.max(0, y - 1))} disabled={year === 0 || isRunning}>Previous</button>
-        <span className="financeQuest-simulation-year-label">
+      <div className="flex justify-center items-center gap-[18px] mx-auto mb-[18px] py-[18px] px-6 bg-[rgba(28,0,50,0.85)] rounded-2xl shadow-[0_2px_0_#FFD43B44] max-w-[600px]">
+        <button className="font-['Press_Start_2P',monospace] text-[1.01rem] rounded-lg border-[2.5px] border-[#CA70E3] bg-[#1C0032] text-[#FFD43B] py-2.5 px-[22px] mx-0.5 cursor-pointer shadow-[0_2px_0_#CA70E344] transition-all duration-150 hover:bg-[#FFD43B] hover:text-[#1C0032] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#CA70E3] active:text-[#FFD43B] active:border-[#CA70E3] active:scale-[0.98] disabled:bg-[#333] disabled:text-[#888] disabled:border-[#555] disabled:cursor-not-allowed disabled:shadow-none" onClick={() => setYear(y => Math.max(0, y - 1))} disabled={year === 0 || isRunning}>Previous</button>
+        <span className="font-['Press_Start_2P',monospace] text-[1.18rem] text-[#FFD43B] font-bold tracking-[1px] mx-2 min-w-[120px] text-center">
           {year === 0 ? 'Initial Allocation' : yearsConfig[year - 1]?.label}
         </span>
-        <button className="financeQuest-simulation-btn" onClick={() => setYear(y => Math.min(maxYear, y + 1))} disabled={year === maxYear || isRunning}>Next</button>
-        <button className="financeQuest-simulation-run-btn" onClick={runSimulation} disabled={isRunning || year === maxYear}>
+        <button className="font-['Press_Start_2P',monospace] text-[1.01rem] rounded-lg border-[2.5px] border-[#CA70E3] bg-[#1C0032] text-[#FFD43B] py-2.5 px-[22px] mx-0.5 cursor-pointer shadow-[0_2px_0_#CA70E344] transition-all duration-150 hover:bg-[#FFD43B] hover:text-[#1C0032] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#CA70E3] active:text-[#FFD43B] active:border-[#CA70E3] active:scale-[0.98] disabled:bg-[#333] disabled:text-[#888] disabled:border-[#555] disabled:cursor-not-allowed disabled:shadow-none" onClick={() => setYear(y => Math.min(maxYear, y + 1))} disabled={year === maxYear || isRunning}>Next</button>
+        <button className="bg-[#FFD43B] text-[#1C0032] border-[2.5px] border-[#CA70E3] font-bold ml-[18px] rounded-lg py-2.5 px-[22px] shadow-[0_2px_0_#FFD43B44] transition-all duration-150 hover:bg-[#CA70E3] hover:text-[#FFD43B] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#FF9524] active:text-white active:border-[#FF9524] active:scale-[0.98] disabled:bg-[#ccc] disabled:text-[#888] disabled:border-[#aaa] disabled:cursor-not-allowed disabled:shadow-none font-['Press_Start_2P',monospace]" onClick={runSimulation} disabled={isRunning || year === maxYear}>
           {isRunning ? 'Running...' : 'Run Simulation'}
         </button>
         {year === maxYear && !isRunning && (
-          <button className="financeQuest-simulation-run-btn" style={{ marginLeft: 18 }} onClick={() => setShowResults(true)}>
+          <button className="bg-[#FFD43B] text-[#1C0032] border-[2.5px] border-[#CA70E3] font-bold rounded-lg py-2.5 px-[22px] shadow-[0_2px_0_#FFD43B44] transition-all duration-150 hover:bg-[#CA70E3] hover:text-[#FFD43B] hover:border-[#FFD43B] hover:scale-[1.04] active:bg-[#FF9524] active:text-white active:border-[#FF9524] active:scale-[0.98] font-['Press_Start_2P',monospace]" style={{ marginLeft: 18 }} onClick={() => setShowResults(true)}>
             View Results
           </button>
         )}
       </div>
-      <div className="financeQuest-simulation-chart-container">
+      <div className="bg-[#1C0032] border-4 border-[#FFD43B] rounded-[18px] shadow-[0_4px_0_#CA70E344,0_0_8px_#FFD43B55] my-8 mx-auto py-8 px-6 max-w-[900px] min-w-[320px] flex flex-col items-center max-[900px]:p-3 max-[900px]:min-w-0 max-[900px]:max-w-[98vw]">
         <canvas id="financeQuestChart" ref={chartRef} height={320}></canvas>
-        <div className="financeQuest-simulation-chart-legend">
+        <div className="flex flex-wrap justify-center gap-[18px] mt-[18px]">
           {results.map((team, idx) => (
-            <div key={team.name} className="financeQuest-simulation-legend-item">
-              <span className="financeQuest-simulation-legend-color" style={{ background: teamColors[idx % teamColors.length] }}></span>
+            <div key={team.name} className="flex items-center font-['Press_Start_2P',monospace] text-[1.05rem] text-[#FFD43B] mr-[18px]">
+              <span className="w-[22px] h-[22px] rounded-md mr-2 border-[2.5px] border-white shadow-[0_2px_0_#0008]" style={{ background: teamColors[idx % teamColors.length] }}></span>
               {team.name}
             </div>
           ))}
         </div>
       </div>
-      <div className="financeQuest-simulation-perpot-details">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6 mx-auto mt-8 max-w-[1100px] px-3 max-[900px]:grid-cols-1 max-[900px]:gap-3 max-[900px]:max-w-[98vw]">
         {results.map((team, idx) => (
-          <div key={team.name} className="financeQuest-simulation-perpot-card">
-            <div className="financeQuest-simulation-perpot-title">{team.name}</div>
+          <div key={team.name} className="bg-[#2D0245] border-[3px] border-[#FFD43B] rounded-[14px] shadow-[0_2px_0_#0008] p-[18px] min-w-[180px] max-w-[260px] font-['Montserrat',Arial,sans-serif] text-[#FFD43B] text-center transition-all duration-150 flex flex-col items-center hover:shadow-[0_8px_24px_#FFD43B44] hover:scale-[1.03] hover:border-[#CA70E3] max-[900px]:min-w-[120px] max-[900px]:max-w-[98vw]">
+            <div className="font-['Press_Start_2P',monospace] text-[1.12rem] mb-2.5 text-[#FFD43B] tracking-[1px] font-bold border-b-2 border-[#FFD43B44] pb-1.5 w-full">{team.name}</div>
             {potLetters.map(l => (
-              <div key={l} className={`financeQuest-simulation-perpot-label-${l}`} style={{ marginBottom: 6 }}>
-                <span style={{ fontWeight: 700 }}>{potNames[l]}:</span>
-                <span className="financeQuest-simulation-perpot-value" style={{ color: potColors[l], marginLeft: 8 }}>
+              <div key={l} className="flex justify-between items-center text-[1.01rem] w-full py-1 border-b border-[#FFD43B22] font-['Montserrat',Arial,sans-serif] last:border-b-0" style={{ marginBottom: 6 }}>
+                <span className="font-bold">{potNames[l]}:</span>
+                <span className="text-[1.08rem] font-['Montserrat',Arial,sans-serif] font-bold ml-2" style={{ color: potColors[l] }}>
                   £{Math.round(team.yearly[year][l]).toLocaleString()}
                 </span>
               </div>
             ))}
-            <div style={{ marginTop: 10, fontWeight: 700, color: teamColors[idx % teamColors.length] }}>
+            <div className="mt-2.5 font-bold" style={{ color: teamColors[idx % teamColors.length] }}>
               Total: £{Math.round(team.yearly[year].total).toLocaleString()}
             </div>
           </div>
@@ -319,4 +318,4 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
   );
 };
 
-export default FinanceQuestSimulation; 
+export default FinanceQuestSimulation;

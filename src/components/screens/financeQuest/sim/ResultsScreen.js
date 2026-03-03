@@ -1,7 +1,7 @@
+/* eslint-disable no-unused-vars -- getFinancialAdvice reserved for future UI */
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Chart from 'chart.js/auto';
-import './styles/ResultsScreen.css';
 import LifeSmartLogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 const ResultsScreen = () => {
@@ -30,8 +30,9 @@ const ResultsScreen = () => {
 
   useEffect(() => {
     // Cleanup function to destroy all charts when component unmounts
+    const instances = chartInstances.current;
     return () => {
-      Object.values(chartInstances.current).forEach(chart => {
+      Object.values(instances).forEach(chart => {
         if (chart) {
           chart.destroy();
         }
@@ -109,6 +110,7 @@ const ResultsScreen = () => {
         setTimeout(() => createChart(team), 100);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- createChart uses refs/state
   }, [expandedGroups, quarterResults]);
 
   const calculateTotalScore = (team) => {
@@ -137,6 +139,7 @@ const ResultsScreen = () => {
     return rank;
   };
 
+  // Reserved for future financial advice display (currently commented out in JSX)
   const getFinancialAdvice = (team) => {
     if (!teamData || !teamData[team]) return 'No data available for financial advice.';
     
@@ -167,10 +170,10 @@ const ResultsScreen = () => {
 
   if (!teams || !teamData) {
     return (
-      <div className="simulation-results-error">
-        <h2>No simulation data available</h2>
-        <p>Please complete a simulation first to see results.</p>
-        <button onClick={restartGame} className="simulation-results-restart-button">
+      <div className="flex flex-col items-center justify-center min-h-screen p-5 text-center bg-[#1a1a1a] text-white">
+        <h2 className="text-[#CB0E38] mb-4 text-[2rem]">No simulation data available</h2>
+        <p className="text-[#888] mb-8 text-[1.1rem]">Please complete a simulation first to see results.</p>
+        <button onClick={restartGame} className="py-3 px-6 text-[1.1rem] text-white bg-[#CB0E38] border-none rounded-lg cursor-pointer transition-all duration-300 block hover:bg-[#a30b2d] hover:-translate-y-0.5">
           Return to Home
         </button>
       </div>
@@ -178,56 +181,52 @@ const ResultsScreen = () => {
   }
 
   return (
-    <div className="simulation-results-screen">
-      <header className="simulation-results-header">
-        <img src={LifeSmartLogo} alt="Logo" className="simulation-results-logo" />
+    <div className="mx-auto p-10 font-['Helvetica_Neue',Arial,sans-serif] bg-[#F6F2EF] min-h-screen">
+      <header className="flex justify-between items-center p-5 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+        <img src={LifeSmartLogo} alt="Logo" className="h-10" />
         <div>
-          <button className="simulation-results-calculator-toggle">
+          <button className="bg-none border-none text-2xl text-[#172b4d] cursor-pointer">
             <i className="fas fa-calculator"></i>
           </button>
         </div>
       </header>
 
-      <h1 className="simulation-results-title">
-        <i className="fas fa-chart-line simulation-results-icon"></i>
+      <h1 className="text-center text-[#172b4d] text-[2.5rem] my-8 flex items-center justify-center gap-4">
+        <i className="fas fa-chart-line text-[#CB0E38] text-[2rem]"></i>
         Investment Results
       </h1>
 
-      <div className="simulation-results-container">
+      <div className="flex flex-col gap-5 items-center w-full max-w-[1200px] mx-auto">
         {teams.map((team, index) => {
           const rank = getTeamRank(team);
           const totalValue = calculateTotalScore(team);
           const isExpanded = expandedGroups[team];
-          const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+          const rankClass = rank === 1 ? 'border-[#ffd700] shadow-[0_6px_10px_rgba(255,215,0,0.3)]' : rank === 2 ? 'border-[#c0c0c0] shadow-[0_6px_10px_rgba(192,192,192,0.3)]' : rank === 3 ? 'border-[#cd7f32] shadow-[0_6px_10px_rgba(205,127,50,0.3)]' : '';
 
           return (
             <div 
               key={team} 
-              className={`simulation-results-group ${rankClass}`}
+              className={`bg-[#FAEDE4] border border-transparent rounded-lg p-5 shadow-[0_6px_10px_rgba(0,0,0,0.1)] transition-transform duration-300 cursor-pointer w-full hover:scale-[1.02] hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)] ${rankClass}`}
               onClick={() => toggleGroup(team)}
             >
-              <h2>{rank}. {team} (${totalValue.toFixed(2)})</h2>
+              <h2 className="text-[#172b4d] text-[1.5rem] mb-6 flex justify-between items-baseline">{rank}. {team} (${totalValue.toFixed(2)})</h2>
               {isExpanded && (
-                <div className="simulation-results-details">
-                  <div className="simulation-results-details-content">
-                    <ul className="simulation-results-asset-list">
-                      <li>Equity: ${teamData[team].equity.toFixed(2)}</li>
-                      <li>Bonds: ${teamData[team].bonds.toFixed(2)}</li>
-                      <li>Real Estate: ${teamData[team].realestate.toFixed(2)}</li>
-                      <li>Commodities: ${teamData[team].commodities.toFixed(2)}</li>
-                      <li>Other: ${teamData[team].other.toFixed(2)}</li>
-                      <li>Total Portfolio Value: ${totalValue.toFixed(2)}</li>
+                <div>
+                  <div className="flex flex-row justify-between items-start gap-5 p-5 max-lg:flex-col max-lg:items-stretch">
+                    <ul className="flex-1 list-none p-0 m-0">
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Equity: ${teamData[team].equity.toFixed(2)}</li>
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Bonds: ${teamData[team].bonds.toFixed(2)}</li>
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Real Estate: ${teamData[team].realestate.toFixed(2)}</li>
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Commodities: ${teamData[team].commodities.toFixed(2)}</li>
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Other: ${teamData[team].other.toFixed(2)}</li>
+                      <li className="block mb-2.5 py-4 px-4 text-[1.1rem] text-[#172b4d] bg-white rounded-lg transition-all duration-300 last:mb-0 hover:bg-[#f8f9fa] hover:translate-x-1">Total Portfolio Value: ${totalValue.toFixed(2)}</li>
                     </ul>
-                    <div className="simulation-results-chart-container">
+                    <div className="flex-[2] bg-white p-5 rounded-lg h-[300px] mx-5 my-0 max-lg:mx-0 max-lg:my-5 max-lg:w-full shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                       <canvas 
                         ref={el => chartRefs.current[team] = el}
-                        className="simulation-results-chart"
+                        className="w-full h-full"
                       />
                     </div>
-                    {/* <div className="simulation-results-financial-advice">
-                      <h4>Financial Advice:</h4>
-                      <p>{getFinancialAdvice(team)}</p>
-                    </div> */}
                   </div>
                 </div>
               )}
@@ -236,11 +235,11 @@ const ResultsScreen = () => {
         })}
       </div>
 
-      <button onClick={restartGame} className="simulation-results-restart-button">
+      <button onClick={restartGame} className="mt-10 mx-auto py-3 px-6 text-[1.1rem] text-white bg-[#CB0E38] border-none rounded-lg cursor-pointer transition-all duration-300 block hover:bg-[#a30b2d] hover:-translate-y-0.5">
         Restart Simulation
       </button>
     </div>
   );
 };
 
-export default ResultsScreen; 
+export default ResultsScreen;

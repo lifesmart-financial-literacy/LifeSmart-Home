@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { db } from '../../../../firebase/initFirebase';
-import { collection, query, getDocs, doc, updateDoc, where, deleteDoc, orderBy, limit, getDoc } from 'firebase/firestore';
-import { 
+import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import {
   FaUserShield,
   FaArrowLeft,
   FaSearch,
@@ -18,11 +18,14 @@ import {
 } from 'react-icons/fa';
 import ConfirmModal from '../../../widgets/modals/ConfirmModal';
 import EditModal from '../../../widgets/modals/EditModal';
-import '../styles/AdminUserManagement.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 const AdminUserManagement = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  useAuth();
   const { trackFeatureView, trackAdminAction, trackError } = useAnalytics();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
@@ -43,17 +46,17 @@ const AdminUserManagement = () => {
       const usersRef = collection(db, 'Users');
       const usersSnap = await getDocs(usersRef);
       const usersData = [];
-      
+
       for (const userDoc of usersSnap.docs) {
         const userData = userDoc.data();
-        
+
         // Fetch the last login and streak from Login Streak document
         let lastLogin = null;
         let streak = 0;
         try {
           const loginStreakRef = doc(db, userDoc.id, 'Login Streak');
           const loginSnap = await getDoc(loginStreakRef);
-          
+
           if (loginSnap.exists()) {
             const loginData = loginSnap.data();
             lastLogin = loginData.lastLogin;
@@ -68,14 +71,14 @@ const AdminUserManagement = () => {
         try {
           const fundsRef = doc(db, userDoc.id, 'Total Funds');
           const fundsSnap = await getDoc(fundsRef);
-          
+
           if (fundsSnap.exists()) {
             totalFunds = fundsSnap.data().amount || 0;
           }
         } catch (error) {
           console.error('Error fetching total funds for user:', userDoc.id, error);
         }
-        
+
         // Combine all data from the main document
         const user = {
           id: userDoc.id,
@@ -108,21 +111,23 @@ const AdminUserManagement = () => {
       trackError('FETCH_USERS_ERROR', error.message, 'AdminUserManagement');
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trackError from useAnalytics is stable
   }, []);
 
   // Track feature view once on mount
   useEffect(() => {
     trackFeatureView('admin_user_management');
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   // Fetch users once on mount
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleUserAction = async (action, user) => {
     setSelectedUser(user);
-    
+
     switch (action) {
       case 'edit':
         setShowEditModal(true);
@@ -162,7 +167,7 @@ const AdminUserManagement = () => {
       default:
         return;
     }
-    
+
     setShowModal(true);
   };
 
@@ -180,7 +185,7 @@ const AdminUserManagement = () => {
     try {
       const userRef = doc(db, 'Users', selectedUser.id);
       const userProfileRef = doc(db, selectedUser.id, 'Profile');
-      
+
       switch (modalConfig.action) {
         case 'toggle-status':
           console.log('Toggling status for user:', selectedUser.id);
@@ -196,7 +201,7 @@ const AdminUserManagement = () => {
             newStatus: !selectedUser.isActive
           });
           break;
-        
+
         case 'toggle-admin':
           console.log('Toggling admin for user:', selectedUser.id);
           const newAdminStatus = !selectedUser.admin;
@@ -232,16 +237,16 @@ const AdminUserManagement = () => {
             newStatus: newDevStatus
           });
           break;
-        
+
         case 'delete':
           console.log('Deleting user:', selectedUser.id);
           try {
             // Delete the Profile document first
             await deleteDoc(userProfileRef);
-            
+
             // Then delete the main user document
             await deleteDoc(userRef);
-            
+
             trackAdminAction('delete_user', {
               userId: selectedUser.id
             });
@@ -250,7 +255,7 @@ const AdminUserManagement = () => {
             throw deleteError;
           }
           break;
-        
+
         default:
           break;
       }
@@ -262,7 +267,7 @@ const AdminUserManagement = () => {
       await fetchUsers();
       setShowModal(false);
       setSelectedUser(null);
-      
+
     } catch (error) {
       console.error('Error updating user:', error);
       alert(`Error: ${error.message}`);
@@ -270,7 +275,7 @@ const AdminUserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => 
+  const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.school.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -279,175 +284,193 @@ const AdminUserManagement = () => {
 
   if (loading) {
     return (
-      <div className="adminusers-loading">
-        <div className="adminusers-loading-spinner"></div>
+      <div className="min-h-screen flex justify-center items-center bg-zinc-900 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200">
+        <div className="w-12 h-12 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="adminusers-container">
-      <header className="adminusers-header">
-        <button 
-          onClick={() => navigate('/admin')} 
-          className="adminusers-back-button"
+    <div className="min-h-screen bg-zinc-900 text-white p-4 md:p-8 [data-theme=light]:bg-gradient-to-br [data-theme=light]:from-gray-100 [data-theme=light]:to-gray-200 [data-theme=light]:text-zinc-900">
+      <header className="max-w-[1400px] mx-auto mb-12 pb-8 border-b border-white/10 [data-theme=light]:border-zinc-200">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/admin')}
+          className="mb-8 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-0 [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-zinc-300"
         >
           <FaArrowLeft size={20} />
           <span>Back to Admin Panel</span>
-        </button>
-        <div className="adminusers-header-content">
-          <h1 className="adminusers-title">
-            <FaUserShield className="adminusers-title-icon" />
+        </Button>
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl mb-4 flex items-center justify-center gap-4 font-semibold">
+            <FaUserShield className="text-blue-500 [data-theme=light]:text-blue-600" />
             User Management
           </h1>
-          <p className="adminusers-subtitle">Manage user accounts and permissions</p>
+          <p className="text-zinc-300 text-lg [data-theme=light]:text-zinc-600">Manage user accounts and permissions</p>
         </div>
       </header>
 
-      <main className="adminusers-main">
-        <div className="adminusers-controls">
-          <div className="adminusers-search">
-            <FaSearch className="adminusers-search-icon" />
-            <input
+      <main className="max-w-[1400px] mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-8">
+          <div className="relative flex-1 min-w-[300px]">
+            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 [data-theme=light]:text-zinc-400" size={24} />
+            <Input
               type="text"
               placeholder="Search by name, email, school, or class..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="adminusers-search-input"
+              className="pl-12 pr-4 py-3 bg-white/5 border-white/15 text-white placeholder:text-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:placeholder:text-zinc-400"
             />
           </div>
-          <div className="adminusers-stats">
-            <div className="adminusers-stat">
-              <strong>{users.length}</strong> Total Users
+          <div className="flex gap-8 justify-around md:justify-start">
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{users.length}</strong> Total Users
             </div>
-            <div className="adminusers-stat">
-              <strong>{users.filter(u => u.admin).length}</strong> Admins
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{users.filter(u => u.admin).length}</strong> Admins
             </div>
-            <div className="adminusers-stat">
-              <strong>{users.filter(u => u.developer).length}</strong> Developers
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{users.filter(u => u.developer).length}</strong> Developers
             </div>
-            <div className="adminusers-stat">
-              <strong>{users.filter(u => u.isActive).length}</strong> Active
+            <div className="text-center text-zinc-300 [data-theme=light]:text-zinc-600 font-medium">
+              <strong className="block text-white text-2xl mb-1 [data-theme=light]:text-zinc-900">{users.filter(u => u.isActive).length}</strong> Active
             </div>
           </div>
         </div>
 
-        <div className="adminusers-table-container">
-          <table className="adminusers-table">
-            <thead>
-              <tr>
-                <th>User Info</th>
-                <th>School</th>
-                <th>Class & Group</th>
-                <th>Roles</th>
-                <th>Last Login</th>
-                <th>Total Funds</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td className="adminusers-user-info">
-                    <div className="adminusers-user-details">
-                      <span className="adminusers-name" title={`${user.firstName} ${user.lastName}`}>
-                        {user.firstName} {user.lastName}
-                      </span>
-                      <span className="adminusers-email" title={user.email}>
-                        {user.email}
-                      </span>
-                      <span className="adminusers-uid" title={`User ID: ${user.userUID}`}>
-                        ID: {user.userUID}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="adminusers-school" title={user.school}>
-                      {user.school || 'Not specified'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="adminusers-class-group">
-                      <span className="adminusers-class" title={`Class: ${user.class}`}>
-                        {user.class || 'Not specified'}
-                      </span>
-                      {user.groupCode && (
-                        <span className="adminusers-group" title={`Group: ${user.groupCode}`}>
-                          Group: {user.groupCode}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="adminusers-roles">
-                      {user.admin ? (
-                        <span className="adminusers-role admin">Admin</span>
-                      ) : user.developer ? (
-                        <span className="adminusers-role developer">Developer</span>
-                      ) : (
-                        <span className="adminusers-role user">User</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="adminusers-login-info">
-                      <span className="adminusers-last-login">
-                        {user.lastLogin || 'Never'}
-                      </span>
-                      {user.streak > 0 && (
-                        <span className="adminusers-streak" title="Current login streak">
-                          🔥 {user.streak} days
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <span className="adminusers-funds">
-                      £{user.totalFunds.toFixed(2)}
-                    </span>
-                  </td>
-                  <td className="adminusers-actions">
-                    <button
-                      onClick={() => handleUserAction('edit', user)}
-                      className="adminusers-action-button edit"
-                      title="Edit User"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('toggle-status', user)}
-                      className={`adminusers-action-button ${user.isActive ? 'deactivate' : 'activate'}`}
-                      title={user.isActive ? 'Deactivate User' : 'Activate User'}
-                    >
-                      {user.isActive ? <FaBan /> : <FaCheck />}
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('toggle-admin', user)}
-                      className={`adminusers-action-button ${user.admin ? 'remove-admin' : 'make-admin'}`}
-                      title={user.admin ? 'Remove Admin' : 'Make Admin'}
-                    >
-                      {user.admin ? <FaUserCog /> : <FaStar />}
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('toggle-developer', user)}
-                      className={`adminusers-action-button ${user.developer ? 'remove-developer' : 'make-developer'}`}
-                      title={user.developer ? 'Remove Developer' : 'Make Developer'}
-                    >
-                      <FaCode />
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('delete', user)}
-                      className="adminusers-action-button delete"
-                      title="Delete User"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
+        <Card className="bg-white/5 border-white/10 overflow-hidden mb-8 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[900px]">
+              <thead>
+                <tr>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">User Info</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">School</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Class & Group</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Roles</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Last Login</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Total Funds</th>
+                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredUsers.map(user => (
+                  <tr key={user.id} className="hover:bg-white/5 [data-theme=light]:hover:bg-zinc-50">
+                    <td className="px-4 py-5 border-b border-white/10 min-w-[250px] [data-theme=light]:border-zinc-200">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-base font-semibold text-white truncate cursor-help [data-theme=light]:text-zinc-900" title={`${user.firstName} ${user.lastName}`}>
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span className="text-sm text-zinc-300 [data-theme=light]:text-zinc-600" title={user.email}>
+                          {user.email}
+                        </span>
+                        <span className="text-sm text-zinc-500 font-mono [data-theme=light]:text-zinc-500" title={`User ID: ${user.userUID}`}>
+                          ID: {user.userUID}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <span className="block text-zinc-300 min-w-[150px] max-w-[250px] [data-theme=light]:text-zinc-600" title={user.school}>
+                        {user.school || 'Not specified'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex flex-col gap-2 min-w-[120px]">
+                        <span className="text-base font-medium text-white [data-theme=light]:text-zinc-900" title={`Class: ${user.class}`}>
+                          {user.class || 'Not specified'}
+                        </span>
+                        {user.groupCode && (
+                          <span className="text-sm text-zinc-300 px-3 py-1 bg-white/10 rounded inline-block [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-600" title={`Group: ${user.groupCode}`}>
+                            Group: {user.groupCode}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex flex-wrap gap-2 min-w-[120px]">
+                        {user.admin ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-500/15 text-blue-300 [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-700">Admin</span>
+                        ) : user.developer ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-purple-500/15 text-purple-300 [data-theme=light]:bg-purple-100 [data-theme=light]:text-purple-700">Developer</span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-amber-500/15 text-amber-300 [data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-700">User</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <div className="flex flex-col gap-2">
+                        <span className="text-zinc-300 [data-theme=light]:text-zinc-600">
+                          {user.lastLogin || 'Never'}
+                        </span>
+                        {user.streak > 0 && (
+                          <span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-400 bg-amber-400/10 px-2 py-1 rounded whitespace-nowrap [data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-700" title="Current login streak">
+                            🔥 {user.streak} days
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
+                      <span className="font-mono text-base font-semibold text-green-500 bg-green-500/10 px-3 py-1 rounded inline-block [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700">
+                        £{user.totalFunds.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-5 border-b border-white/10 min-w-[200px] [data-theme=light]:border-zinc-200">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUserAction('edit', user)}
+                          title="Edit User"
+                          className="h-8 w-8 bg-white/10 hover:bg-blue-500 text-white [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-blue-500 [data-theme=light]:hover:text-white"
+                        >
+                          <FaEdit />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUserAction('toggle-status', user)}
+                          title={user.isActive ? 'Deactivate User' : 'Activate User'}
+                          className={cn(
+                            "h-8 w-8 text-white [data-theme=light]:text-zinc-900",
+                            user.isActive ? "bg-white/20 hover:bg-red-500" : "bg-white/10 hover:bg-green-500"
+                          )}
+                        >
+                          {user.isActive ? <FaBan /> : <FaCheck />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUserAction('toggle-admin', user)}
+                          title={user.admin ? 'Remove Admin' : 'Make Admin'}
+                          className="h-8 w-8 bg-white/10 hover:bg-amber-500 text-white [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-purple-500 [data-theme=light]:hover:text-white"
+                        >
+                          {user.admin ? <FaUserCog /> : <FaStar />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUserAction('toggle-developer', user)}
+                          title={user.developer ? 'Remove Developer' : 'Make Developer'}
+                          className="h-8 w-8 bg-white/10 hover:bg-purple-500 text-white [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-purple-600 [data-theme=light]:hover:text-white"
+                        >
+                          <FaCode />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUserAction('delete', user)}
+                          title="Delete User"
+                          className="h-8 w-8 bg-white/10 hover:bg-red-500 text-white [data-theme=light]:bg-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-red-500 [data-theme=light]:hover:text-white"
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </main>
 
       <ConfirmModal
@@ -469,4 +492,4 @@ const AdminUserManagement = () => {
   );
 };
 
-export default AdminUserManagement; 
+export default AdminUserManagement;
