@@ -27,13 +27,10 @@
 @import './components/screens/financeQuest/sim/styles/ResultsScreen.css';
 @import './components/screens/financeQuest/sim/styles/PastSimulations.css';
 
-/* Budget */
+/* Budget - BudgetSpreadsheet converted to Tailwind */
 @import './components/screens/budget/styles/BudgetTool.css';
-@import './components/screens/budget/styles/BudgetSpreadsheet.css';
 
-/* Calculator */
-@import './components/screens/calculator/InvestmentCalculator.css';
-@import './components/widgets/InvestmentCalculator.css';
+/* Calculator - converted to Tailwind */
 
 /* shadcn/ui theme - Light mode (default) */
 :root,

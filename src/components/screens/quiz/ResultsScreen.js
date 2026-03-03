@@ -68,7 +68,7 @@ const ResultsScreen = ({ teams, quizComplete, onNextQuestion }) => {
                 </p>
                 <div className="flex-[2] h-6 bg-white/20 rounded-[25px] overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
                   <div
-                    className="h-full bg-gradient-to-r from-[#00f2fe] to-[#4facfe] rounded-[25px] transition-[width] duration-[1.5s] ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[0_0_20px_rgba(79,172,254,0.5)]"
+                    className="h-full bg-gradient-to-r from-[#00f2fe] to-[#4facfe] rounded-[25px] transition-[width] duration-1500 ease-in-out shadow-[0_0_20px_rgba(79,172,254,0.5)]"
                     style={{ width: `${barWidths[team.name] || 0}%`, transitionDelay: `${index * 0.2}s` }}
                   />
                 </div>

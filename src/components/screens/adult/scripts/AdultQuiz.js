@@ -124,7 +124,7 @@ const AdultQuiz = () => {
     <div className="fixed top-1/2 right-10 -translate-y-1/2 flex flex-col items-center z-[200] max-[900px]:right-2.5 max-[900px]:top-auto max-[900px]:bottom-[30px] max-[900px]:translate-y-0">
       <div className="text-white text-[1.3rem] font-semibold mb-2 tracking-wide">Points</div>
       <div className="relative w-[22px] h-[220px] bg-white rounded-xl border-[3px] border-orange shadow-[0_2px_8px_rgba(0,0,0,0.1)] mb-2 flex items-end overflow-hidden">
-        <div className="absolute left-0 bottom-0 w-full bg-orange rounded-b-xl transition-[height] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ height: `${percent * 100}%` }} />
+        <div className="absolute left-0 bottom-0 w-full bg-orange rounded-b-xl transition-[height] duration-300 ease-in-out" style={{ height: `${percent * 100}%` }} />
       </div>
       <div className="text-orange text-[1.4rem] font-bold">{points}</div>
     </div>

@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import crownIcon from '../../../assets/icons/crown.png';
 
 const Leaderboard = ({ teams, quizComplete, onNextQuestion }) => {
-  const [barWidths, setBarWidths] = useState({});
+  const [, setBarWidths] = useState({});
   const [expandedTeam, setExpandedTeam] = useState(null);
   const [rankedTeams, setRankedTeams] = useState([]);
-  const navigate = useNavigate();
   const maxPoints = 23;
 
   // Calculate sorted and ranked teams
@@ -39,18 +36,6 @@ const Leaderboard = ({ teams, quizComplete, onNextQuestion }) => {
 
   const handleExpand = (teamName) => {
     setExpandedTeam(expandedTeam === teamName ? null : teamName);
-  };
-
-  const goHome = () => {
-    navigate('/');
-  };
-
-  const nextOrNavigateToSimulation = () => {
-    if (quizComplete) {
-      navigate('/finance-quest-setup');
-    } else {
-      onNextQuestion();
-    }
   };
 
   useEffect(() => {

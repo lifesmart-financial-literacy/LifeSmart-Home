@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { 
-  FaCalculator, 
   FaCog, 
   FaCalendarAlt, 
-  FaPencilAlt, 
-  FaTrashAlt, 
   FaArrowRight,
   FaPlus,
   FaDice,

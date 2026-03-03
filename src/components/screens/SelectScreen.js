@@ -4,18 +4,13 @@ import { useAuth } from '../../firebase/auth';
 import {
   FaWallet,
   FaClipboardList,
-  FaChartLine,
   FaCalculator,
   FaUserCircle,
   FaCog,
-  FaStar,
-  FaStackExchange,
-  FaBook,
   FaSignOutAlt,
   FaFire,
   FaGraduationCap,
   FaBalanceScale,
-  FaAndroid,
   FaMoneyBillWave,
 } from 'react-icons/fa';
 import { doc, getDoc } from 'firebase/firestore';

@@ -8,7 +8,7 @@ const GlossaryModal = ({ open, onClose, title, children }) => {
       onClick={onClose}
     >
       <div
-        className={`fixed top-0 right-0 w-[420px] h-screen bg-[#FFC247] rounded-l-[36px] shadow-[-4px_0_32px_rgba(0,0,0,0.18)] z-[10000] flex flex-col transition-[right] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${open ? 'right-0' : '-right-[520px]'}`}
+        className={`fixed top-0 right-0 w-[420px] h-screen bg-[#FFC247] rounded-l-[36px] shadow-[-4px_0_32px_rgba(0,0,0,0.18)] z-[10000] flex flex-col transition-[right] duration-300 ease-in-out ${open ? 'right-0' : '-right-[520px]'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center px-9 pt-9 pb-5 border-b-2 border-[#e6b200] text-2xl font-bold text-[#222] relative">

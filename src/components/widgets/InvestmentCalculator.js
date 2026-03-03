@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Chart } from 'chart.js/auto';
 
 const InvestmentCalculator = () => {
@@ -104,7 +104,8 @@ const InvestmentCalculator = () => {
     });
   };
 
-  const calculate = () => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- renderChart uses refs/state, including it causes infinite loop
+  const calculate = useCallback(() => {
     const principal = parseFloat(initialInvestment);
     const monthlyAmount = parseFloat(monthlyContribution);
     const years = parseInt(investmentPeriod);
@@ -119,11 +120,11 @@ const InvestmentCalculator = () => {
 
     setFutureValue(currentValue.toFixed(2));
     renderChart(data);
-  };
+  }, [initialInvestment, monthlyContribution, investmentPeriod, rate]);
 
   useEffect(() => {
     calculate();
-  }, [initialInvestment, monthlyContribution, investmentPeriod, rate]);
+  }, [calculate]);
 
   const handleInputChange = (setter) => (e) => {
     const value = parseFloat(e.target.value);
@@ -133,67 +134,67 @@ const InvestmentCalculator = () => {
   };
 
   return (
-    <div className="investment-calculator">
-      <div className="calculator-content">
-        <div className="calculator-inputs">
-          <div className="input-group">
-            <label htmlFor="initialInvestment">Initial Investment (£):</label>
+    <div className="bg-[#1a1a1a] rounded-xl p-6 shadow-[0_8px_16px_rgba(0,0,0,0.2)] max-w-[800px] mx-auto flex flex-col items-center text-white">
+      <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8 mb-8">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="initialInvestment" className="text-white/90 text-sm">Initial Investment (£):</label>
             <input
               type="number"
               placeholder="0"
               id="initialInvestment"
               value={initialInvestment}
               onChange={handleInputChange(setInitialInvestment)}
-              className="calculator-input"
+              className="w-full px-3 py-3 border-2 border-white/10 rounded-lg text-base transition-all duration-300 bg-white/5 text-white focus:border-[#4caf50] focus:outline-none focus:bg-white/10"
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="monthlyContribution">Monthly Contribution (£):</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="monthlyContribution" className="text-white/90 text-sm">Monthly Contribution (£):</label>
             <input
               type="number"
               placeholder="500"
               id="monthlyContribution"
               value={monthlyContribution}
               onChange={handleInputChange(setMonthlyContribution)}
-              className="calculator-input"
+              className="w-full px-3 py-3 border-2 border-white/10 rounded-lg text-base transition-all duration-300 bg-white/5 text-white focus:border-[#4caf50] focus:outline-none focus:bg-white/10"
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="investmentPeriod">Investment Period (Years):</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="investmentPeriod" className="text-white/90 text-sm">Investment Period (Years):</label>
             <input
               type="number"
               placeholder="10"
               id="investmentPeriod"
               value={investmentPeriod}
               onChange={handleInputChange(setInvestmentPeriod)}
-              className="calculator-input"
+              className="w-full px-3 py-3 border-2 border-white/10 rounded-lg text-base transition-all duration-300 bg-white/5 text-white focus:border-[#4caf50] focus:outline-none focus:bg-white/10"
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="rate">Interest Rate (%):</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="rate" className="text-white/90 text-sm">Interest Rate (%):</label>
             <input
               type="number"
               placeholder="8"
               id="rate"
               value={rate}
               onChange={handleInputChange(setRate)}
-              className="calculator-input"
+              className="w-full px-3 py-3 border-2 border-white/10 rounded-lg text-base transition-all duration-300 bg-white/5 text-white focus:border-[#4caf50] focus:outline-none focus:bg-white/10"
             />
           </div>
-          <button onClick={calculate} className="calculate-button">Calculate</button>
+          <button onClick={calculate} className="w-full py-3 bg-[#4caf50] text-white border-none rounded-lg text-lg cursor-pointer transition-colors duration-300 mt-2.5 hover:bg-[#45a049]">Calculate</button>
         </div>
 
-        <div className="calculator-chart">
+        <div className="w-full h-[300px] md:h-[300px] bg-white/5 rounded-xl p-5 border border-white/10">
           <canvas ref={chartRef} width="400" height="200"></canvas>
         </div>
       </div>
 
       {futureValue && (
-        <div className="result">
-          <h4>Future Value:</h4>
-          <div className="result-box">
-            <p>At <strong>{rate}%</strong> return rate:</p>
-            <span className="future-value">£{formatNumber(futureValue)}</span>
+        <div className="mt-8 w-full text-center">
+          <h4 className="text-white text-lg mb-2.5">Future Value:</h4>
+          <div className="bg-gradient-to-br from-[#4CAF50]/10 to-[#4CAF50]/20 p-5 rounded-xl border border-[#4CAF50]/30">
+            <p className="text-white/90 text-lg m-0 mb-2.5">At <strong>{rate}%</strong> return rate:</p>
+            <span className="text-3xl md:text-[2rem] text-[#4caf50] font-bold">£{formatNumber(futureValue)}</span>
           </div>
         </div>
       )}

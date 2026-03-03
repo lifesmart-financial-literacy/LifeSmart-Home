@@ -64,21 +64,34 @@ module.exports = {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        fadeIn: {
+          from: { opacity: '0', transform: 'translateY(20px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
         'slide-up': {
           from: { opacity: '0', transform: 'translateY(20px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideIn: {
+          from: { transform: 'translateX(-100%)' },
+          to: { transform: 'translateX(0)' },
         },
       },
       animation: {
         float: 'float 20s infinite',
         'homescreen-float': 'homescreen-float 15s ease-in-out infinite',
         'fade-in': 'fade-in 1s ease-in forwards',
+        fadeIn: 'fadeIn 0.5s ease-out forwards',
         'slide-up': 'slide-up 0.5s ease-out forwards',
+        slideIn: 'slideIn 3s infinite',
       },
       animationDelay: {
         300: '300ms',
         600: '600ms',
         900: '900ms',
+      },
+      transitionDuration: {
+        1500: '1500ms',
       },
     },
   },

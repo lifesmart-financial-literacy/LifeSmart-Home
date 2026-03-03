@@ -8,7 +8,6 @@ import {
   query,
   orderBy,
   limit,
-  doc,
   writeBatch
 } from 'firebase/firestore';
 import {
