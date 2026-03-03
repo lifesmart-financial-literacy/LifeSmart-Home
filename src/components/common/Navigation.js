@@ -63,7 +63,7 @@ import BudgetTool from '../screens/budget/scripts/BudgetTool';
 const Navigation = () => {
   return (
     <Router>
-      <div className="app">
+      <div className="min-h-screen bg-background text-foreground">
         <Routes>
           {/* Core Navigation */}
           <Route path="/" element={<HomeScreen />} />
