@@ -20,9 +20,6 @@ alwaysApply: false
 | createdAt  | string  |          | ISO date                       |
 | lastLogin  | string  |          | ISO date                       |
 | streak     | number  |          | Login streak count             |
-| school     | string  |          | Optional                       |
-| class      | string  |          | Optional                       |
-| groupCode  | string  |          | Optional                       |
 
 ## Consistency
 - Use `userUtils.ensureUserDoc` when creating new users

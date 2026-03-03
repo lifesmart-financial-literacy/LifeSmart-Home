@@ -58,9 +58,6 @@ const AdminUserManagement = () => {
           isActive: userData.isActive !== false,
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
-          school: userData.school || '',
-          class: userData.class || '',
-          groupCode: userData.groupCode || '',
           role: userData.role || 'user',
           userUID: userDoc.id,
           lastLogin: userData.lastLogin || null,
@@ -227,9 +224,7 @@ const AdminUserManagement = () => {
 
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.school.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.class.toLowerCase().includes(searchTerm.toLowerCase())
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -266,7 +261,7 @@ const AdminUserManagement = () => {
             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 [data-theme=light]:text-zinc-400" size={24} />
             <Input
               type="text"
-              placeholder="Search by name, email, school, or class..."
+              placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 pr-4 py-3 bg-white/5 border-white/15 text-white placeholder:text-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:placeholder:text-zinc-400"
@@ -294,8 +289,6 @@ const AdminUserManagement = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">User Info</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">School</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Class & Group</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Roles</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Last Login</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Actions</th>
@@ -315,23 +308,6 @@ const AdminUserManagement = () => {
                         <span className="text-sm text-zinc-500 font-mono [data-theme=light]:text-zinc-500" title={`User ID: ${user.userUID}`}>
                           ID: {user.userUID}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <span className="block text-zinc-300 min-w-[150px] max-w-[250px] [data-theme=light]:text-zinc-600" title={user.school}>
-                        {user.school || 'Not specified'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <div className="flex flex-col gap-2 min-w-[120px]">
-                        <span className="text-base font-medium text-white [data-theme=light]:text-zinc-900" title={`Class: ${user.class}`}>
-                          {user.class || 'Not specified'}
-                        </span>
-                        {user.groupCode && (
-                          <span className="text-sm text-zinc-300 px-3 py-1 bg-white/10 rounded inline-block [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-600" title={`Group: ${user.groupCode}`}>
-                            Group: {user.groupCode}
-                          </span>
-                        )}
                       </div>
                     </td>
                     <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">

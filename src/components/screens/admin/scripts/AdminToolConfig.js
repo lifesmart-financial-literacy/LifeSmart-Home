@@ -160,7 +160,7 @@ const AdminToolConfig = () => {
         {tools.length > 0 ? (
           <Reorder.Group axis="y" values={tools} onReorder={setTools} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {tools.map((tool, index) => (
-              <Reorder.Item key={tool.id} value={tool} className="cursor-grab active:cursor-grabbing">
+              <Reorder.Item key={tool.id} value={tool} drag className="cursor-grab active:cursor-grabbing relative">
                 <Card className="bg-white/5 border-white/10 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 hover:border-white/20 transition-colors">
                   <CardHeader className="flex flex-row items-center justify-between pb-2 gap-2">
                     <div className="flex items-center gap-2 min-w-0">

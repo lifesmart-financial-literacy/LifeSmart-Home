@@ -16,7 +16,6 @@ alwaysApply: false
 
 ## User Document Schema (Users/{uid})
 - `email`, `firstName`, `lastName`, `admin`, `developer`, `isActive`, `role`, `userUID`
-- `school`, `class`, `groupCode` (optional)
 - `createdAt`, `lastLogin`, `streak` (ISO strings / numbers)
 
 ## User Utilities

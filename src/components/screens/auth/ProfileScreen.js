@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserCircle, FaLock, FaEnvelope, FaArrowLeft, FaSave, FaEye, FaEyeSlash, FaSchool, FaUserTag, FaFire } from 'react-icons/fa';
+import { FaUserCircle, FaLock, FaEnvelope, FaArrowLeft, FaSave, FaEye, FaEyeSlash, FaFire } from 'react-icons/fa';
 import { firebaseAuth, db } from '../../../firebase/initFirebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
@@ -16,7 +16,7 @@ const ProfileScreen = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', class: '', school: '', groupCode: '',
+    firstName: '', lastName: '', email: '',
     currentPassword: '', newPassword: '', confirmPassword: '',
     loginStreak: 0,
   });
@@ -35,9 +35,6 @@ const ProfileScreen = () => {
             firstName: ud.firstName || '',
             lastName: ud.lastName || '',
             email: ud.email || '',
-            class: ud.class || ud.Y12 || '',
-            school: ud.school || ud.WCGS || '',
-            groupCode: ud.groupCode || ud.DEVELOPER || '',
             loginStreak: ud.streak || 0,
           }));
         }
@@ -64,8 +61,7 @@ const ProfileScreen = () => {
       const user = firebaseAuth.currentUser;
       if (!user) { navigate('/'); return; }
       await updateDoc(doc(db, 'Users', user.userUID || user.uid), {
-        firstName: formData.firstName, lastName: formData.lastName, class: formData.class,
-        school: formData.school, groupCode: formData.groupCode, email: formData.email,
+        firstName: formData.firstName, lastName: formData.lastName, email: formData.email,
       });
       setSuccess('Profile updated successfully');
     } catch (err) {
@@ -126,9 +122,6 @@ const ProfileScreen = () => {
                 { icon: FaUserCircle, label: 'First Name', name: 'firstName' },
                 { icon: FaUserCircle, label: 'Last Name', name: 'lastName' },
                 { icon: FaEnvelope, label: 'Email Address', name: 'email', disabled: true },
-                { icon: FaSchool, label: 'School', name: 'school' },
-                { icon: FaUserTag, label: 'Class', name: 'class' },
-                { icon: FaUserTag, label: 'Group Code', name: 'groupCode' },
               ].map(({ icon: Icon, label, name, disabled }) => (
                 <div key={name} className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-zinc-300 text-base">

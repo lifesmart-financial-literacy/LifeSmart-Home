@@ -16,9 +16,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
     firstName: '',
     lastName: '',
     email: '',
-    school: '',
-    class: '',
-    groupCode: '',
     isActive: true,
     admin: false,
     developer: false,
@@ -39,9 +36,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
             firstName: ud.firstName || '',
             lastName: ud.lastName || '',
             email: ud.email || '',
-            school: ud.school || '',
-            class: ud.class || '',
-            groupCode: ud.groupCode || '',
             isActive: ud.isActive !== false,
             admin: ud.admin || false,
             developer: ud.developer || false,
@@ -101,24 +95,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-zinc-300">Email</label>
                 <Input id="email" type="email" name="email" value={userData.email} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
-              </div>
-            </div>
-
-            <div className="space-y-4 border-b border-white/10 pb-6">
-              <h3 className="text-lg font-medium text-blue-400">School Information</h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="school" className="block text-sm font-medium text-zinc-300">School</label>
-                  <Input id="school" name="school" value={userData.school} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="class" className="block text-sm font-medium text-zinc-300">Class</label>
-                  <Input id="class" name="class" value={userData.class} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="groupCode" className="block text-sm font-medium text-zinc-300">Group Code</label>
-                <Input id="groupCode" name="groupCode" value={userData.groupCode} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
               </div>
             </div>
 
