@@ -40,7 +40,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "GENERATE_SOURCEMAP=false craco build",
+    "build": "cross-env GENERATE_SOURCEMAP=false craco build",
     "deploy": "npm run build && npx wrangler pages deploy build --project-name=lifesmart-home",
     "test": "craco test",
     "eject": "react-scripts eject"
@@ -64,6 +64,7 @@
     ]
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "wrangler": "^3.90.0",
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
