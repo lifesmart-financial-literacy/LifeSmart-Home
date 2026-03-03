@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Reorder } from 'framer-motion';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
@@ -54,11 +54,17 @@ const AdminToolConfig = () => {
   const [modal, setModal] = useState({ open: false, title: '', message: '', type: 'success' });
   const [confirmRemove, setConfirmRemove] = useState({ open: false, type: null, groupIndex: null, toolIndex: null });
   const [iconPicker, setIconPicker] = useState({ open: false, groupIndex: null, toolIndex: null });
+  const colorDebounceRef = useRef({ timeout: null, pending: null });
 
   useEffect(() => {
     trackFeatureView('admin_tool_config');
     loadConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
+  }, []);
+
+  useEffect(() => () => {
+    const ref = colorDebounceRef.current;
+    if (ref.timeout) clearTimeout(ref.timeout);
   }, []);
 
   const loadConfig = async () => {
@@ -174,6 +180,19 @@ const AdminToolConfig = () => {
     setGroups((prev) =>
       prev.map((g, i) => (i === groupIndex ? { ...g, tools: newTools } : g))
     );
+  };
+
+  const debouncedUpdateColor = (groupIndex, toolIndex, value) => {
+    const ref = colorDebounceRef.current;
+    ref.pending = { groupIndex, toolIndex, value };
+    if (ref.timeout) clearTimeout(ref.timeout);
+    ref.timeout = setTimeout(() => {
+      if (ref.pending) {
+        updateTool(ref.pending.groupIndex, ref.pending.toolIndex, 'color', ref.pending.value);
+        ref.pending = null;
+      }
+      ref.timeout = null;
+    }, 150);
   };
 
   const inputClasses = 'bg-white/5 border-white/20 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900';
@@ -347,7 +366,7 @@ const AdminToolConfig = () => {
                                     <input
                                       type="color"
                                       value={/^#[0-9A-Fa-f]{6}$/.test(tool.color) ? tool.color : '#2196F3'}
-                                      onChange={(e) => updateTool(groupIndex, toolIndex, 'color', e.target.value)}
+                                      onChange={(e) => debouncedUpdateColor(groupIndex, toolIndex, e.target.value)}
                                       className="h-8 w-8 min-w-[2rem] cursor-pointer rounded border border-white/20 p-0.5"
                                     />
                                     <Input value={tool.color || '#2196F3'} onChange={(e) => updateTool(groupIndex, toolIndex, 'color', e.target.value)} placeholder="#2196F3" className={cn(inputClasses, 'flex-1 text-sm')} />
