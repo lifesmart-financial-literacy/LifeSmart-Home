@@ -1,0 +1,34 @@
+---
+description: Folder layout and file organisation
+alwaysApply: true
+---
+
+# Codebase Structure
+
+```
+src/
+├── components/
+│   ├── common/          # Shared (Navigation, ThemeToggle)
+│   ├── contexts/        # React context providers (ThemeContext)
+│   ├── screens/        # Route-level screens by feature
+│   │   ├── admin/      # Admin scripts (AdminUserManagement, etc.)
+│   │   ├── auth/       # Login, Register, Profile, Settings
+│   │   ├── budget/     # Budget tool scripts
+│   │   ├── calculator/ # Investment calculator
+│   │   ├── financeQuest/
+│   │   ├── lifebalance/
+│   │   ├── quiz/
+│   │   └── adult/
+│   ├── ui/             # Radix-based primitives (button, card, input, etc.)
+│   └── widgets/        # Reusable widgets (modals, InvestmentCalculator)
+├── firebase/            # initFirebase, auth
+├── hooks/               # Custom hooks (useAnalytics, useToolConfig)
+├── lib/                 # Utilities (utils, userUtils, toolConfig)
+├── services/            # External services (seoService)
+└── utils/               # Build/script utils (generateSitemap)
+```
+
+## Organisation Rules
+- **Screens**: One folder per feature; `scripts/` subfolder for multi-file features
+- **Components**: Use `@/` path alias for imports
+- **Firebase**: Centralised in `firebase/`; never initialise Firebase elsewhere

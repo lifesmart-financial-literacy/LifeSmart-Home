@@ -1,0 +1,28 @@
+---
+description: Firebase and Firestore usage patterns
+globs: "**/firebase/**/*.js,firestore.rules,src/**/*.js"
+alwaysApply: false
+---
+
+# Firebase & Firestore
+
+## Initialisation
+- Import from `src/firebase/initFirebase.js`: `db`, `firebaseAuth`, `analytics`, `logAnalyticsEvent`
+- Never initialise Firebase elsewhere; use shared instances
+
+## Firestore Collections
+- `Users` – user profiles (email, admin, developer, isActive, role, streak, etc.)
+- Document ID for users: `firebaseUser.uid` (same as Auth UID)
+
+## User Document Schema (Users/{uid})
+- `email`, `firstName`, `lastName`, `admin`, `developer`, `isActive`, `role`, `userUID`
+- `school`, `class`, `groupCode` (optional)
+- `createdAt`, `lastLogin`, `streak` (ISO strings / numbers)
+
+## User Utilities
+- Use `ensureUserDoc(db, firebaseUser, overrides)` from `@/lib/userUtils` to create user doc on first login
+- Use `updateLoginStreak(db, userId)` on each login
+
+## Firestore Rules
+- Current rules are permissive (dev only): `allow read, write: if request.auth != null`
+- **Production**: Tighten to per-collection, per-role rules; validate field types and ownership

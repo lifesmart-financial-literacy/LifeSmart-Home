@@ -1,0 +1,29 @@
+---
+description: Data schemas and Firestore document shapes
+globs: "**/lib/**/*.js,**/firebase/**/*.js,firestore.rules"
+alwaysApply: false
+---
+
+# Data Schema
+
+## Users Collection (`Users/{uid}`)
+| Field       | Type    | Required | Notes                          |
+|------------|---------|----------|--------------------------------|
+| email      | string  | yes      |                                |
+| firstName  | string  |          |                                |
+| lastName   | string  |          |                                |
+| admin      | boolean |          | Default false                  |
+| developer  | boolean |          | Default false                  |
+| isActive   | boolean |          | Default true                   |
+| role       | string  |          | e.g. 'user'                   |
+| userUID    | string  | yes      | Same as doc id                 |
+| createdAt  | string  |          | ISO date                       |
+| lastLogin  | string  |          | ISO date                       |
+| streak     | number  |          | Login streak count             |
+| school     | string  |          | Optional                       |
+| class      | string  |          | Optional                       |
+| groupCode  | string  |          | Optional                       |
+
+## Consistency
+- Use `userUtils.ensureUserDoc` when creating new users
+- Use `??` for defaults when reading (e.g. `userData.admin ?? false`)

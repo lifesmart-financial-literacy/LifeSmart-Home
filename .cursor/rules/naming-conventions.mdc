@@ -1,0 +1,26 @@
+---
+description: Naming conventions for files, components, and variables
+alwaysApply: true
+---
+
+# Naming Conventions
+
+## Files
+- **Components**: PascalCase (`AdminUserManagement.js`, `EditModal.js`)
+- **Hooks**: camelCase with `use` prefix (`useAnalytics.js`, `useToolConfig.js`)
+- **Utilities**: camelCase (`userUtils.js`, `utils.js`)
+- **Screens**: PascalCase; scripts in `scripts/` subfolder
+
+## Components & Functions
+- Components: PascalCase
+- Hooks: `useXxx`
+- Handlers: `handleXxx` or verb + noun (`fetchUsers`, `updateUser`)
+- Booleans: `isXxx`, `hasXxx`, `showXxx`
+
+## Firestore
+- Collections: PascalCase singular or plural (`Users`, `Stock Market Data`)
+- Document IDs: use `uid` for user docs; meaningful IDs for others
+
+## Constants
+- UPPER_SNAKE_CASE for true constants
+- `analyticsEvents` object keys: UPPER_SNAKE_CASE

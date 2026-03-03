@@ -1,0 +1,23 @@
+---
+description: Testing standards and patterns
+globs: "**/*.test.{js,jsx},**/*.spec.{js,jsx},**/__tests__/**"
+alwaysApply: false
+---
+
+# Testing
+
+## Framework
+- React Testing Library (`@testing-library/react`, `@testing-library/user-event`)
+- Jest (via react-scripts / craco)
+
+## Conventions
+- Test files: `*.test.js` or `*.test.jsx` colocated with source
+- Use `render()`, `screen`, `userEvent` for component tests
+- Mock Firebase: mock `firebase/initFirebase` and auth/firestore modules
+- Avoid testing implementation details; focus on user behaviour
+
+## Examples
+```javascript
+// Mock Firebase before importing component
+jest.mock('@/firebase/initFirebase', () => ({ db: {}, firebaseAuth: {} }));
+```

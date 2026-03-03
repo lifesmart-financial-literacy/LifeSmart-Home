@@ -1,0 +1,22 @@
+---
+description: Pre-production deployment checklist
+alwaysApply: true
+---
+
+# Production Checklist
+
+## Before Deploy
+- [ ] Remove or gate `console.log` of env vars and sensitive data (initFirebase.js)
+- [ ] Tighten Firestore rules: per-collection, role-based; validate document shapes
+- [ ] Ensure `.env` / `.env.local` are in `.gitignore`; use CI secrets for build
+- [ ] Run `npm run build`; fix any build errors
+- [ ] Verify all `REACT_APP_*` vars are set in deployment environment
+
+## Firestore Rules
+- Current: `allow read, write: if request.auth != null` (dev only)
+- Production: Add rules per collection; restrict admin collections to `admin == true`
+- Validate required fields and data types in rules
+
+## Performance
+- Lazy-load heavy screens if needed
+- Ensure analytics does not block render
