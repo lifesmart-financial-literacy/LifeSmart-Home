@@ -40,27 +40,23 @@ const TeamCreationPage = () => {
   };
 
   return (
-    <div className="financeQuest-teamCreation-background">
-      <div className="financeQuest-teamCreation-container" style={{ background: 'none', borderRadius: 0, boxShadow: 'none', marginBottom: 0 }}>
-        <div className="financeQuest-teamCreation-title">START GAME</div>
-        <form onSubmit={handleSubmit} className="financeQuest-teamCreation-teams">
+    <div className="fq-team-bg min-h-screen w-screen flex items-center justify-center relative overflow-hidden">
+      <div className="flex flex-col items-center justify-center min-w-[350px] py-12 px-8 max-[600px]:min-w-0 max-[600px]:py-6 max-[600px]:px-2" style={{ background: 'none', borderRadius: 0, boxShadow: 'none', marginBottom: 0 }}>
+        <div className="font-['Press_Start_2P',monospace] text-[#ffd43b] text-[2.5rem] tracking-[3px] mb-10 text-center max-[600px]:text-[1.3rem]">START GAME</div>
+        <form onSubmit={handleSubmit} className="w-full mb-10">
           {[...Array(teamCount)].map((_, idx) => (
-            <div className={
-              'financeQuest-teamCreation-team-row' + (idx === selectedTeam ? ' selected' : '')
-            } key={idx} style={{ alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', minWidth: 120 }}>
+            <div className={`flex items-center mb-6 transition-transform duration-250 ease-in-out ${idx === selectedTeam ? 'translate-x-[18px]' : ''}`} key={idx} style={{ alignItems: 'center' }}>
+              <div className="flex items-center min-w-[120px]">
                 {idx === selectedTeam && (
-                  <span className="financeQuest-teamCreation-arrow">▶</span>
+                  <span className="text-[1.2rem] text-[#ff2d2d] mr-[18px] font-['Press_Start_2P',monospace] transition-all duration-250 ease-in-out" style={{ textShadow: '2px 2px 0 #2d1a4d' }}>▶</span>
                 )}
-                <span className={
-                  'financeQuest-teamCreation-team-label' + (idx === selectedTeam ? ' selected' : '')
-                }>
+                <span className={`font-['Press_Start_2P',monospace] text-white text-[1.1rem] mr-6 min-w-[120px] tracking-[1px] max-[600px]:text-[0.8rem] max-[600px]:min-w-[60px]`} style={{ textShadow: '2px 2px 0 #2d1a4d' }}>
                   Team {idx + 1}
                 </span>
               </div>
-              <div className="financeQuest-teamCreation-input-pixel-wrapper">
+              <div className="fq-input-pixel-wrapper relative inline-block w-full bg-[#090316] border-4 border-[#3E0B6E] mb-5 mx-3 box-border">
                 <input
-                  className="financeQuest-teamCreation-input"
+                  className="bg-transparent text-[#ccc] font-['Press_Start_2P',monospace] text-[1.1rem] border-none outline-none py-[1.1rem] px-[2.8rem] w-full box-border z-[1] text-center max-[600px]:text-[0.8rem] max-[600px]:py-2 max-[600px]:px-3 placeholder:text-white placeholder:opacity-70 disabled:bg-[#2d1a4d] disabled:text-[#aaa] disabled:opacity-70"
                   type="text"
                   placeholder="ENTER TEAM NAME"
                   value={teams[idx]}
@@ -74,7 +70,7 @@ const TeamCreationPage = () => {
           {teamCount < maxTeams && (
             <button
               type="button"
-              className="financeQuest-teamCreation-add-btn"
+              className="block mx-auto mb-6 font-['Press_Start_2P',monospace] bg-[#181818] text-white text-base border-[3px] border-white rounded-none py-[0.7rem] px-10 cursor-pointer shadow-[0_2px_0_#2d1a4d] transition-all duration-150 hover:bg-[#333] hover:shadow-[0_4px_0_#2d1a4d] hover:scale-[1.04] active:bg-black active:shadow-[0_1px_0_#2d1a4d] active:scale-[0.98] tracking-[2px]"
               onClick={increaseTeams}
             >
               + ADD TEAM
@@ -83,7 +79,7 @@ const TeamCreationPage = () => {
           {teamCount > 1 && (
             <button
               type="button"
-              className="financeQuest-teamCreation-remove-btn"
+              className="block mx-auto mb-6 font-['Press_Start_2P',monospace] bg-[#181818] text-white text-base border-[3px] border-white rounded-none py-[0.7rem] px-10 cursor-pointer shadow-[0_2px_0_#2d1a4d] transition-all duration-150 hover:bg-[#333] hover:shadow-[0_4px_0_#2d1a4d] hover:scale-[1.04] active:bg-black active:shadow-[0_1px_0_#2d1a4d] active:scale-[0.98] tracking-[2px]"
               onClick={decreaseTeams}
             >
               - REMOVE TEAM
@@ -91,7 +87,7 @@ const TeamCreationPage = () => {
           )}
           <button
             type="submit"
-            className="financeQuest-teamCreation-submit"
+            className="font-['Press_Start_2P',monospace] bg-[#181818] text-white text-[1.1rem] border-[3px] border-white rounded-none py-4 px-14 mt-6 cursor-pointer shadow-[0_4px_0_#2d1a4d] transition-all duration-150 hover:bg-[#333] hover:shadow-[0_8px_0_#2d1a4d] hover:scale-[1.04] active:bg-black active:shadow-[0_2px_0_#2d1a4d] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed tracking-[2px] block max-[600px]:text-[0.8rem] max-[600px]:py-[0.7rem] max-[600px]:px-6"
             disabled={teams.slice(0, teamCount).some(name => !name.trim())}
           >
             SUBMIT

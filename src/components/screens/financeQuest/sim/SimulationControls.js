@@ -289,29 +289,29 @@ const SimulationControls = () => {
   };
 
   return (
-    <div className="simulationcontrols-container">
-      <h2>Simulation Controls</h2>
+    <div className="my-8 mx-auto py-10 px-10 bg-gradient-to-b from-white to-[#f5f7fa] rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.05)] max-w-[1400px] w-[95%]">
+      <h2 className="text-[2.5rem] font-bold text-[#1a1a1a] mb-8 text-center tracking-tight">Simulation Controls</h2>
       <form onSubmit={onSubmit}>
-        <div className="simulationcontrols-input-group">
-          <label htmlFor="years">Years:</label>
+        <div className="flex items-center gap-4 mb-8 p-6 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+          <label htmlFor="years" className="text-[1.1rem] font-medium text-[#4a5568] min-w-[100px]">Years:</label>
           <input
             type="number"
             id="years"
-            className="simulationcontrols-input"
+            className="w-[120px] py-3 px-3 border-2 border-[#e2e8f0] rounded-lg text-base text-[#2d3748] bg-white transition-all duration-200 text-center focus:border-[#4299e1] focus:shadow-[0_0_0_3px_rgba(66,153,225,0.15)] focus:outline-none"
             value={years}
             onChange={(e) => setYears(Number(e.target.value))}
             min="1"
           />
         </div>
-        <div className="simulationcontrols-quarterly-changes">
-          <h3>Quarterly Asset Changes</h3>
-          <table>
+        <div className="mb-6">
+          <h3 className="text-[1.8rem] font-semibold text-[#2d3748] my-8 mx-0 mb-6 text-center">Quarterly Asset Changes</h3>
+          <table className="w-full">
             <thead>
               <tr>
-                <th>Year</th>
-                <th>Quarter</th>
+                <th className="text-center mb-5 text-[#FFD700]">Year</th>
+                <th className="text-center mb-5 text-[#FFD700]">Quarter</th>
                 {assets.map(asset => (
-                  <th key={asset}>{asset}</th>
+                  <th key={asset} className="text-center mb-5 text-[#FFD700]">{asset}</th>
                 ))}
               </tr>
             </thead>
@@ -320,7 +320,6 @@ const SimulationControls = () => {
                 quarters.map((quarter, qIndex) => (
                   <tr
                     key={`${yearIndex}-${quarter}`}
-                    className={`simulationcontrols-year-${yearIndex}`}
                     style={{ backgroundColor: getColorForYear(yearIndex) }}
                   >
                     {qIndex === 0 && (
@@ -329,7 +328,7 @@ const SimulationControls = () => {
                     <td>
                       <button
                         type="button"
-                        className="simulationcontrols-quarter-button"
+                        className="bg-transparent text-[#4299e1] font-semibold py-2 px-4 rounded-md transition-all duration-200 hover:bg-[#4299e1]/10"
                         onClick={() => quarterClicked(yearIndex, quarter)}
                       >
                         {quarter}
@@ -339,7 +338,7 @@ const SimulationControls = () => {
                       <td key={`${yearIndex}-${quarter}-${asset}`}>
                         <input
                           type="number"
-                          className="simulationcontrols-input"
+                          className="w-[120px] py-3 px-3 border-2 border-[#e2e8f0] rounded-lg text-base text-[#2d3748] bg-white transition-all duration-200 text-center focus:border-[#4299e1] focus:shadow-[0_0_0_3px_rgba(66,153,225,0.15)] focus:outline-none"
                           value={assetChanges[yearIndex - 1]?.[quarter]?.[asset] || 0}
                           onChange={(e) => {
                             const newAssetChanges = [...assetChanges];
@@ -356,84 +355,83 @@ const SimulationControls = () => {
             </tbody>
           </table>
         </div>
-        <button onClick={toggleEventList} className="simulationcontrols-toggle-event-list-button">
+        <button type="button" onClick={toggleEventList} className="bg-gradient-to-br from-[#4299e1] to-[#667eea] text-white py-4 px-8 rounded-xl text-base font-semibold border-none cursor-pointer transition-all duration-300 shadow-[0_4px_12px_rgba(66,153,225,0.2)] uppercase tracking-wide w-full hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(66,153,225,0.3)] hover:from-[#3182ce] hover:to-[#5a67d8]">
           {showEventList ? 'Hide Events' : 'Show Events'}
         </button>
-        <button type="submit" className="simulationcontrols-save-button">Save</button>
-        <button type="button" className="simulationcontrols-modern-button" onClick={generateRandomValues}>
+        <button type="submit" className="bg-gradient-to-br from-[#48bb78] to-[#38a169] text-white border-none py-4 px-8 rounded-xl text-base font-semibold cursor-pointer transition-all duration-300 shadow-[0_4px_12px_rgba(72,187,120,0.2)] mt-4 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(72,187,120,0.3)] hover:from-[#38a169] hover:to-[#2f855a]">Save</button>
+        <button type="button" className="bg-[#0e335c] text-white border-none py-2.5 px-5 mt-2.5 rounded-md cursor-pointer transition-all duration-200 hover:bg-[#0056b3] hover:-translate-y-0.5 active:translate-y-px" onClick={generateRandomValues}>
           Generate Random Values
         </button>
-        <label className="simulationcontrols-custom-file-upload">
+        <label className="inline-flex items-center gap-2 py-4 px-8 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-xl cursor-pointer transition-all duration-300 font-semibold shadow-[0_4px_12px_rgba(102,126,234,0.2)] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(102,126,234,0.3)] hover:from-[#5a67d8] hover:to-[#6b46c1]">
           <input
             type="file"
-            className="simulationcontrols-input"
+            className="hidden"
             onChange={handleFileUpload}
             accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            style={{ display: 'none' }}
           />
-          <span>Upload File</span>
+          <span className="text-base">Upload File</span>
         </label>
-        <label className="simulationcontrols-custom-file-upload">
+        <label className="inline-flex items-center gap-2 py-4 px-8 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-xl cursor-pointer transition-all duration-300 font-semibold shadow-[0_4px_12px_rgba(102,126,234,0.2)] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(102,126,234,0.3)] hover:from-[#5a67d8] hover:to-[#6b46c1] ml-2">
           <input
             type="file"
-            className="simulationcontrols-input"
+            className="hidden"
             onChange={handleEventFileUpload}
             accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            style={{ display: 'none' }}
           />
-          <span>Upload Event File</span>
+          <span className="text-base">Upload Event File</span>
         </label>
       </form>
 
       {showConfirmationModal && (
-        <div className="simulationcontrols-modal-overlay" onClick={closeConfirmationModal}>
-          <div className="simulationcontrols-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" onClick={closeConfirmationModal}>
+          <div className="bg-white p-5 rounded-lg text-center max-w-[400px] w-full" onClick={e => e.stopPropagation()}>
             <h3>{confirmationMessage}</h3>
-            <button onClick={closeConfirmationModal}>Close</button>
+            <button onClick={closeConfirmationModal} className="bg-[#0e335c] text-white border-none py-2.5 px-5 mt-2.5 rounded-md cursor-pointer">Close</button>
           </div>
         </div>
       )}
 
       {showEventModal && (
-        <div className="simulationcontrols-event-modal-overlay" onClick={closeEventModal}>
-          <div className="simulationcontrols-event-modal" onClick={e => e.stopPropagation()}>
-            <h3>Add Event for {selectedYear} - {selectedQuarter}</h3>
-            <label htmlFor="eventName">Event Name:</label>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-[5px] flex items-center justify-center z-[10]" onClick={closeEventModal}>
+          <div className="bg-white rounded-[20px] p-10 shadow-[0_20px_40px_rgba(0,0,0,0.2)] w-[90%] max-w-[600px] z-[11]" onClick={e => e.stopPropagation()}>
+            <h3 className="m-0 mb-5">Add Event for {selectedYear} - {selectedQuarter}</h3>
+            <label htmlFor="eventName" className="block my-2.5">Event Name:</label>
             <input
               type="text"
               id="eventName"
-              className="simulationcontrols-input"
+              className="w-full py-4 px-4 border-2 border-[#e2e8f0] rounded-lg text-base my-2 mx-0 mb-6 transition-all duration-200 focus:border-[#4299e1] focus:shadow-[0_0_0_3px_rgba(66,153,225,0.15)] focus:outline-none"
               value={eventName}
               onChange={(e) => setEventName(e.target.value)}
             />
             
-            <label htmlFor="eventDescription">Description:</label>
+            <label htmlFor="eventDescription" className="block my-2.5">Description:</label>
             <textarea
               id="eventDescription"
               value={eventDescription}
               onChange={(e) => setEventDescription(e.target.value)}
+              className="w-full py-4 px-4 border-2 border-[#e2e8f0] rounded-lg text-base my-2 mx-0 mb-6 transition-all duration-200 resize-y h-[100px] focus:border-[#4299e1] focus:shadow-[0_0_0_3px_rgba(66,153,225,0.15)] focus:outline-none"
             />
             
-            <button onClick={saveEvent}>Save Event</button>
-            <button onClick={closeEventModal}>Cancel</button>
+            <button onClick={saveEvent} className="py-2.5 px-5 mr-2.5 border-none rounded-md cursor-pointer bg-[#FFD700] text-[#000080] transition-all duration-300 hover:scale-105 active:scale-95">Save Event</button>
+            <button onClick={closeEventModal} className="py-2.5 px-5 border-none rounded-md cursor-pointer bg-[#0e335c] text-white">Cancel</button>
           </div>
         </div>
       )}
 
       {showEventList && (
-        <div className="simulationcontrols-event-list-container">
+        <div className="bg-gradient-to-br from-[#2d3748] to-[#1a202c] border-l-none py-8 px-8 w-[400px] shadow-[-10px_0_30px_rgba(0,0,0,0.2)] text-white fixed right-0 top-0 bottom-0 overflow-y-auto transition-[right] duration-300 z-[1000] max-lg:w-[300px] max-md:w-full">
           <h3>Active Events</h3>
-          <ul className="simulationcontrols-event-list">
+          <ul className="p-0">
             {Object.entries(events).map(([year, yearEvents]) => (
-              <li key={year}>
-                <h4>Year {year}</h4>
+              <li key={year} className="bg-white/5 rounded-xl py-4 px-4 mb-4 backdrop-blur-[10px] border border-white/10 cursor-pointer transition-all duration-200 hover:bg-white/10 hover:translate-x-1">
+                <h4 className="mt-4 mb-2.5 text-[1.2em] border-b border-[#FFD700] pb-1.5">Year {year}</h4>
                 <ul>
                   {Object.entries(yearEvents).map(([quarter, event]) => (
                     <li key={quarter}>
                       {quarter}: {event.name}
-                      <span className="simulationcontrols-event-description"> - {event.description}</span>
-                      <button className="simulationcontrols-edit-button" onClick={() => editEvent(year, quarter)}>Edit</button>
-                      <button className="simulationcontrols-delete-button" onClick={() => deleteEvent(year, quarter)}>Delete</button>
+                      <span className="text-white/70 text-[0.9rem] mt-2 block leading-normal"> - {event.description}</span>
+                      <button className="bg-transparent border-none py-2 px-4 rounded cursor-pointer mt-2 hover:scale-105 active:scale-95" onClick={() => editEvent(year, quarter)}>Edit</button>
+                      <button className="bg-transparent border-none py-2 px-4 rounded cursor-pointer mt-2 hover:scale-105 active:scale-95" onClick={() => deleteEvent(year, quarter)}>Delete</button>
                     </li>
                   ))}
                 </ul>
@@ -444,13 +442,13 @@ const SimulationControls = () => {
       )}
 
       {showDeleteConfirmation && (
-        <div className="simulationcontrols-modal-overlay" onClick={handleCancelDelete}>
-          <div className="simulationcontrols-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" onClick={handleCancelDelete}>
+          <div className="bg-white p-5 rounded-lg text-center max-w-[400px] w-full" onClick={e => e.stopPropagation()}>
             <h3>Delete Event</h3>
-            <p>Are you sure you want to delete the event for {eventToDelete?.quarter} of year {eventToDelete?.year}?</p>
-            <div className="simulationcontrols-modal-actions">
-              <button onClick={handleConfirmDelete} className="simulationcontrols-delete-button">Delete</button>
-              <button onClick={handleCancelDelete}>Cancel</button>
+            <p className="my-4 text-center text-[#333]">Are you sure you want to delete the event for {eventToDelete?.quarter} of year {eventToDelete?.year}?</p>
+            <div className="flex justify-center gap-2.5 mt-5">
+              <button onClick={handleConfirmDelete} className="bg-transparent border-none py-2 px-4 rounded cursor-pointer min-w-[100px] hover:scale-105 active:scale-95">Delete</button>
+              <button onClick={handleCancelDelete} className="bg-[#0e335c] text-white border-none py-2 px-4 rounded cursor-pointer min-w-[100px]">Cancel</button>
             </div>
           </div>
         </div>
@@ -459,4 +457,4 @@ const SimulationControls = () => {
   );
 };
 
-export default SimulationControls; 
+export default SimulationControls;

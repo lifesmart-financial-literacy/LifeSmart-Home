@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import BudgetSpreadsheet, { downloadSpreadsheet } from './BudgetSpreadsheet';
 import SpreadsheetModal from './SpreadsheetModal';
 import BudgetWelcome from './BudgetWelcome';
+import { Button } from '@/components/ui/button';
 import * as XLSX from 'xlsx';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
@@ -45,9 +46,9 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 // Add an InfoButton component for tooltips
 const InfoButton = ({ text }) => (
-  <span className="budgettool-info-button" tabIndex="-1">
-    <span className="budgettool-info-icon">💡</span>
-    <span className="budgettool-info-tooltip">{text}</span>
+  <span className="bt-info-button" tabIndex="-1">
+    <span className="bt-info-icon">💡</span>
+    <span className="bt-info-tooltip">{text}</span>
   </span>
 );
 
@@ -147,14 +148,14 @@ const BudgetTool = () => {
       category: 'Income',
       description: (
         <>
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>Enter the money you receive each month.</strong>
           </div>
-          <div className="budgettool-info-popover">
+          <div className="flex items-center gap-[0.5em] my-4 mb-6">
             <InfoButton text={
               "Look through your bank statements for all the money coming in as part of your salary or other income"
             } />
-            <span className="budgettool-info-popover-label">Where do I find this information?</span>
+            <span className="bt-info-popover-label">Where do I find this information?</span>
           </div>
         </>
       ),
@@ -187,14 +188,14 @@ const BudgetTool = () => {
       category: 'Needs',
       description: (
         <>
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>Add the costs you have to pay each month - housing, food, transport, utilities. Things that are non-negotiables.</strong>
           </div>
-          <div className="budgettool-info-popover">
+          <div className="flex items-center gap-[0.5em] my-4 mb-6">
             <InfoButton text={
               "Look through your bank statements. Many modern banks already categorise spending, but if not, you can use budgeting apps that connect your accounts and categorise the spending, like Snoop and MoneyWise (free version is sufficient)."
             } />
-            <span className="budgettool-info-popover-label">Where do I find this information?</span>
+            <span className="bt-info-popover-label">Where do I find this information?</span>
           </div>
         </>
       ),
@@ -264,14 +265,14 @@ const BudgetTool = () => {
       category: 'Wants',
       description: (
         <>
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>Record the optional spending every month - dining out, shopping, hobbies, subscriptions.</strong>
           </div>
-          <div className="budgettool-info-popover">
+          <div className="flex items-center gap-[0.5em] my-4 mb-6">
             <InfoButton text={
               "Look through your bank statements. Many modern banks already categorise spending, but if not, you can use budgeting apps that connect your accounts and categorise the spending, like Snoop and MoneyWise."
             } />
-            <span className="budgettool-info-popover-label">Where do I find this information?</span>
+            <span className="bt-info-popover-label">Where do I find this information?</span>
           </div>
         </>
       ),
@@ -370,7 +371,7 @@ const BudgetTool = () => {
       category: 'Spending Snapshot',
       description: (
         <>
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>See your spending snapshot and recommendations based on your inputs so far.</strong>
           </div>
         </>
@@ -394,9 +395,9 @@ const BudgetTool = () => {
         const currentSavings = Number(formData.totalSavings) || 0;
         const savingsGap = Math.max(0, recommendedMinimumSavings - currentSavings);
         return (
-          <div className="budgettool-analysis">
-            <h3 className="budgettool-analysis-title">Your Spending Snapshot</h3>
-            <div className="budgettool-analysis-chart">
+          <div className="bt-analysis">
+            <h3 className="bt-analysis-title">Your Spending Snapshot</h3>
+            <div className="bt-analysis-chart">
               <Pie
                 data={{
                   labels: ['Needs', 'Wants', 'Savings'],
@@ -466,14 +467,14 @@ const BudgetTool = () => {
                 }}
               />
               {/* Show percentages next to the pie chart */}
-              <div className="budgettool-piechart-percentages">
-                <div className="budgettool-piechart-percentage-card needs">Needs: {needsPercentage.toFixed(1)}%</div>
-                <div className="budgettool-piechart-percentage-card wants">Wants: {wantsPercentage.toFixed(1)}%</div>
-                <div className="budgettool-piechart-percentage-card savings">Savings: {remainingPercentage.toFixed(1)}%</div>
+              <div className="bt-piechart-percentages">
+                <div className="bt-piechart-percentage-card needs">Needs: {needsPercentage.toFixed(1)}%</div>
+                <div className="bt-piechart-percentage-card wants">Wants: {wantsPercentage.toFixed(1)}%</div>
+                <div className="bt-piechart-percentage-card savings">Savings: {remainingPercentage.toFixed(1)}%</div>
               </div>
             </div>
-            <div className="budgettool-analysis-content">
-              <div className="budgettool-analysis-rule">
+            <div className="mt-10 text-white">
+              <div className="bt-analysis-rule">
                 <strong>Smart Spending Rule:</strong>
                 <ul>
                   <li>Pay your needs</li>
@@ -485,7 +486,7 @@ const BudgetTool = () => {
                 </div>
               </div>
               {wantsReduction > 0 && (
-                <div className="budgettool-analysis-warning">
+                <div className="bt-analysis-warning">
                   <strong>Top Tip:</strong> You need to reduce your wants spending by £{wantsReduction.toFixed(2)} each month to hit that target.
                 </div>
               )}
@@ -498,7 +499,7 @@ const BudgetTool = () => {
       category: 'Savings Deep Dive',
       description: (
         <>
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>Savings are the foundation you need to deal with issues, start investing and reach financial freedom.</strong>
           </div>
         </>
@@ -537,25 +538,25 @@ const BudgetTool = () => {
           if (val !== null && !isNaN(val)) setFormData({ ...formData, goalFund: val });
         };
         return (
-          <div className="budgettool-savings-deepdive">
+          <div className="bt-savings-deepdive">
             {/* Total Savings */}
-            <div className="budgettool-savings-deepdive-row">
-              <span className="budgettool-savings-deepdive-label">Total Savings:</span>
-              <span className="budgettool-savings-deepdive-value">{formatCurrency(totalSavings)}</span>
-              <button className="budgettool-savings-deepdive-edit" onClick={handleEditTotalSavings}>Edit</button>
+            <div className="bt-savings-deepdive-row">
+              <span className="bt-savings-deepdive-label">Total Savings:</span>
+              <span className="bt-savings-deepdive-value">{formatCurrency(totalSavings)}</span>
+              <button className="bt-savings-deepdive-edit" onClick={handleEditTotalSavings}>Edit</button>
             </div>
             {/* Emergency Fund */}
-            <div className="budgettool-savings-deepdive-section">
-              <div className="budgettool-savings-deepdive-title">Emergency Fund</div>
-              <div className="budgettool-savings-deepdive-row">
+            <div className="bt-savings-deepdive-section">
+              <div className="bt-savings-deepdive-title">Emergency Fund</div>
+              <div className="bt-savings-deepdive-row">
                 <span>Minimum Amount (3 months of Essentials):</span>
                 <span>{formatCurrency(emergencyMin)}</span>
               </div>
-              <div className="budgettool-savings-deepdive-row">
+              <div className="bt-savings-deepdive-row">
                 <span>Current Savings:</span>
                 <span>{formatCurrency(currentEmergency)}</span>
               </div>
-              <div className="budgettool-savings-deepdive-row budgettool-savings-deepdive-action">
+              <div className="bt-savings-deepdive-row bt-savings-deepdive-action">
                 {emergencyShortfall > 0 ? (
                   <>
                     <span>Action:</span>
@@ -567,33 +568,33 @@ const BudgetTool = () => {
               </div>
             </div>
             {/* Sinking Fund */}
-            <div className="budgettool-savings-deepdive-section">
-              <div className="budgettool-savings-deepdive-title">Sinking Fund</div>
-              <div className="budgettool-savings-deepdive-row">
+            <div className="bt-savings-deepdive-section">
+              <div className="bt-savings-deepdive-title">Sinking Fund</div>
+              <div className="bt-savings-deepdive-row">
                 <span>Total planned expenses:</span>
                 <input
                   type="number"
-                  className="budgettool-savings-deepdive-input"
+                  className="bt-savings-deepdive-input"
                   value={formData.sinkingPlannedExpenses || ''}
                   onChange={e => setFormData({ ...formData, sinkingPlannedExpenses: e.target.value })}
                   placeholder="Enter amount"
                 />
-                <span className="budgettool-info-button" tabIndex="0">💡<span className="budgettool-info-tooltip">Estimate any large expenses you have coming up in the next couple of years that aren't part of your usual spending such as home repair, wedding, large holiday etc. If you do not have any, then you can leave this blank.</span></span>
+                <InfoButton text="Estimate any large expenses you have coming up in the next couple of years that aren't part of your usual spending such as home repair, wedding, large holiday etc. If you do not have any, then you can leave this blank." />
               </div>
-              <div className="budgettool-savings-deepdive-row">
+              <div className="bt-savings-deepdive-row">
                 <span>Current Fund Balance:</span>
                 <span>{formatCurrency(sinkingFund)}</span>
               </div>
             </div>
             {/* Goal / Investment Fund */}
-            <div className="budgettool-savings-deepdive-section">
-              <div className="budgettool-savings-deepdive-title">Goal / Investment Fund</div>
-              <div className="budgettool-savings-deepdive-row">
+            <div className="bt-savings-deepdive-section">
+              <div className="bt-savings-deepdive-title">Goal / Investment Fund</div>
+              <div className="bt-savings-deepdive-row">
                 <span>Current goal/Investment fund:</span>
                 <span>{formatCurrency(formData.goalFund || goalFund)}</span>
-                <button className="budgettool-savings-deepdive-edit" onClick={handleEditGoalFund}>Edit</button>
+                <button className="bt-savings-deepdive-edit" onClick={handleEditGoalFund}>Edit</button>
               </div>
-              <div className="budgettool-savings-deepdive-info">
+              <div className="bt-savings-deepdive-info">
                 Any remaining savings can be used towards the longer term goals you may have or invested to grow your wealth. If you currently have any investments that you haven't considered part of your savings, or aren't mentioned previously, update the number now.
               </div>
             </div>
@@ -613,10 +614,10 @@ const BudgetTool = () => {
           return secondMonth.toLocaleString('default', { month: 'long' });
         }
         return (
-          <div className="budgettool-step-description">
+          <div className="bt-step-description">
             <strong>Fantastic, below is your spending and saving outline for the next 6 months.</strong><br />
             Based on this, your savings will have increased by {formatCurrency(totalIncrease)}.<br /><br />
-            <span className="budgettool-step-action">
+            <span className="bt-step-action">
               Action: During the first week of {getSecondMonthName()}, you need to come and enter the actual spend figures to see if you are on track.
             </span>
           </div>
@@ -638,18 +639,18 @@ const BudgetTool = () => {
         const summary = calculateBudgetSummary();
 
         return (
-          <div className="budgettool-projections">
-            <h3 className="budgettool-projections-title">6-Month Projection</h3>
+          <div className="bt-projections">
+            <h3 className="bt-projections-title">6-Month Projection</h3>
             
             {/* Income Section */}
-            <div className="budgettool-projections-section">
-              <div className="budgettool-projections-question">
+            <div className="bt-projections-section">
+              <div className="bt-projections-question">
                 <label>Do you expect your income to change over the next 6 months?</label>
                 <select
                   name="incomeChange"
                   value={formData.incomeChange}
                   onChange={handleInputChange}
-                  className="budgettool-select"
+                  className="bt-input"
                 >
                   <option value="">Select an option</option>
                   <option value="yes">Yes</option>
@@ -658,9 +659,9 @@ const BudgetTool = () => {
               </div>
 
               {formData.incomeChange === 'yes' && (
-                <div className="budgettool-projections-table">
+                <div className="bt-projections-table mt-6 w-full overflow-x-auto">
                   <h4>Expected Income Changes</h4>
-                  <div className="budgettool-table-container">
+                  <div>
                     <table>
                       <thead>
                         <tr>
@@ -679,7 +680,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.income || summary.totalIncome}
                                 onChange={(e) => handleAmountChange(index, 'income', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${summary.totalIncome.toFixed(2)}`}
                               />
                             </td>
@@ -693,14 +694,14 @@ const BudgetTool = () => {
             </div>
 
             {/* Needs Section */}
-            <div className="budgettool-projections-section">
-              <div className="budgettool-projections-question">
+            <div className="bt-projections-section">
+              <div className="bt-projections-question">
                 <label>Do you expect your needs spending to change over the next 6 months?</label>
                 <select
                   name="needsChange"
                   value={formData.needsChange}
                   onChange={handleInputChange}
-                  className="budgettool-select"
+                  className="bt-input"
                 >
                   <option value="">Select an option</option>
                   <option value="yes">Yes</option>
@@ -709,7 +710,7 @@ const BudgetTool = () => {
               </div>
 
               {formData.needsChange === 'yes' && (
-                <div className="budgettool-projections-table">
+                <div className="bt-projections-table mt-6 w-full overflow-x-auto">
                   <h4>Expected Needs Changes</h4>
                   <table>
                     <thead>
@@ -729,7 +730,7 @@ const BudgetTool = () => {
                               type="number"
                               value={formData.monthlyProjections[index]?.needsDetails?.housingPayment || Number(formData.housingPayment || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.housingPayment', e.target.value)}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                               placeholder={`£${Number(formData.housingPayment || 0).toFixed(2)}`}
                             />
                           </td>
@@ -743,7 +744,7 @@ const BudgetTool = () => {
                               type="number"
                               value={formData.monthlyProjections[index]?.needsDetails?.utilities || Number(formData.utilities || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.utilities', e.target.value)}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                               placeholder={`£${Number(formData.utilities || 0).toFixed(2)}`}
                             />
                           </td>
@@ -757,7 +758,7 @@ const BudgetTool = () => {
                               type="number"
                               value={formData.monthlyProjections[index]?.needsDetails?.groceries || Number(formData.groceries || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.groceries', e.target.value)}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                               placeholder={`£${Number(formData.groceries || 0).toFixed(2)}`}
                             />
                           </td>
@@ -772,7 +773,7 @@ const BudgetTool = () => {
                               value={formData.monthlyProjections[index]?.needsDetails?.transportation || Number(formData.transportation || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.transportation', e.target.value)}
                               placeholder={`£${Number(formData.transportation || 0).toFixed(2)}`}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                             />
                           </td>
                         ))}
@@ -786,7 +787,7 @@ const BudgetTool = () => {
                               value={formData.monthlyProjections[index]?.needsDetails?.healthInsurance || Number(formData.healthInsurance || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.healthInsurance', e.target.value)}
                               placeholder={`£${Number(formData.healthInsurance || 0).toFixed(2)}`}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                             />
                           </td>
                         ))}
@@ -800,7 +801,7 @@ const BudgetTool = () => {
                               value={formData.monthlyProjections[index]?.needsDetails?.medicalExpenses || Number(formData.medicalExpenses || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.medicalExpenses', e.target.value)}
                               placeholder={`£${Number(formData.medicalExpenses || 0).toFixed(2)}`}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                             />
                           </td>
                         ))}
@@ -814,7 +815,7 @@ const BudgetTool = () => {
                               value={formData.monthlyProjections[index]?.needsDetails?.loanPayments || Number(formData.otherLoanPayment || 0)}
                               onChange={(e) => handleAmountChange(index, 'needsDetails.loanPayments', e.target.value)}
                               placeholder={`£${Number(formData.otherLoanPayment || 0).toFixed(2)}`}
-                              className="budgettool-input"
+                              className="bt-input bt-input-number"
                             />
                           </td>
                         ))}
@@ -826,14 +827,14 @@ const BudgetTool = () => {
             </div>
 
             {/* Wants Section */}
-            <div className="budgettool-projections-section">
-              <div className="budgettool-projections-question">
+            <div className="bt-projections-section">
+              <div className="bt-projections-question">
                 <label>Do you think you can change your wants spending over the next 6 months?</label>
                 <select
                   name="wantsChange"
                   value={formData.wantsChange}
                   onChange={handleInputChange}
-                  className="budgettool-select"
+                  className="bt-input"
                 >
                   <option value="">Select an option</option>
                   <option value="yes">Yes</option>
@@ -842,9 +843,9 @@ const BudgetTool = () => {
               </div>
 
               {formData.wantsChange === 'yes' && (
-                <div className="budgettool-projections-table">
+                <div className="bt-projections-table mt-6 w-full overflow-x-auto">
                   <h4>Expected Wants Changes</h4>
-                  <div className="budgettool-table-container">
+                  <div>
                     <table>
                       <thead>
                         <tr>
@@ -863,7 +864,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.wantsDetails?.entertainment || formData.entertainment || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.entertainment', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${Number(formData.entertainment || 0).toFixed(2)}`}
                               />
                             </td>
@@ -877,7 +878,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.wantsDetails?.shopping || formData.shopping || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.shopping', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${Number(formData.shopping || 0).toFixed(2)}`}
                               />
                             </td>
@@ -892,7 +893,7 @@ const BudgetTool = () => {
                                 value={formData.monthlyProjections[index]?.wantsDetails?.diningOut || formData.diningOut || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.diningOut', e.target.value)}
                                 placeholder={`£${Number(formData.diningOut || 0).toFixed(2)}`}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                               />
                             </td>
                           ))}
@@ -905,7 +906,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.wantsDetails?.personalCare || formData.personalCare || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.personalCare', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${Number(formData.personalCare || 0).toFixed(2)}`}
                               />
                             </td>
@@ -919,7 +920,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.wantsDetails?.gymMembership || formData.gymMembership || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.gymMembership', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${Number(formData.gymMembership || 0).toFixed(2)}`}
                               />
                             </td>
@@ -933,7 +934,7 @@ const BudgetTool = () => {
                                 type="number"
                                 value={formData.monthlyProjections[index]?.wantsDetails?.subscriptions || formData.subscriptions || ''}
                                 onChange={(e) => handleAmountChange(index, 'wantsDetails.subscriptions', e.target.value)}
-                                className="budgettool-input"
+                                className="bt-input bt-input-number"
                                 placeholder={`£${Number(formData.subscriptions || 0).toFixed(2)}`}
                               />
                             </td>
@@ -946,7 +947,7 @@ const BudgetTool = () => {
               )}
             </div>
 
-            <div className="budgettool-projections-footer">
+            <div className="mt-6 pt-6 text-[#cccccc] text-center">
               <p>
                 Please come back after one month and enter the actual figures to compare with these projections.
                 This will help you track your progress and make necessary adjustments to your budget.
@@ -1138,24 +1139,24 @@ const BudgetTool = () => {
   const renderSavingsInfo = () => {
     if (formData.hasSavingsPot === 'no') {
       return (
-        <div className="budgettool-savings-info">
-          <h3 className="budgettool-savings-title">Understanding Savings Pots</h3>
-          <p className="budgettool-savings-text">
+        <div className="bt-savings-info">
+          <h3 className="bt-savings-title">Understanding Savings Pots</h3>
+          <p className="bt-savings-text">
             Having a structured approach to savings is crucial for financial stability. We recommend setting up three distinct savings pots:
           </p>
-          <div className="budgettool-savings-pots">
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🛡️</div>
+          <div className="bt-savings-pots">
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🛡️</div>
               <h4>Emergency Fund</h4>
               <p>3-6 months of essential expenses for unexpected situations</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🎯</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🎯</div>
               <h4>Sinking Fund</h4>
               <p>For planned future expenses like holidays or home repairs</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">💎</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">💎</div>
               <h4>Goal/Investment Fund</h4>
               <p>For long-term goals and building wealth</p>
             </div>
@@ -1166,24 +1167,24 @@ const BudgetTool = () => {
 
     if (formData.savingsPotType === 'one') {
       return (
-        <div className="budgettool-savings-info">
-          <h3 className="budgettool-savings-title">Multiple Savings Pots</h3>
-          <p className="budgettool-savings-text">
+        <div className="bt-savings-info">
+          <h3 className="bt-savings-title">Multiple Savings Pots</h3>
+          <p className="bt-savings-text">
             While having a single savings pot is a good start, it's important to build up multiple savings pots that have different roles. Here's how we suggest you structure your savings:
           </p>
-          <div className="budgettool-savings-pots">
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🛡️</div>
+          <div className="bt-savings-pots">
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🛡️</div>
               <h4>Emergency Fund</h4>
               <p>3-6 months of essential expenses for unexpected situations</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🎯</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🎯</div>
               <h4>Sinking Fund</h4>
               <p>For planned future expenses like holidays or home repairs</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">💎</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">💎</div>
               <h4>Goal/Investment Fund</h4>
               <p>For long-term goals and wealth building</p>
             </div>
@@ -1194,24 +1195,24 @@ const BudgetTool = () => {
 
     if (formData.savingsPotType === 'multiple') {
       return (
-        <div className="budgettool-savings-info">
-          <h3 className="budgettool-savings-title">Great Job!</h3>
-          <p className="budgettool-savings-text">
+        <div className="bt-savings-info">
+          <h3 className="bt-savings-title">Great Job!</h3>
+          <p className="bt-savings-text">
             You're on the right track with multiple savings pots. Let's review your current savings structure:
           </p>
-          <div className="budgettool-savings-pots">
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🛡️</div>
+          <div className="bt-savings-pots">
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🛡️</div>
               <h4>Emergency Fund</h4>
               <p>3-6 months of essential expenses for unexpected situations</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">🎯</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">🎯</div>
               <h4>Sinking Fund</h4>
               <p>For planned future expenses like holidays or home repairs</p>
             </div>
-            <div className="budgettool-savings-pot">
-              <div className="budgettool-savings-pot-icon">💎</div>
+            <div className="bt-savings-pot">
+              <div className="bt-savings-pot-icon">💎</div>
               <h4>Goal/Investment Fund</h4>
               <p>For long-term goals and wealth building</p>
             </div>
@@ -1229,20 +1230,20 @@ const BudgetTool = () => {
     }
 
     return (
-      <div className="budgettool-question">
-        <label className="budgettool-label">{question.label}</label>
+      <div className="mb-6">
+        <label className="bt-label">{question.label}</label>
         {(() => {
           switch (question.type) {
             case 'number':
               return (
-                <div className="budgettool-input-group">
+                <div className="flex items-center gap-4 mb-4">
                   <input
                     type="number"
                     name={question.id}
                     value={formData[question.id]}
                     onChange={handleInputChange}
                     placeholder={question.placeholder}
-                    className="budgettool-input"
+                    className="bt-input bt-input-number"
                   />
                 </div>
               );
@@ -1253,7 +1254,7 @@ const BudgetTool = () => {
                     name={question.id}
                     value={formData[question.id]}
                     onChange={handleInputChange}
-                    className="budgettool-select"
+                    className="bt-input"
                   >
                     <option value="">Select option</option>
                     {question.options.map(option => (
@@ -1267,11 +1268,11 @@ const BudgetTool = () => {
               );
             case 'multiselect':
               return (
-                <div className="budgettool-multiselect">
+                <div className="flex flex-col gap-3 mt-2">
                   {question.options.map(option => (
                     <label 
                       key={option.value} 
-                      className="budgettool-checkbox-label"
+                      className="bt-checkbox-label"
                       data-checked={formData[question.id]?.includes(option.value)}
                     >
                       <input
@@ -1299,7 +1300,7 @@ const BudgetTool = () => {
                             [question.id]: newValues
                           }));
                         }}
-                        className="budgettool-checkbox"
+                        className="bt-checkbox"
                       />
                       {option.label}
                     </label>
@@ -1308,7 +1309,7 @@ const BudgetTool = () => {
               );
             case 'display':
               return (
-                <div className="budgettool-display-value">
+                <div>
                   {question.getValue(formData)}
                 </div>
               );
@@ -1495,27 +1496,21 @@ const BudgetTool = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="budgettool-modal-overlay">
-        <div className="budgettool-modal-content">
-          <div className="budgettool-modal-header">
-            <h2>Confirm Navigation</h2>
-            <button onClick={onClose} className="budgettool-modal-close">&times;</button>
+      <div className="bt-modal-overlay">
+        <div className="bt-modal-content w-full max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[20px] p-8 shadow-[0_25px_50px_rgba(0,0,0,0.2)]">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-[1.8rem] text-white m-0">Confirm Navigation</h2>
+            <button onClick={onClose} className="bt-modal-close bg-transparent border-none text-white text-3xl cursor-pointer p-2 leading-none opacity-70 hover:opacity-100 transition-opacity rounded">&times;</button>
           </div>
-          <div className="budgettool-modal-body">
-            <p className="budgettool-modal-text">Are you SURE you want to leave yet?</p>
-            <div className="budgettool-modal-actions">
-              <button
-                onClick={onClose}
-                className="budgettool-button budgettool-button-secondary"
-              >
+          <div className="bt-modal-body text-white">
+            <p className="text-xl text-center my-8 leading-relaxed">Are you SURE you want to leave yet?</p>
+            <div className="flex justify-center gap-4 mt-8">
+              <Button onClick={onClose} variant="outline" className="min-w-[120px] border-white/20 bg-transparent text-white hover:bg-white/10">
                 Stay Here
-              </button>
-              <button
-                onClick={onConfirm}
-                className="budgettool-button budgettool-button-primary"
-              >
+              </Button>
+              <Button onClick={onConfirm} className="min-w-[120px] bg-gradient-to-br from-[#4CAF50] to-[#2196F3] text-white hover:opacity-90">
                 Yes, Leave
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -1527,56 +1522,58 @@ const BudgetTool = () => {
     const totalIncrease = (formData.monthlyProjections || []).reduce((sum, m) => sum + (Number(m.savings) || 0), 0);
     const formatCurrency = (value) => `£${Number(value || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
     return (
-      <div className="budgettool-container">
-        <div className="budgettool-content">
-          <header className="budgettool-header">
-            <h1 className="budgettool-title">Wealth Map</h1>
+      <div className="bt-container min-h-screen flex justify-center items-center p-8 text-white">
+        <div className="bt-content w-full rounded-[20px] p-10 shadow-[0_25px_50px_rgba(0,0,0,0.2)]">
+          <header className="text-center mb-8">
+            <h1 className="bt-title text-4xl mb-4">Wealth Map</h1>
           </header>
 
-          <div className="budgettool-progress">
+          <div className="mb-8">
             <div 
-              className="budgettool-progress-bar"
+              className="bt-progress-bar h-1.5 rounded transition-[width] duration-300 ease-out"
               style={{ width: `${((currentStep + 1) / (questions.length + 1)) * 100}%` }}
             ></div>
-            <p className="budgettool-progress-text">
+            <p className="text-center mt-2 text-[#cccccc] text-sm">
               Step {currentStep + 1} of {questions.length + 1}
             </p>
           </div>
 
           {currentStep === questions.length ? (
-            <div className="budgettool-step-description">
+            <div className="bt-step-description">
               <strong>Fantastic, below is your spending and saving outline for the next 6 months.</strong><br />
-              <span className="budgettool-step-action">
+              <span className="bt-step-action">
                 Action: During the first week of {getSecondMonthName()}, you need to come and enter the actual spend figures to see if you are on track.
               </span>
             </div>
           ) : null}
 
-          <div className="budgettool-spreadsheet-step">
+          <div className="bt-spreadsheet-step">
             <BudgetSpreadsheet formData={formData} />
           </div>
 
-          <div className="budgettool-navigation">
-            <button
+          <div className="flex justify-between gap-4 flex-wrap">
+            <Button
               onClick={handlePrevious}
-              className="budgettool-button budgettool-button-secondary"
+              variant="outline"
               disabled={currentStep === 0}
+              className="border-white/20 bg-transparent text-white hover:bg-white/10 disabled:opacity-50"
             >
               Previous
-            </button>
-            <div className="budgettool-navigation-right">
-              <button
+            </Button>
+            <div className="flex gap-4">
+              <Button
                 onClick={() => setIsConfirmModalOpen(true)}
-                className="budgettool-button budgettool-button-secondary"
+                variant="outline"
+                className="border-white/20 bg-transparent text-white hover:bg-white/10"
               >
                 Return to Select
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDownloadSpreadsheet}
-                className="budgettool-button budgettool-button-primary"
+                className="bg-gradient-to-br from-[#4CAF50] to-[#2196F3] text-white hover:opacity-90"
               >
                 Download Spreadsheet
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -1591,32 +1588,32 @@ const BudgetTool = () => {
   }
 
   return (
-    <div className="budgettool-container">
-      <div className="budgettool-content">
+    <div className="bt-container min-h-screen flex justify-center items-center p-8 text-white">
+      <div className="bt-content w-full rounded-[20px] p-10 shadow-[0_25px_50px_rgba(0,0,0,0.2)]">
         {currentStep === -1 ? (
           <BudgetWelcome onNext={handleNext} />
         ) : (
           <>
-            <header className="budgettool-header">
-              <h1 className="budgettool-title">Budget Planning Tool</h1>
-              <p className="budgettool-subtitle">Let's get started with your financial information</p>
+            <header className="text-center mb-8">
+              <h1 className="bt-title text-4xl mb-4">Budget Planning Tool</h1>
+              <p className="bt-subtitle text-lg">Let's get started with your financial information</p>
             </header>
 
-            <div className="budgettool-progress">
+            <div className="mb-8">
               <div 
-                className="budgettool-progress-bar"
+                className="bt-progress-bar h-1.5 rounded transition-[width] duration-300 ease-out"
                 style={{ width: `${((currentStep + 1) / (questions.length + 1)) * 100}%` }}
               ></div>
-              <p className="budgettool-progress-text">
+              <p className="bt-progress-text">
                 Step {currentStep + 1} of {questions.length + 1}
               </p>
             </div>
 
-            <div className="budgettool-form">
+            <div className="mb-8">
               {currentStep < questions.length ? (
                 <>
                   {DEV_TESTING_ENABLED && (
-                    <div className="budgettool-dev-controls" style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                    <div className="mb-4 p-4 bg-black/20 rounded-lg">
                       <div style={{ marginBottom: '0.5rem', color: '#ffc107', fontFamily: 'monospace' }}>
                         🛠️ Developer Testing Mode: ON
                       </div>
@@ -1726,7 +1723,7 @@ const BudgetTool = () => {
                           setFormData(newFormData);
                           console.log(`[Dev] Generated random data for ${questions[currentStep].category}:`, newFormData);
                         }}
-                        className="budgettool-dev-button"
+                        className="bt-dev-button"
                       >
                         🎲 Generate Random Data for {questions[currentStep].category}
                         <br />
@@ -1735,7 +1732,7 @@ const BudgetTool = () => {
                     </div>
                   )}
                   
-                  <h2 className="budgettool-category-title">
+                  <h2 className="text-2xl mb-6 text-white">
                     {questions[currentStep].category}
                   </h2>
                   
@@ -1751,7 +1748,7 @@ const BudgetTool = () => {
                     }
 
                     return (
-                      <div key={index} className="budgettool-question">
+                      <div key={index} className="mb-6">
                         {renderQuestion(question)}
                       </div>
                     );
@@ -1762,9 +1759,9 @@ const BudgetTool = () => {
                   }
                 </>
               ) : (
-                <div className="budgettool-spreadsheet-step">
-                  <h2 className="budgettool-category-title">Your Budget Spreadsheet</h2>
-                  <p className="budgettool-spreadsheet-text">
+                <div className="bt-spreadsheet-step">
+                  <h2 className="text-2xl mb-6 text-white">Your Budget Spreadsheet</h2>
+                  <p className="text-lg leading-relaxed text-[#cccccc] mb-8 text-center">
                     Review your complete budget information in the spreadsheet below.
                     You can download it at any time using the button below.
                   </p>
@@ -1773,27 +1770,29 @@ const BudgetTool = () => {
               )}
             </div>
 
-            <div className="budgettool-navigation">
-              <button
+            <div className="flex justify-between gap-4 flex-wrap">
+              <Button
                 onClick={handlePrevious}
-                className="budgettool-button budgettool-button-secondary"
+                variant="outline"
                 disabled={currentStep === -1}
+                className="border-white/20 bg-transparent text-white hover:bg-white/10 disabled:opacity-50"
               >
                 Previous
-              </button>
-              <div className="budgettool-navigation-right">
-                <button
+              </Button>
+              <div className="flex gap-4">
+                <Button
                   onClick={() => setIsConfirmModalOpen(true)}
-                  className="budgettool-button budgettool-button-secondary"
+                  variant="outline"
+                  className="border-white/20 bg-transparent text-white hover:bg-white/10"
                 >
                   Return to Select
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={currentStep === questions.length ? handleDownloadSpreadsheet : handleNext}
-                  className="budgettool-button budgettool-button-primary"
+                  className="bg-gradient-to-br from-[#4CAF50] to-[#2196F3] text-white hover:opacity-90"
                 >
                   {currentStep === questions.length ? 'Download Spreadsheet' : 'Next'}
-                </button>
+                </Button>
               </div>
             </div>
           </>
