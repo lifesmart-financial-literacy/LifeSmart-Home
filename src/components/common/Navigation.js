@@ -14,7 +14,8 @@ import AdminAnalytics from '../screens/admin/scripts/AdminAnalytics';
 import AdminUserManagement from '../screens/admin/scripts/AdminUserManagement';
 import AdminSystemSettings from '../screens/admin/scripts/AdminSystemSettings';
 import AdminDatabaseManagement from '../screens/admin/scripts/AdminDatabaseManagement';
-import AdminLoginCodes from '../screens/admin/scripts/AdminLoginCodes'; 
+import AdminLoginCodes from '../screens/admin/scripts/AdminLoginCodes';
+import AdminToolConfig from '../screens/admin/scripts/AdminToolConfig';
 
 // Life Balance related screens
 import LifeBalance from '../screens/lifebalance/LifeBalance';
@@ -59,6 +60,7 @@ const Navigation = () => {
           <Route path="/admin/system-settings" element={<AdminSystemSettings />} />
           <Route path="/admin/database" element={<AdminDatabaseManagement />} />
           <Route path="/admin/login-codes" element={<AdminLoginCodes />} />
+          <Route path="/admin/tool-config" element={<AdminToolConfig />} />
           
 
           {/* School Quiz System */}

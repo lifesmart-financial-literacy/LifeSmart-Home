@@ -2,75 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/auth';
 import {
-  FaWallet,
-  FaClipboardList,
-  FaCalculator,
   FaUserCircle,
   FaCog,
   FaSignOutAlt,
   FaFire,
-  FaGraduationCap,
-  FaBalanceScale,
-  FaMoneyBillWave,
 } from 'react-icons/fa';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/initFirebase';
 import Modal from '../widgets/modals/Modal';
 import { cn } from '@/lib/utils';
-
-// Configuration object for tool availability
-const TOOL_CONFIG = {
-  budgetTool: {
-    enabled: true,
-    in_development: false,
-    path: '/budget-tool',
-    icon: <FaWallet size={40} color="#4CAF50" />,
-    text: 'Budget Tool',
-  },
-  adultQuiz: {
-    enabled: true,
-    in_development: false,
-    path: '/adult-quiz',
-    icon: <FaGraduationCap size={40} color="#673AB7" />,
-    text: 'Adult Quiz',
-  },
-  lifeBalance: {
-    enabled: true,
-    in_development: true,
-    path: '/life-balance',
-    icon: <FaBalanceScale size={40} color="#FF5722" />,
-    text: 'Life Balance',
-  },
-  financeQuest: {
-    enabled: true,
-    in_development: false,
-    path: '/finance-quest',
-    icon: <FaMoneyBillWave size={40} color="#000000" />,
-    text: 'Finance Quest',
-  },
-  financialQuiz: {
-    enabled: false,
-    in_development: false,
-    path: '/quiz',
-    icon: <FaClipboardList size={40} color="#2196F3" />,
-    text: 'School Simulation',
-  },
-  investmentCalculator: {
-    enabled: false,
-    in_development: false,
-    path: '/investment-calculator',
-    icon: <FaCalculator size={40} color="#9C27B0" />,
-    text: 'Investment Calculator',
-  },
-};
+import { useToolConfig } from '../../hooks/useToolConfig';
+import { getIconComponent } from '../../lib/toolConfig';
 
 const SelectScreen = () => {
   const navigate = useNavigate();
   const { currentUser, loading: authLoading, logout } = useAuth();
+  const { tools, loading: toolsLoading } = useToolConfig();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [canAccessAdmin, setCanAccessAdmin] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -82,7 +33,8 @@ const SelectScreen = () => {
         }
         const userDoc = await getDoc(doc(db, currentUser.uid, 'Profile'));
         if (userDoc.exists()) {
-          setIsAdmin(userDoc.data().admin === true);
+          const profile = userDoc.data();
+          setCanAccessAdmin(profile.admin === true || profile.developer === true);
         }
         const streakDoc = await getDoc(doc(db, currentUser.uid, 'Login Streak'));
         if (streakDoc.exists()) {
@@ -113,7 +65,7 @@ const SelectScreen = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || toolsLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] [data-theme=light]:from-[#f7f8fa] [data-theme=light]:to-[#e3e8ee]">
         <div className="w-12 h-12 border-2 border-white/10 border-t-green-500 rounded-full animate-spin [data-theme=light]:border-gray-200 [data-theme=light]:border-t-green-500" />
@@ -152,43 +104,67 @@ const SelectScreen = () => {
 
           <main>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
-              {Object.entries(TOOL_CONFIG).map(([key, config]) =>
-                config.enabled ? (
-                  <button
-                    key={key}
-                    onClick={() => handleNavigation(config.path)}
-                    className={cn(
-                      'relative flex flex-col items-center gap-4 p-8 rounded-2xl border-none cursor-pointer transition-all duration-300',
-                      'bg-white/10 backdrop-blur-md text-white text-xl',
-                      'hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl',
-                      '[data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200',
-                      '[data-theme=light]:hover:bg-gray-100 [data-theme=light]:shadow-md'
-                    )}
-                  >
-                    {config.in_development && (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-blue-500 px-4 py-2 rounded border-2 border-blue-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-500">
-                        In Development
-                      </div>
-                    )}
-                    <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{config.icon}</span>
-                    <span className="font-medium">{config.text}</span>
-                  </button>
-                ) : (
-                  <div
-                    key={key}
-                    className={cn(
-                      'relative flex flex-col items-center gap-4 p-8 rounded-2xl cursor-not-allowed opacity-70',
-                      'bg-white/5 [data-theme=light]:bg-gray-100 [data-theme=light]:text-gray-400 [data-theme=light]:border [data-theme=light]:border-gray-200'
-                    )}
-                  >
+              {tools.map((tool) => {
+                const iconEl = getIconComponent(tool.icon, 40, tool.color);
+                const cardClass = cn(
+                  'relative flex flex-col items-center gap-4 p-8 rounded-2xl transition-all duration-300',
+                  'bg-white/10 backdrop-blur-md text-white text-xl',
+                  '[data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200',
+                  '[data-theme=light]:shadow-md'
+                );
+                const disabledClass = cn(
+                  'relative flex flex-col items-center gap-4 p-8 rounded-2xl cursor-not-allowed opacity-70',
+                  'bg-white/5 [data-theme=light]:bg-gray-100 [data-theme=light]:text-gray-400 [data-theme=light]:border [data-theme=light]:border-gray-200'
+                );
+
+                if (tool.enabled) {
+                  const content = (
+                    <>
+                      {tool.inDevelopment && (
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-blue-500 px-4 py-2 rounded border-2 border-blue-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-500">
+                          In Development
+                        </div>
+                      )}
+                      <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{iconEl}</span>
+                      <span className="font-medium">{tool.label}</span>
+                    </>
+                  );
+
+                  if (tool.type === 'external') {
+                    return (
+                      <a
+                        key={tool.id}
+                        href={tool.url}
+                        target={tool.openInNewTab ? '_blank' : undefined}
+                        rel={tool.openInNewTab ? 'noopener noreferrer' : undefined}
+                        className={cn(cardClass, 'border-none cursor-pointer hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl [data-theme=light]:hover:bg-gray-100 no-underline')}
+                      >
+                        {content}
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={tool.id}
+                      onClick={() => handleNavigation(tool.path)}
+                      className={cn(cardClass, 'border-none cursor-pointer hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl [data-theme=light]:hover:bg-gray-100')}
+                    >
+                      {content}
+                    </button>
+                  );
+                }
+
+                return (
+                  <div key={tool.id} className={disabledClass}>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-green-500 px-4 py-2 rounded border-2 border-green-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-500">
                       Coming Soon
                     </div>
-                    <span className="opacity-50">{config.icon}</span>
-                    <span className="opacity-50 font-medium">{config.text}</span>
+                    <span className="opacity-50">{iconEl}</span>
+                    <span className="opacity-50 font-medium">{tool.label}</span>
                   </div>
-                )
-              )}
+                );
+              })}
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8 p-4 bg-white/5 rounded-xl backdrop-blur-md [data-theme=light]:bg-gray-100 [data-theme=light]:border [data-theme=light]:border-gray-200">
@@ -206,7 +182,7 @@ const SelectScreen = () => {
                 <FaCog size={24} />
                 <span>Settings</span>
               </button>
-              {isAdmin && (
+              {canAccessAdmin && (
                 <button
                   onClick={() => handleNavigation('/admin')}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 bg-amber-500/20 text-white font-medium cursor-pointer transition-all hover:-translate-y-0.5 hover:bg-amber-500/30 [data-theme=light]:bg-amber-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-amber-300 [data-theme=light]:hover:bg-amber-200"

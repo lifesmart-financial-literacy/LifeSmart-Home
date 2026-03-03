@@ -1,0 +1,55 @@
+/**
+ * Tool configuration utilities and defaults.
+ * Tools can be internal (routes in this app) or external (links to other LifeSmart sites).
+ */
+
+import {
+  FaWallet,
+  FaClipboardList,
+  FaCalculator,
+  FaGraduationCap,
+  FaBalanceScale,
+  FaMoneyBillWave,
+  FaSchool,
+  FaExternalLinkAlt,
+  FaChartLine,
+  FaPiggyBank,
+  FaBook,
+  FaStar,
+  FaLink,
+  FaCog,
+} from 'react-icons/fa';
+
+/** Map icon name (string) to React Icon component */
+export const ICON_MAP = {
+  FaWallet,
+  FaClipboardList,
+  FaCalculator,
+  FaGraduationCap,
+  FaBalanceScale,
+  FaMoneyBillWave,
+  FaSchool,
+  FaExternalLinkAlt,
+  FaChartLine,
+  FaPiggyBank,
+  FaBook,
+  FaStar,
+  FaLink,
+  FaCog,
+};
+
+/** Default tool config - used when Firestore has no data */
+export const DEFAULT_TOOL_CONFIG = [
+  { id: 'budget-tool', type: 'internal', path: '/budget-tool', label: 'Budget Tool', icon: 'FaWallet', color: '#4CAF50', enabled: true, inDevelopment: false, order: 1 },
+  { id: 'adult-quiz', type: 'internal', path: '/adult-quiz', label: 'Adult Quiz', icon: 'FaGraduationCap', color: '#673AB7', enabled: true, inDevelopment: false, order: 2 },
+  { id: 'life-balance', type: 'internal', path: '/life-balance', label: 'Life Balance', icon: 'FaBalanceScale', color: '#FF5722', enabled: true, inDevelopment: true, order: 3 },
+  { id: 'finance-quest', type: 'internal', path: '/finance-quest', label: 'Finance Quest', icon: 'FaMoneyBillWave', color: '#000000', enabled: true, inDevelopment: false, order: 4 },
+  { id: 'financial-quiz', type: 'internal', path: '/quiz', label: 'School Simulation', icon: 'FaClipboardList', color: '#2196F3', enabled: false, inDevelopment: false, order: 5 },
+  { id: 'investment-calculator', type: 'internal', path: '/investment-calculator', label: 'Investment Calculator', icon: 'FaCalculator', color: '#9C27B0', enabled: false, inDevelopment: false, order: 6 },
+];
+
+/** Get icon component from name */
+export function getIconComponent(name, size = 40, color) {
+  const Icon = ICON_MAP[name] || FaLink;
+  return <Icon size={size} color={color} />;
+}

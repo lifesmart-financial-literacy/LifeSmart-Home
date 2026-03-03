@@ -11,7 +11,8 @@ import {
   FaDatabase,
   FaUserShield,
   FaArrowLeft,
-  FaKey
+  FaKey,
+  FaSlidersH
 } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -35,7 +36,9 @@ const AdminHome = () => {
         }
 
         const userDoc = await getDoc(doc(db, currentUser.uid, "Profile"));
-        if (!userDoc.exists() || !userDoc.data().admin) {
+        const profile = userDoc.data();
+        const hasAccess = profile?.admin === true || profile?.developer === true;
+        if (!userDoc.exists() || !hasAccess) {
           trackError('AUTH_ERROR', 'Unauthorized access attempt', 'AdminHome');
           console.log("Unauthorized access attempt to admin panel");
           navigate('/', { replace: true });
@@ -99,6 +102,13 @@ const AdminHome = () => {
       icon: <FaKey size={24} />,
       path: '/admin/login-codes',
       description: 'Generate and manage login codes for users',
+      inDevelopment: false
+    },
+    {
+      title: 'Tool Configuration',
+      icon: <FaSlidersH size={24} />,
+      path: '/admin/tool-config',
+      description: 'Configure tools and external links on the dashboard',
       inDevelopment: false
     },
   ];
