@@ -35,9 +35,10 @@ const AdminHome = () => {
           return;
         }
 
-        const userDoc = await getDoc(doc(db, currentUser.uid, "Profile"));
-        const profile = userDoc.data();
-        const hasAccess = profile?.admin === true || profile?.developer === true;
+        // Profile doc is readable; AdminUserManagement syncs admin/developer here
+        const userDoc = await getDoc(doc(db, currentUser.uid, 'Profile'));
+        const data = userDoc.exists() ? userDoc.data() : {};
+        const hasAccess = data.admin === true || data.developer === true || data.isAdmin === true || data.role === 'admin';
         if (!userDoc.exists() || !hasAccess) {
           trackError('AUTH_ERROR', 'Unauthorized access attempt', 'AdminHome');
           console.log("Unauthorized access attempt to admin panel");

@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ============================================================
+    // ADD THIS RULE: Allow authenticated users to read tool config
+    // (required for SelectScreen dashboard - useToolConfig hook)
+    // ============================================================
+    match /SystemSettings/toolConfig {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null; // Admins write via AdminToolConfig
+    }
+    
+    // Your existing rules below (e.g. Users, {uid}/Profile, etc.)
+    // If you already have rules, add only the SystemSettings block above.
+  }
+}
