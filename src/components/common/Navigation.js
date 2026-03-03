@@ -19,11 +19,9 @@ import AdminLoginCodes from '../screens/admin/scripts/AdminLoginCodes';
 // Life Balance related screens
 import LifeBalance from '../screens/lifebalance/LifeBalance';
 
-// School Simulation related screens
+// School Quiz related screens (simulation removed)
 import SchoolQuizLandingPage from '../screens/quiz/QuizLandingPage';
 import SchoolFinancialQuiz from '../screens/quiz/FinancialQuiz';
-import SchoolQuizSimulation from '../screens/simulation/scripts/QuizSimulation';
-import SchoolSimSetup from '../screens/quiz/sim/SimSetup';
 
 // Adult Simulation related screens
 import FinanceQuestFinancialQuiz from '../screens/financeQuest/FinancialQuiz';
@@ -38,23 +36,6 @@ import FinanceQuestResultsScreen from '../screens/financeQuest/sim/ResultsScreen
 
 // Adult Quiz related screens
 import AdultQuiz from '../screens/adult/scripts/AdultQuiz';
-
-// Simulation related screens
-import GroupCreation from '../screens/simulation/scripts/GroupCreation';
-import SimulationPage from '../screens/simulation/scripts/Simulation';
-import ResultsScreen from '../screens/simulation/scripts/ResultsScreen';
-
-// Learning and Courses
-import FinancialLiteracy from '../screens/learning/FinancialLiteracy';
-import InvestingCourse from '../screens/learning/investingCourse/InvestingCourse';
-import InvestingCourseContent from '../screens/learning/investingCourse/InvestingCourseContent';
-import InvestingCourseExam from '../screens/learning/investingCourse/InvestingCourseExam';
-
-// Stock Market related screens
-import PortfolioCreation from '../screens/stockmarket/scripts/PortfolioCreation';
-import PortfolioDisplay from '../screens/stockmarket/scripts/PortfolioDisplay';
-import StockTradingSelect from '../screens/stockmarket/scripts/StockTradingSelect';
-import StickyNoteCreator from '../screens/stockmarket/scripts/StickyNoteCreator'; 
 
 // Tools and Calculators
 import InvestmentCalculator from '../screens/calculator/InvestmentCalculator';
@@ -80,11 +61,9 @@ const Navigation = () => {
           <Route path="/admin/login-codes" element={<AdminLoginCodes />} />
           
 
-          {/* School Simulation System */}
+          {/* School Quiz System */}
           <Route path="/quiz-landing" element={<SchoolQuizLandingPage />} />
           <Route path="/quiz" element={<SchoolFinancialQuiz />} />
-          <Route path="/quiz-simulation" element={<SchoolQuizSimulation />} />
-          <Route path="/sim-setup" element={<SchoolSimSetup />} />
 
           {/* Adult Simulation System */}
           <Route path="/finance-quest" element={<FinanceQuestLandingPage />} />
@@ -102,23 +81,6 @@ const Navigation = () => {
 
           {/* Life Balance System */}
           <Route path="/life-balance" element={<LifeBalance />} />
-
-          {/* Simulation System */}
-          <Route path="/simulation" element={<GroupCreation />} />
-          <Route path="/simulation-page" element={<SimulationPage />} />
-          <Route path="/simulation-results" element={<ResultsScreen />} />
-
-          {/* Learning Platform */}
-          <Route path="/financial-literacy" element={<FinancialLiteracy />} />
-          <Route path="/investing-course" element={<InvestingCourse />} />
-          <Route path="/investing-course-content" element={<InvestingCourseContent />} />
-          <Route path="/investing-course-exam" element={<InvestingCourseExam />} />
-
-          {/* Stock Market System */}
-          <Route path="/portfolio-creation" element={<PortfolioCreation />} />
-          <Route path="/portfolio-display" element={<PortfolioDisplay />} />
-          <Route path="/stock-market-simulator" element={<StockTradingSelect />} />
-          <Route path="/sticky-note-creator" element={<StickyNoteCreator />} />
 
           {/* Financial Tools */}
           <Route path="/investment-calculator" element={<InvestmentCalculator />} />

@@ -43,9 +43,7 @@ const ResultsScreen = ({ teams, quizComplete, onNextQuestion }) => {
   };
 
   const nextOrNavigateToSimulation = () => {
-    if (quizComplete) {
-      navigate('/quiz-simulation');
-    } else {
+    if (!quizComplete) {
       onNextQuestion();
     }
   };
@@ -76,9 +74,6 @@ const ResultsScreen = ({ teams, quizComplete, onNextQuestion }) => {
   return (
     <div className="results-container">
       <button onClick={goHome} className="home-button">Go to Home</button>
-      <button onClick={() => navigate('/quiz-simulation')} className="simulation-button">
-        Go to Simulation
-      </button>
       
       <h2 className="title">Scoreboard</h2>
 

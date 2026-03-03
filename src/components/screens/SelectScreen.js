@@ -60,27 +60,6 @@ const TOOL_CONFIG = {
     icon: <FaClipboardList size={40} color="#2196F3" />,
     text: 'School Simulation',
   },
-  assetMarketSimulation: {
-    enabled: false,
-    in_development: false,
-    path: '/simulation',
-    icon: <FaChartLine size={40} color="#FF9800" />,
-    text: 'Asset Market Simulation',
-  },
-  stockMarketSimulator: {
-    enabled: false,
-    in_development: true,
-    path: '/stock-market-simulator',
-    icon: <FaStackExchange size={40} color="#E91E63" />,
-    text: 'Stock Market Simulator',
-  },
-  learningResources: {
-    enabled: false,
-    in_development: false,
-    path: '/financial-literacy',
-    icon: <FaBook size={40} color="#9C27B0" />,
-    text: 'Learning Resources',
-  },
   investmentCalculator: {
     enabled: false,
     in_development: false,

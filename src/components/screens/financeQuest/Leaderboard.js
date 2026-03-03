@@ -48,7 +48,7 @@ const Leaderboard = ({ teams, quizComplete, onNextQuestion }) => {
 
   const nextOrNavigateToSimulation = () => {
     if (quizComplete) {
-      navigate('/sim-setup');
+      navigate('/finance-quest-setup');
     } else {
       onNextQuestion();
     }

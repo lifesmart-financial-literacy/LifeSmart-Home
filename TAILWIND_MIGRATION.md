@@ -34,7 +34,13 @@ The foundation for React + Tailwind + shadcn/ui is in place:
 
 ---
 
-## 📋 Remaining Migration (77 CSS files)
+## 🗑️ Removed Features (no migration needed)
+- **Learning** – FinancialLiteracy, BasicsOfFinancialLiteracy, InvestingCourse, InvestingCourseContent, InvestingCourseExam, InvestingCourseExamResults, CoursePage (×11), QuestionTemplate
+- **Stock Market** – PortfolioCreation, PortfolioDisplay, StockTradingSelect, StickyNoteCreator, StockMarketDisplay
+- **Simulation** – GroupCreation, Simulation, ResultsScreen, PastSimulations, QuizSimulation, SimulationControls
+- **School Quiz SimSetup** – Removed (simulation dependency)
+
+## 📋 Remaining Migration
 
 Convert screens incrementally. For each component:
 
@@ -44,10 +50,10 @@ Convert screens incrementally. For each component:
 4. **Delete** the CSS file when done
 
 ### Suggested Order
-1. **Shared/Common** – HomeScreen, NotFound, Login, Register
-2. **Auth** – ProfileScreen, SettingsScreen
-3. **Admin** – AdminHome, AdminAnalytics, etc.
-4. **Feature screens** – Budget, Quiz, Finance Quest, etc.
+1. **Shared/Common** – HomeScreen, NotFound, Login, Register ✅
+2. **Auth** – ProfileScreen, SettingsScreen ✅
+3. **Admin** – AdminHome, AdminAnalytics, etc. ✅
+4. **Feature screens** – Budget, Quiz, Finance Quest, Life Balance, Adult Quiz, Calculator
 
 ### Adding More shadcn Components
 ```bash

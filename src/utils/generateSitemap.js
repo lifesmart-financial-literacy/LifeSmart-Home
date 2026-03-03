@@ -17,11 +17,6 @@ const routes = [
     changefreq: 'weekly'
   },
   {
-    path: '/simulation',
-    priority: 0.8,
-    changefreq: 'weekly'
-  },
-  {
     path: '/calculator',
     priority: 0.8,
     changefreq: 'weekly'

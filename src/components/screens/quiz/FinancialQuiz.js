@@ -89,7 +89,7 @@ const FinancialQuiz = () => {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
       setQuizComplete(true);
-      saveResultsAndNavigate();
+      saveResultsAndShowResults();
     }
   };
 
@@ -97,7 +97,7 @@ const FinancialQuiz = () => {
     navigate('/');
   };
 
-  const saveResultsAndNavigate = async () => {
+  const saveResultsAndShowResults = async () => {
     if (!uid) {
       alert("No user is logged in. Please sign in.");
       navigate('/');
@@ -107,16 +107,12 @@ const FinancialQuiz = () => {
     const teamsCollectionRef = collection(db, uid, "Quiz Simulations", "Teams");
 
     try {
-      // Step 1: Retrieve and delete all existing team documents for this user
       const snapshot = await getDocs(teamsCollectionRef);
       const deletePromises = snapshot.docs.map(docSnapshot =>
         deleteDoc(docSnapshot.ref)
       );
       await Promise.all(deletePromises);
 
-      console.log("All old teams deleted from Firebase for this user.");
-
-      // Step 2: Save each new team's data from the current session
       const savePromises = sortedTeams.map(team => {
         const teamDocRef = doc(teamsCollectionRef, team.name);
         return setDoc(teamDocRef, {
@@ -128,16 +124,10 @@ const FinancialQuiz = () => {
 
       await Promise.all(savePromises);
 
-      console.log("New results saved to Firebase:", sortedTeams);
-
-      // Step 3: Navigate to the SimSetup screen with teams data
-      navigate('/sim-setup', { 
-        state: { 
-          teams: sortedTeams
-        }
-      });
+      setShowResults(true);
     } catch (error) {
       console.error("Error during saving results to Firebase:", error);
+      setShowResults(true);
     }
   };
 
