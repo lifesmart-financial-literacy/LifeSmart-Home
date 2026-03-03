@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { DEFAULT_TOOL_CONFIG, getIconComponent } from '@/lib/toolConfig';
+import { DEFAULT_TOOL_CONFIG, getIconComponent, USER_ROLES } from '@/lib/toolConfig';
 import Modal from '../../../widgets/modals/Modal';
 import ConfirmModal from '../../../widgets/modals/ConfirmModal';
 import IconPickerModal from '../../../widgets/modals/IconPickerModal';
@@ -46,7 +46,12 @@ const AdminToolConfig = () => {
       const ref = doc(db, TOOL_CONFIG_REF.collection, TOOL_CONFIG_REF.id);
       const snap = await getDoc(ref);
       if (snap.exists() && Array.isArray(snap.data().tools) && snap.data().tools.length > 0) {
-        setTools([...snap.data().tools].sort((a, b) => (a.order ?? 999) - (b.order ?? 999)));
+        const raw = [...snap.data().tools].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+        const normalized = raw.map((t) => ({
+          ...t,
+          allowedRoles: Array.isArray(t.allowedRoles) && t.allowedRoles.length > 0 ? t.allowedRoles : ['user', 'admin', 'developer'],
+        }));
+        setTools(normalized);
       } else {
         setTools([...DEFAULT_TOOL_CONFIG]);
       }
@@ -91,7 +96,19 @@ const AdminToolConfig = () => {
       enabled: true,
       inDevelopment: false,
       order: prev.length,
+      allowedRoles: ['user', 'admin', 'developer'],
     }]);
+  };
+
+  const toggleToolRole = (index, role) => {
+    setTools(prev => prev.map((t, i) => {
+      if (i !== index) return t;
+      const roles = Array.isArray(t.allowedRoles) ? [...t.allowedRoles] : ['user', 'admin', 'developer'];
+      const idx = roles.indexOf(role);
+      if (idx >= 0) roles.splice(idx, 1);
+      else roles.push(role);
+      return { ...t, allowedRoles: roles.length > 0 ? roles : ['user'] };
+    }));
   };
 
   const removeTool = (index) => {
@@ -243,6 +260,30 @@ const AdminToolConfig = () => {
                         placeholder="#2196F3"
                         className={inputClasses}
                       />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label className={labelClasses}>Allowed roles</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {USER_ROLES.map((role) => {
+                          const roles = Array.isArray(tool.allowedRoles) ? tool.allowedRoles : ['user', 'admin', 'developer'];
+                          const isChecked = roles.includes(role);
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              onClick={() => toggleToolRole(index, role)}
+                              className={cn(
+                                'px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 capitalize',
+                                isChecked
+                                  ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/50 shadow-sm shadow-indigo-500/20 [data-theme=light]:bg-indigo-100 [data-theme=light]:text-indigo-700 [data-theme=light]:border-indigo-300'
+                                  : 'bg-white/5 text-zinc-500 border border-white/10 hover:bg-white/10 hover:text-zinc-400 [data-theme=light]:border [data-theme=light]:border-zinc-200'
+                              )}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <Label className={labelClasses}>Options</Label>

@@ -12,7 +12,7 @@ import { db } from '../../firebase/initFirebase';
 import Modal from '../widgets/modals/Modal';
 import { cn } from '@/lib/utils';
 import { useToolConfig } from '../../hooks/useToolConfig';
-import { getIconComponent } from '../../lib/toolConfig';
+import { getIconComponent, canRoleAccessTool } from '../../lib/toolConfig';
 
 const SelectScreen = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const SelectScreen = () => {
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
+  const [userRole, setUserRole] = useState('user');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -37,6 +38,8 @@ const SelectScreen = () => {
           const hasAccess = data.admin === true || data.developer === true || data.isAdmin === true || data.role === 'admin';
           setCanAccessAdmin(hasAccess);
           setStreak(data.streak || 0);
+          const role = data.developer === true ? 'developer' : data.admin === true || data.isAdmin === true || data.role === 'admin' ? 'admin' : 'user';
+          setUserRole(role);
         }
       } catch (error) {
         console.error('Error in auth check:', error);
@@ -102,7 +105,7 @@ const SelectScreen = () => {
 
           <main>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
-              {tools.map((tool) => {
+              {tools.filter((tool) => canRoleAccessTool(tool, userRole)).map((tool) => {
                 const iconEl = getIconComponent(tool.icon, 40, tool.color);
                 const isExternal = tool.type === 'external';
                 const cardClass = cn(
