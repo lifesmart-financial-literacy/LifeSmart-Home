@@ -51,6 +51,7 @@ const AdminDatabaseManagement = () => {
   useEffect(() => {
     trackFeatureView('admin_database_management');
     loadDatabaseStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const loadDatabaseStats = async () => {

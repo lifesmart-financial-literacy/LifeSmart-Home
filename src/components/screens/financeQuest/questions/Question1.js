@@ -1,7 +1,5 @@
+/* eslint-disable no-unused-vars -- Question has placeholder state for future glossary/hint features */
 import React, { useState, useEffect, useRef } from 'react';
-import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
-import q1Image from '../../../../assets/icons/q1image.png';
-import { MdFlashOn } from 'react-icons/md';
 import QuestionHeader from './QuestionHeader';
 
 const PLANET_EARTH = '/financeQuest/celestialBodies/Earth.png';

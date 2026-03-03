@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chart } from 'chart.js/auto';
 import QuestionHeader from './questions/QuestionHeader';
 import FinanceQuestResultsScreen from './FinanceQuestResultsScreen';
@@ -29,7 +29,6 @@ function simulateAllYears(teams, initialAllocations, baseFunds, yearsConfig) {
     const teamBase = baseFunds + (team.points || 0) * 1000;
     const alloc = initialAllocations[idx];
     // Year 0: initial allocation
-    let prev = {};
     let yearArr = [];
     let total = 0;
     let pots = {};
@@ -85,8 +84,8 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
   const chartInstanceRef = useRef(null);
   const runTimeout = useRef(null);
 
-  // Always show all years on the x-axis
-  const allLabels = ['Initial', ...yearsConfig.map(y => y.label)];
+  // Always show all years on the x-axis - memoized to avoid effect re-runs
+  const allLabels = useMemo(() => ['Initial', ...yearsConfig.map(y => y.label)], [yearsConfig]);
 
   useEffect(() => {
     // Prepare data for the chart
@@ -144,7 +143,8 @@ const FinanceQuestSimulation = ({ teams, initialAllocations, baseFunds }) => {
         chartInstanceRef.current.destroy();
       }
     };
-  }, [results, year, restartKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- allLabels derived from yearsConfig
+  }, [results, year, restartKey, allLabels]);
 
   // Clean up timeout on unmount
   useEffect(() => {

@@ -43,6 +43,7 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term hovers
   const showHoverModal = (title, content, event) => {
     if (!event) return;
     setHoverModal({
@@ -54,10 +55,12 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     });
   };
 
+  // eslint-disable-next-line no-unused-vars -- pairs with showHoverModal
   const hideHoverModal = () => {
     setHoverModal(prev => ({ ...prev, show: false }));
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term clicks
   const openGlossary = (term) => {
     setShowGlossary(true);
     if (term === 'stocksFundPortfolio') {
@@ -127,7 +130,7 @@ const Question4 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
         </div>
         <div className="question4-task-header-question">
           <p>Ben wants to save money for his future. He has £1,000 to invest.</p>
-          <img src={moneyBars} alt="Task 4 Image" className="question4-task-image" />
+          <img src={moneyBars} alt="Task 4 scenario" className="question4-task-image" />
         </div>
       </div>
 

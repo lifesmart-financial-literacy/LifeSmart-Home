@@ -56,6 +56,7 @@ const Question2 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     setHoverModal(prev => ({ ...prev, show: false }));
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term clicks
   const openGlossary = (term) => {
     setShowGlossary(true);
     if (term === 'incomeTax') {

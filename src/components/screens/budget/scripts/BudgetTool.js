@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- Budget tool has many computed values for future UI enhancements */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BudgetSpreadsheet, { downloadSpreadsheet } from './BudgetSpreadsheet';

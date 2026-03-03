@@ -21,6 +21,7 @@ const SimulationControls = () => {
 
   useEffect(() => {
     initializeAssetChanges(years);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initializeAssetChanges is stable
   }, [years]);
 
   const getNextSimulationIndex = async () => {

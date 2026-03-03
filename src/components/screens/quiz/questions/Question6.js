@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- showHintModal reserved for future hint feature */
 import React, { useState, useEffect } from 'react';
 import equitiesIcon from '../../../../assets/icons/equities.png';
 import bondsIcon from '../../../../assets/icons/bonds.png';

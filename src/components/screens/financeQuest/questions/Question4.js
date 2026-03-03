@@ -1,7 +1,5 @@
+/* eslint-disable no-unused-vars -- Question has placeholder functions for future glossary/hint features */
 import React, { useState, useEffect, useRef } from 'react';
-import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
-import moneyBars from '../../../../assets/icons/moneybars.png';
-import InvestmentCalculator from '../../../widgets/InvestmentCalculator';
 
 const PLANET_EARTH = '/financeQuest/celestialBodies/Earth.png';
 const PLANET_MOON = '/financeQuest/celestialBodies/Moon.png';

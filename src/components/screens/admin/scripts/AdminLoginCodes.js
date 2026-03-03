@@ -40,6 +40,7 @@ const AdminLoginCodes = () => {
   useEffect(() => {
     trackFeatureView('admin_login_codes');
     fetchCodes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const fetchCodes = async () => {

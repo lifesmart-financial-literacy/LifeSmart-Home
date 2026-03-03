@@ -31,6 +31,7 @@ const SettingsScreen = () => {
       }
     };
     fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- settings is set by fetch, not a dependency
   }, [navigate]);
 
   const handleChange = (name, value) => setSettings((prev) => ({ ...prev, [name]: value }));

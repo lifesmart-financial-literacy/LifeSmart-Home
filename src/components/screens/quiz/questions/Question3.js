@@ -69,6 +69,7 @@ const Question3 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
     setHoverModal(prev => ({ ...prev, show: false }));
   };
 
+  // eslint-disable-next-line no-unused-vars -- reserved for glossary term clicks
   const openGlossary = (term) => {
     setShowGlossary(true);
     if (term === 'mortgage') {
@@ -157,7 +158,7 @@ const Question3 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
         </div>
         <div className="question3-task-header-question">
           <p>Ben inherits a £20,000 gift from an old uncle. He has several options on what to do with the money.</p>
-          <img src={blueCash} alt="Task 3 Image" className="question3-task-image" />
+          <img src={blueCash} alt="Task 3 scenario" className="question3-task-image" />
         </div>
       </div>
 

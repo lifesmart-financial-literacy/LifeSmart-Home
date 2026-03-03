@@ -61,6 +61,7 @@ const AdminSystemSettings = () => {
   useEffect(() => {
     trackFeatureView('admin_system_settings');
     loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const loadSettings = async () => {

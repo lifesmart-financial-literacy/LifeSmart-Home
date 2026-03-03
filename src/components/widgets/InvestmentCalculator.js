@@ -104,7 +104,6 @@ const InvestmentCalculator = () => {
     });
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- renderChart uses refs/state, including it causes infinite loop
   const calculate = useCallback(() => {
     const principal = parseFloat(initialInvestment);
     const monthlyAmount = parseFloat(monthlyContribution);
@@ -120,6 +119,7 @@ const InvestmentCalculator = () => {
 
     setFutureValue(currentValue.toFixed(2));
     renderChart(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- renderChart uses refs, including causes infinite loop
   }, [initialInvestment, monthlyContribution, investmentPeriod, rate]);
 
   useEffect(() => {

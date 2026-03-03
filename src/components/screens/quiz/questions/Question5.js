@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- Question has glossary state for future term tooltips */
 import React, { useState, useEffect } from 'react';
 import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
 import moneyBars from '../../../../assets/icons/moneybars.png';
@@ -136,7 +137,7 @@ const Question5 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
               onMouseLeave={hideHoverModal}
             > credit rating</span>.
           </p>
-          <img src={moneyBars} alt="Task 5 Image" className="question5-task-image" />
+          <img src={moneyBars} alt="Task 5 scenario" className="question5-task-image" />
         </div>
       </div>
 

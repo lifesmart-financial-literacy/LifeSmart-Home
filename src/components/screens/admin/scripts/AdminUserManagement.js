@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 
 const AdminUserManagement = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  useAuth();
   const { trackFeatureView, trackAdminAction, trackError } = useAnalytics();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
@@ -111,17 +111,19 @@ const AdminUserManagement = () => {
       trackError('FETCH_USERS_ERROR', error.message, 'AdminUserManagement');
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trackError from useAnalytics is stable
   }, []);
 
   // Track feature view once on mount
   useEffect(() => {
     trackFeatureView('admin_user_management');
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   // Fetch users once on mount
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleUserAction = async (action, user) => {
     setSelectedUser(user);

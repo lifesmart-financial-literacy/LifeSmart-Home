@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- getFinancialAdvice reserved for future UI */
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Chart from 'chart.js/auto';
@@ -29,8 +30,9 @@ const ResultsScreen = () => {
 
   useEffect(() => {
     // Cleanup function to destroy all charts when component unmounts
+    const instances = chartInstances.current;
     return () => {
-      Object.values(chartInstances.current).forEach(chart => {
+      Object.values(instances).forEach(chart => {
         if (chart) {
           chart.destroy();
         }
@@ -108,6 +110,7 @@ const ResultsScreen = () => {
         setTimeout(() => createChart(team), 100);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- createChart uses refs/state
   }, [expandedGroups, quarterResults]);
 
   const calculateTotalScore = (team) => {
@@ -136,6 +139,7 @@ const ResultsScreen = () => {
     return rank;
   };
 
+  // Reserved for future financial advice display (currently commented out in JSX)
   const getFinancialAdvice = (team) => {
     if (!teamData || !teamData[team]) return 'No data available for financial advice.';
     

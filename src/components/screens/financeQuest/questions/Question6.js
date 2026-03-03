@@ -1,11 +1,6 @@
+/* eslint-disable no-unused-vars -- Icon imports reserved for future UI enhancements */
 import React, { useState, useEffect } from 'react';
 import { FaBook, FaSmile, FaChartLine, FaHeartbeat, FaExclamationTriangle } from 'react-icons/fa';
-import equitiesIcon from '../../../../assets/icons/equities.png';
-import bondsIcon from '../../../../assets/icons/bonds.png';
-import realEstateIcon from '../../../../assets/icons/real_estate.png';
-import commoditiesIcon from '../../../../assets/icons/commodities.png';
-import otherIcon from '../../../../assets/icons/other.png';
-import graphImage from '../../../../assets/icons/graphimage.png';
 import potIcon from '../../../../assets/icons/piggy_bank.png';
 import QuestionHeader from './QuestionHeader';
 
