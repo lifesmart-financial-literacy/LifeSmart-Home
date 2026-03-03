@@ -169,6 +169,20 @@ const SelectScreen = () => {
                   'bg-white/5 [data-theme=light]:bg-gray-100 [data-theme=light]:text-gray-400 [data-theme=light]:border [data-theme=light]:border-gray-200'
                 );
 
+                const restrictedRoles = Array.isArray(tool.allowedRoles) && tool.allowedRoles.length > 0 && tool.allowedRoles.length < 3
+                  ? tool.allowedRoles
+                  : null;
+
+                const roleTagClass = (role) => {
+                  const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border';
+                  const styles = {
+                    user: 'bg-blue-500/20 text-blue-300 border-blue-500/40 [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-700 [data-theme=light]:border-blue-300',
+                    admin: 'bg-purple-500/20 text-purple-300 border-purple-500/40 [data-theme=light]:bg-purple-100 [data-theme=light]:text-purple-700 [data-theme=light]:border-purple-300',
+                    developer: 'bg-amber-500/20 text-amber-300 border-amber-500/40 [data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-700 [data-theme=light]:border-amber-300',
+                  };
+                  return cn(base, styles[role] || 'bg-gray-500/20 text-gray-300 border-gray-500/40');
+                };
+
                 if (tool.enabled) {
                   const content = (
                     <>
@@ -179,6 +193,15 @@ const SelectScreen = () => {
                       )}
                       <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{iconEl}</span>
                       <span className="font-medium">{tool.label}</span>
+                      {restrictedRoles && (
+                        <div className="flex flex-wrap justify-center gap-1.5 mt-2" title={`Visible to: ${restrictedRoles.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(', ')}`}>
+                          {restrictedRoles.map((role) => (
+                            <span key={role} className={roleTagClass(role)}>
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </>
                   );
 
@@ -214,6 +237,15 @@ const SelectScreen = () => {
                     </div>
                     <span className="opacity-50">{iconEl}</span>
                     <span className="opacity-50 font-medium">{tool.label}</span>
+                    {restrictedRoles && (
+                      <div className="flex flex-wrap justify-center gap-1.5 mt-2 opacity-70">
+                        {restrictedRoles.map((role) => (
+                          <span key={role} className={roleTagClass(role)}>
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
