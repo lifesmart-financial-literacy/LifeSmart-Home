@@ -246,35 +246,50 @@ const AdminToolConfig = () => {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <Label className={labelClasses}>Options</Label>
-                      <div className="flex flex-wrap gap-3">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={tool.enabled !== false}
-                            onChange={(e) => updateTool(index, 'enabled', e.target.checked)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className={labelClasses}>Enabled</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={tool.inDevelopment === true}
-                            onChange={(e) => updateTool(index, 'inDevelopment', e.target.checked)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className={labelClasses}>In Development</span>
-                        </label>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateTool(index, 'enabled', !(tool.enabled !== false))}
+                          className={cn(
+                            'px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+                            tool.enabled !== false
+                              ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-sm shadow-emerald-500/20'
+                              : 'bg-white/5 text-zinc-500 border border-white/10 hover:bg-white/10 hover:text-zinc-400',
+                            '[data-theme=light]:border [data-theme=light]:border-zinc-200',
+                            tool.enabled !== false && '[data-theme=light]:bg-emerald-100 [data-theme=light]:text-emerald-700 [data-theme=light]:border-emerald-300'
+                          )}
+                        >
+                          Enabled
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateTool(index, 'inDevelopment', !(tool.inDevelopment === true))}
+                          className={cn(
+                            'px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+                            tool.inDevelopment === true
+                              ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-500/20'
+                              : 'bg-white/5 text-zinc-500 border border-white/10 hover:bg-white/10 hover:text-zinc-400',
+                            '[data-theme=light]:border [data-theme=light]:border-zinc-200',
+                            tool.inDevelopment === true && '[data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-700 [data-theme=light]:border-amber-300'
+                          )}
+                        >
+                          In Development
+                        </button>
                         {tool.type === 'external' && (
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={tool.openInNewTab !== false}
-                              onChange={(e) => updateTool(index, 'openInNewTab', e.target.checked)}
-                              className="w-4 h-4 rounded"
-                            />
-                            <span className={labelClasses}>Open in new tab</span>
-                          </label>
+                          <button
+                            type="button"
+                            onClick={() => updateTool(index, 'openInNewTab', !(tool.openInNewTab !== false))}
+                            className={cn(
+                              'px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+                              tool.openInNewTab !== false
+                                ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50 shadow-sm shadow-blue-500/20'
+                                : 'bg-white/5 text-zinc-500 border border-white/10 hover:bg-white/10 hover:text-zinc-400',
+                              '[data-theme=light]:border [data-theme=light]:border-zinc-200',
+                              tool.openInNewTab !== false && '[data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-700 [data-theme=light]:border-blue-300'
+                            )}
+                          >
+                            Open in new tab
+                          </button>
                         )}
                       </div>
                     </div>
