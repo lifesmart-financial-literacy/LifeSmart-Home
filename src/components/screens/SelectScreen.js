@@ -187,7 +187,7 @@ const SelectScreen = () => {
                   const content = (
                     <>
                       {tool.inDevelopment && (
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-blue-500 px-4 py-2 rounded border-2 border-blue-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-500">
+                        <div className="absolute top-2 right-2 bg-black/80 text-blue-500 px-2.5 py-1 rounded-md border border-blue-500/60 text-xs font-semibold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-400">
                           In Development
                         </div>
                       )}
@@ -232,7 +232,7 @@ const SelectScreen = () => {
 
                 return (
                   <div key={tool.id} className={disabledClass}>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-green-500 px-4 py-2 rounded border-2 border-green-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-500">
+                    <div className="absolute top-2 right-2 bg-black/80 text-green-500 px-2.5 py-1 rounded-md border border-green-500/60 text-xs font-semibold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-400">
                       Coming Soon
                     </div>
                     <span className="opacity-50">{iconEl}</span>
