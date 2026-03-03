@@ -6,6 +6,8 @@ import {
   FaCog,
   FaSignOutAlt,
   FaFire,
+  FaChevronDown,
+  FaChevronRight,
 } from 'react-icons/fa';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/initFirebase';
@@ -17,12 +19,34 @@ import { getIconComponent, canRoleAccessTool } from '../../lib/toolConfig';
 const SelectScreen = () => {
   const navigate = useNavigate();
   const { currentUser, loading: authLoading, logout } = useAuth();
-  const { tools, loading: toolsLoading } = useToolConfig();
+  const { groups, loading: toolsLoading } = useToolConfig();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const [userRole, setUserRole] = useState('user');
+  const [expandedGroups, setExpandedGroups] = useState(null);
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups((prev) => {
+      const base = prev ?? new Set(groups.map((g) => g.id));
+      const next = new Set(base);
+      if (next.has(groupId)) next.delete(groupId);
+      else next.add(groupId);
+      return next;
+    });
+  };
+
+  const isGroupExpanded = (groupId) => {
+    if (expandedGroups === null) return true;
+    return expandedGroups.has(groupId);
+  };
+
+  useEffect(() => {
+    if (groups.length > 0) {
+      setExpandedGroups((prev) => (prev === null ? new Set(groups.map((g) => g.id)) : prev));
+    }
+  }, [groups]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -104,8 +128,33 @@ const SelectScreen = () => {
           </header>
 
           <main>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
-              {tools.filter((tool) => canRoleAccessTool(tool, userRole)).map((tool) => {
+            <div className="flex flex-col gap-10">
+              {groups.map((group) => {
+                const visibleTools = (group.tools || []).filter((tool) => canRoleAccessTool(tool, userRole));
+                if (visibleTools.length === 0) return null;
+                const expanded = isGroupExpanded(group.id);
+                return (
+                  <section key={group.id} className="flex flex-col gap-4">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group.id)}
+                      className="flex items-center gap-2 w-full text-left px-1 py-2 rounded-lg hover:bg-white/5 [data-theme=light]:hover:bg-gray-100 transition-colors group/btn"
+                    >
+                      <span className="text-gray-400 group-hover/btn:text-gray-300 transition-transform duration-200 [data-theme=light]:text-gray-500 [data-theme=light]:group-hover/btn:text-gray-700">
+                        {expanded ? <FaChevronDown size={16} /> : <FaChevronRight size={16} />}
+                      </span>
+                      {group.label && (
+                        <h2 className="text-lg font-semibold text-gray-300 [data-theme=light]:text-gray-600">
+                          {group.label}
+                        </h2>
+                      )}
+                      <span className="text-sm text-gray-500 [data-theme=light]:text-gray-400 ml-1">
+                        ({visibleTools.length})
+                      </span>
+                    </button>
+                    {expanded && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
+                      {visibleTools.map((tool) => {
                 const iconEl = getIconComponent(tool.icon, 40, tool.color);
                 const isExternal = tool.type === 'external';
                 const cardClass = cn(
@@ -166,6 +215,11 @@ const SelectScreen = () => {
                     <span className="opacity-50">{iconEl}</span>
                     <span className="opacity-50 font-medium">{tool.label}</span>
                   </div>
+                );
+              })}
+                    </div>
+                    )}
+                  </section>
                 );
               })}
             </div>

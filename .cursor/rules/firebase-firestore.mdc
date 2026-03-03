@@ -12,7 +12,12 @@ alwaysApply: false
 
 ## Firestore Collections
 - `Users` – user profiles (email, admin, developer, isActive, role, streak, etc.)
-- Document ID for users: `firebaseUser.uid` (same as Auth UID)
+- `SystemSettings/toolConfig` – tool groups and links (see Tool Config Schema)
+
+## Tool Config (SystemSettings/toolConfig)
+- `groups`: array of `{ id, label, order, tools: [...] }`
+- Each tool: `id`, `type` (internal|external), `path`|`url`, `label`, `icon`, `color`, `enabled`, `inDevelopment`, `allowedRoles`, `openInNewTab` (external)
+- Legacy: flat `tools` array is auto-migrated to a single "Tools" group
 
 ## User Document Schema (Users/{uid})
 - `email`, `firstName`, `lastName`, `admin`, `developer`, `isActive`, `role`, `userUID`

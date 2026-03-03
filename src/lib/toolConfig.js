@@ -52,8 +52,8 @@ export function canRoleAccessTool(tool, userRole) {
   return roles.includes(userRole);
 }
 
-/** Default tool config - used when Firestore has no data */
-export const DEFAULT_TOOL_CONFIG = [
+/** Default tools - used when migrating from flat config */
+const DEFAULT_TOOLS = [
   { id: 'budget-tool', type: 'internal', path: '/budget-tool', label: 'Budget Tool', icon: 'FaWallet', color: '#4CAF50', enabled: true, inDevelopment: false, order: 1, allowedRoles: DEFAULT_ALLOWED_ROLES },
   { id: 'adult-quiz', type: 'internal', path: '/adult-quiz', label: 'Adult Quiz', icon: 'FaGraduationCap', color: '#673AB7', enabled: true, inDevelopment: false, order: 2, allowedRoles: DEFAULT_ALLOWED_ROLES },
   { id: 'life-balance', type: 'internal', path: '/life-balance', label: 'Life Balance', icon: 'FaBalanceScale', color: '#FF5722', enabled: true, inDevelopment: true, order: 3, allowedRoles: DEFAULT_ALLOWED_ROLES },
@@ -61,6 +61,34 @@ export const DEFAULT_TOOL_CONFIG = [
   { id: 'financial-quiz', type: 'internal', path: '/quiz', label: 'School Simulation', icon: 'FaClipboardList', color: '#2196F3', enabled: false, inDevelopment: false, order: 5, allowedRoles: DEFAULT_ALLOWED_ROLES },
   { id: 'investment-calculator', type: 'internal', path: '/investment-calculator', label: 'Investment Calculator', icon: 'FaCalculator', color: '#9C27B0', enabled: false, inDevelopment: false, order: 6, allowedRoles: DEFAULT_ALLOWED_ROLES },
 ];
+
+/** Migrate legacy flat tools array to groups format. */
+export function migrateToGroups(data) {
+  if (Array.isArray(data.groups) && data.groups.length > 0) {
+    return data.groups.map((g) => ({
+      id: g.id || `group-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      label: g.label || 'Tools',
+      order: g.order ?? 999,
+      tools: (g.tools || []).map((t, i) => ({
+        ...t,
+        order: t.order ?? i,
+        allowedRoles: Array.isArray(t.allowedRoles) && t.allowedRoles.length > 0 ? t.allowedRoles : DEFAULT_ALLOWED_ROLES,
+      })),
+    })).sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  }
+  if (Array.isArray(data.tools) && data.tools.length > 0) {
+    const normalized = data.tools.map((t, i) => ({
+      ...t,
+      order: t.order ?? i,
+      allowedRoles: Array.isArray(t.allowedRoles) && t.allowedRoles.length > 0 ? t.allowedRoles : DEFAULT_ALLOWED_ROLES,
+    })).sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    return [{ id: 'default', label: 'Tools', order: 0, tools: normalized }];
+  }
+  return [{ id: 'default', label: 'Tools', order: 0, tools: DEFAULT_TOOLS }];
+}
+
+/** Default group config - used when Firestore has no data */
+export const DEFAULT_GROUP_CONFIG = migrateToGroups({ tools: DEFAULT_TOOLS });
 
 /** Get icon component from name - supports any icon in ALL_ICONS (fa, md, fi, bs, hi, bi, io5, tb, ri) */
 export function getIconComponent(name, size = 40, color) {
