@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Chart from 'chart.js/auto';
-import './styles/ResultsScreen.css';
 import LifeSmartLogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 const ResultsScreen = () => {

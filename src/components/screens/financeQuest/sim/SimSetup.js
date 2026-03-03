@@ -17,7 +17,6 @@ import {
 } from 'react-icons/fa';
 import SimulationControls from './SimulationControls';
 import SimulationHistory from './PastSimulations';
-import './styles/SimSetup.css';
 import LifeSmartLogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 Chart.register(ArcElement, Tooltip, Legend, Title);

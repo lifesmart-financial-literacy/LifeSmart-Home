@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/BudgetTool.css';
 
 const BudgetWelcome = ({ onNext }) => {
   return (

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
-import './FinanceQuestSimulation.css';
 import QuestionHeader from './questions/QuestionHeader';
 import FinanceQuestResultsScreen from './FinanceQuestResultsScreen';
 

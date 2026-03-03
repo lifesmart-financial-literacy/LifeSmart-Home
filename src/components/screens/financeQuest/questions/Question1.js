@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Question1.css';
 import lightningBolt from '../../../../assets/icons/Lightning Bolt.png';
 import q1Image from '../../../../assets/icons/q1image.png';
 import { MdFlashOn } from 'react-icons/md';

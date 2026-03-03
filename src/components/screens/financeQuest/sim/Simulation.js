@@ -4,7 +4,6 @@ import { Chart } from 'chart.js/auto';
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db, auth } from '../../../../firebase/initFirebase';
-import './styles/Simulation.css';
 import lifesmartlogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 // Custom hook for chart management

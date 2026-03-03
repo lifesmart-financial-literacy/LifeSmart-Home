@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './TeamCreationPage.css';
 
 const TeamCreationPage = () => {
   const [teamCount, setTeamCount] = useState(2);

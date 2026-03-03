@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question6.css';
 import { FaBook, FaSmile, FaChartLine, FaHeartbeat, FaExclamationTriangle } from 'react-icons/fa';
 import equitiesIcon from '../../../../assets/icons/equities.png';
 import bondsIcon from '../../../../assets/icons/bonds.png';

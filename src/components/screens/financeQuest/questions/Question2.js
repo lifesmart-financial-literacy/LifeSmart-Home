@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QuestionHeader from './QuestionHeader';
-import './Question2.css';
 
 const Question2 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {
   const [showResults, setShowResults] = useState(false);

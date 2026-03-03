@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/BudgetTool.css';
 import BudgetSpreadsheet, { downloadSpreadsheet } from './BudgetSpreadsheet';
 import SpreadsheetModal from './SpreadsheetModal';
 import BudgetWelcome from './BudgetWelcome';

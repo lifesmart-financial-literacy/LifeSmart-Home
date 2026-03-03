@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 import { FaCalculator, FaChartLine, FaPiggyBank } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import './InvestmentCalculator.css';
 
 const InvestmentCalculator = () => {
   const navigate = useNavigate();

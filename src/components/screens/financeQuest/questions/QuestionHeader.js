@@ -1,5 +1,4 @@
 import React from 'react';
-import './QuestionHeader.css';
 
 const QuestionHeader = () => {
   return (

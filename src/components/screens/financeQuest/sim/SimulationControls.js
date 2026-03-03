@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, setDoc, getDocs, collection } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
-import './styles/SimulationControls.css';
 
 const SimulationControls = () => {
   const [years, setYears] = useState(1);

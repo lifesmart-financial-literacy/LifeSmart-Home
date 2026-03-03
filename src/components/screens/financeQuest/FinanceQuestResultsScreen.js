@@ -1,5 +1,4 @@
 import React from 'react';
-import './FinanceQuestResultsScreen.css';
 
 const potNames = {
   A: 'Training & Self-Development',

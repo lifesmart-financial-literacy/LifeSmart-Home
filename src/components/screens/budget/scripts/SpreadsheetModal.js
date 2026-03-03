@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/BudgetTool.css';
 
 const SpreadsheetModal = ({ isOpen, onClose, formData }) => {
   if (!isOpen) return null;

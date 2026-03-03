@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/BudgetSpreadsheet.css';
 import ExcelJS from 'exceljs';
 
 // Define categories at component level

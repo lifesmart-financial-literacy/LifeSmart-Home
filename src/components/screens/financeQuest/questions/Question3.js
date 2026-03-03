@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Question3.css';
 import QuestionHeader from './QuestionHeader';
 
 const Question3 = ({ teams, onAnswer, onNextQuestion, onAwardPoints }) => {

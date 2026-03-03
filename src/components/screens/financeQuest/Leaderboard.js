@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Leaderboard.css';
 import crownIcon from '../../../assets/icons/crown.png';
 
 const Leaderboard = ({ teams, quizComplete, onNextQuestion }) => {

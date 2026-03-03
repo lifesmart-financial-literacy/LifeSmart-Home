@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
-import './InvestmentCalculator.css';
 
 const InvestmentCalculator = () => {
   const [initialInvestment, setInitialInvestment] = useState(0);

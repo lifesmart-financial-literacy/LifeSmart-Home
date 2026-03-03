@@ -8,6 +8,33 @@
 @import './components/screens/quiz/questions/Question5.css';
 @import './components/screens/quiz/questions/Question6.css';
 
+/* Finance Quest */
+@import './components/screens/financeQuest/QuestLandingPage.css';
+@import './components/screens/financeQuest/TeamCreationPage.css';
+@import './components/screens/financeQuest/Leaderboard.css';
+@import './components/screens/financeQuest/FinanceQuestSimulation.css';
+@import './components/screens/financeQuest/FinanceQuestResultsScreen.css';
+@import './components/screens/financeQuest/questions/QuestionHeader.css';
+@import './components/screens/financeQuest/questions/Question1.css';
+@import './components/screens/financeQuest/questions/Question2.css';
+@import './components/screens/financeQuest/questions/Question3.css';
+@import './components/screens/financeQuest/questions/Question4.css';
+@import './components/screens/financeQuest/questions/Question5.css';
+@import './components/screens/financeQuest/questions/Question6.css';
+@import './components/screens/financeQuest/sim/styles/SimSetup.css';
+@import './components/screens/financeQuest/sim/styles/Simulation.css';
+@import './components/screens/financeQuest/sim/styles/SimulationControls.css';
+@import './components/screens/financeQuest/sim/styles/ResultsScreen.css';
+@import './components/screens/financeQuest/sim/styles/PastSimulations.css';
+
+/* Budget */
+@import './components/screens/budget/styles/BudgetTool.css';
+@import './components/screens/budget/styles/BudgetSpreadsheet.css';
+
+/* Calculator */
+@import './components/screens/calculator/InvestmentCalculator.css';
+@import './components/widgets/InvestmentCalculator.css';
+
 /* shadcn/ui theme - Light mode (default) */
 :root,
 [data-theme='light'] {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './Question5.css';
 import QuestionHeader from './QuestionHeader';
 
 const PLANET_EARTH = '/financeQuest/celestialBodies/Earth.png';
