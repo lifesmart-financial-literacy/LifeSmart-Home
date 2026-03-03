@@ -2,75 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/auth';
 import {
-  FaWallet,
-  FaClipboardList,
-  FaCalculator,
   FaUserCircle,
   FaCog,
   FaSignOutAlt,
   FaFire,
-  FaGraduationCap,
-  FaBalanceScale,
-  FaMoneyBillWave,
+  FaChevronDown,
+  FaChevronRight,
 } from 'react-icons/fa';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/initFirebase';
 import Modal from '../widgets/modals/Modal';
 import { cn } from '@/lib/utils';
-
-// Configuration object for tool availability
-const TOOL_CONFIG = {
-  budgetTool: {
-    enabled: true,
-    in_development: false,
-    path: '/budget-tool',
-    icon: <FaWallet size={40} color="#4CAF50" />,
-    text: 'Budget Tool',
-  },
-  adultQuiz: {
-    enabled: true,
-    in_development: false,
-    path: '/adult-quiz',
-    icon: <FaGraduationCap size={40} color="#673AB7" />,
-    text: 'Adult Quiz',
-  },
-  lifeBalance: {
-    enabled: true,
-    in_development: true,
-    path: '/life-balance',
-    icon: <FaBalanceScale size={40} color="#FF5722" />,
-    text: 'Life Balance',
-  },
-  financeQuest: {
-    enabled: true,
-    in_development: false,
-    path: '/finance-quest',
-    icon: <FaMoneyBillWave size={40} color="#000000" />,
-    text: 'Finance Quest',
-  },
-  financialQuiz: {
-    enabled: false,
-    in_development: false,
-    path: '/quiz',
-    icon: <FaClipboardList size={40} color="#2196F3" />,
-    text: 'School Simulation',
-  },
-  investmentCalculator: {
-    enabled: false,
-    in_development: false,
-    path: '/investment-calculator',
-    icon: <FaCalculator size={40} color="#9C27B0" />,
-    text: 'Investment Calculator',
-  },
-};
+import { useToolConfig } from '../../hooks/useToolConfig';
+import { getIconComponent, canRoleAccessTool } from '../../lib/toolConfig';
 
 const SelectScreen = () => {
   const navigate = useNavigate();
   const { currentUser, loading: authLoading, logout } = useAuth();
+  const { groups, loading: toolsLoading } = useToolConfig();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [canAccessAdmin, setCanAccessAdmin] = useState(false);
+  const [userRole, setUserRole] = useState('user');
+  const [expandedGroups, setExpandedGroups] = useState(null);
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups((prev) => {
+      const base = prev ?? new Set(groups.map((g) => g.id));
+      const next = new Set(base);
+      if (next.has(groupId)) next.delete(groupId);
+      else next.add(groupId);
+      return next;
+    });
+  };
+
+  const isGroupExpanded = (groupId) => {
+    if (expandedGroups === null) return true;
+    return expandedGroups.has(groupId);
+  };
+
+  useEffect(() => {
+    if (groups.length > 0) {
+      setExpandedGroups((prev) => (prev === null ? new Set(groups.map((g) => g.id)) : prev));
+    }
+  }, [groups]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -80,13 +56,14 @@ const SelectScreen = () => {
           navigate('/', { replace: true });
           return;
         }
-        const userDoc = await getDoc(doc(db, currentUser.uid, 'Profile'));
+        const userDoc = await getDoc(doc(db, 'Users', currentUser.uid));
         if (userDoc.exists()) {
-          setIsAdmin(userDoc.data().admin === true);
-        }
-        const streakDoc = await getDoc(doc(db, currentUser.uid, 'Login Streak'));
-        if (streakDoc.exists()) {
-          setStreak(streakDoc.data().streak || 0);
+          const data = userDoc.data();
+          const hasAccess = data.admin === true || data.developer === true || data.isAdmin === true || data.role === 'admin';
+          setCanAccessAdmin(hasAccess);
+          setStreak(data.streak || 0);
+          const role = data.developer === true ? 'developer' : data.admin === true || data.isAdmin === true || data.role === 'admin' ? 'admin' : 'user';
+          setUserRole(role);
         }
       } catch (error) {
         console.error('Error in auth check:', error);
@@ -113,7 +90,7 @@ const SelectScreen = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || toolsLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] [data-theme=light]:from-[#f7f8fa] [data-theme=light]:to-[#e3e8ee]">
         <div className="w-12 h-12 border-2 border-white/10 border-t-green-500 rounded-full animate-spin [data-theme=light]:border-gray-200 [data-theme=light]:border-t-green-500" />
@@ -151,44 +128,132 @@ const SelectScreen = () => {
           </header>
 
           <main>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
-              {Object.entries(TOOL_CONFIG).map(([key, config]) =>
-                config.enabled ? (
-                  <button
-                    key={key}
-                    onClick={() => handleNavigation(config.path)}
-                    className={cn(
-                      'relative flex flex-col items-center gap-4 p-8 rounded-2xl border-none cursor-pointer transition-all duration-300',
-                      'bg-white/10 backdrop-blur-md text-white text-xl',
-                      'hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl',
-                      '[data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200',
-                      '[data-theme=light]:hover:bg-gray-100 [data-theme=light]:shadow-md'
-                    )}
-                  >
-                    {config.in_development && (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-blue-500 px-4 py-2 rounded border-2 border-blue-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-500">
-                        In Development
-                      </div>
-                    )}
-                    <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{config.icon}</span>
-                    <span className="font-medium">{config.text}</span>
-                  </button>
-                ) : (
-                  <div
-                    key={key}
-                    className={cn(
-                      'relative flex flex-col items-center gap-4 p-8 rounded-2xl cursor-not-allowed opacity-70',
-                      'bg-white/5 [data-theme=light]:bg-gray-100 [data-theme=light]:text-gray-400 [data-theme=light]:border [data-theme=light]:border-gray-200'
-                    )}
-                  >
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-15 bg-black/80 text-green-500 px-4 py-2 rounded border-2 border-green-500 text-base font-bold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-500">
+            <div className="flex flex-col gap-10">
+              {groups.map((group) => {
+                const visibleTools = (group.tools || []).filter((tool) => canRoleAccessTool(tool, userRole));
+                if (visibleTools.length === 0) return null;
+                const expanded = isGroupExpanded(group.id);
+                return (
+                  <section key={group.id} className="flex flex-col gap-4">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group.id)}
+                      className="flex items-center gap-2 w-full text-left px-1 py-2 rounded-lg hover:bg-white/5 [data-theme=light]:hover:bg-gray-100 transition-colors group/btn"
+                    >
+                      <span className="text-gray-400 group-hover/btn:text-gray-300 transition-transform duration-200 [data-theme=light]:text-gray-500 [data-theme=light]:group-hover/btn:text-gray-700">
+                        {expanded ? <FaChevronDown size={16} /> : <FaChevronRight size={16} />}
+                      </span>
+                      {group.label && (
+                        <h2 className="text-lg font-semibold text-gray-300 [data-theme=light]:text-gray-600">
+                          {group.label}
+                        </h2>
+                      )}
+                      <span className="text-sm text-gray-500 [data-theme=light]:text-gray-400 ml-1">
+                        ({visibleTools.length})
+                      </span>
+                    </button>
+                    {expanded && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
+                      {visibleTools.map((tool) => {
+                const iconEl = getIconComponent(tool.icon, 40, tool.color);
+                const isExternal = tool.type === 'external';
+                const cardClass = cn(
+                  'relative flex flex-col items-center gap-4 p-8 rounded-2xl transition-all duration-300',
+                  'backdrop-blur-md text-white text-xl',
+                  isExternal
+                    ? 'bg-teal-500/20 border border-teal-400/40 [data-theme=light]:bg-teal-50 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-teal-300 [data-theme=light]:shadow-md'
+                    : 'bg-white/10 [data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200 [data-theme=light]:shadow-md'
+                );
+                const disabledClass = cn(
+                  'relative flex flex-col items-center gap-4 p-8 rounded-2xl cursor-not-allowed opacity-70',
+                  'bg-white/5 [data-theme=light]:bg-gray-100 [data-theme=light]:text-gray-400 [data-theme=light]:border [data-theme=light]:border-gray-200'
+                );
+
+                const restrictedRoles = Array.isArray(tool.allowedRoles) && tool.allowedRoles.length > 0 && tool.allowedRoles.length < 3
+                  ? tool.allowedRoles
+                  : null;
+
+                const roleTagClass = (role) => {
+                  const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border';
+                  const styles = {
+                    user: 'bg-blue-500/20 text-blue-300 border-blue-500/40 [data-theme=light]:bg-blue-100 [data-theme=light]:text-blue-700 [data-theme=light]:border-blue-300',
+                    admin: 'bg-purple-500/20 text-purple-300 border-purple-500/40 [data-theme=light]:bg-purple-100 [data-theme=light]:text-purple-700 [data-theme=light]:border-purple-300',
+                    developer: 'bg-amber-500/20 text-amber-300 border-amber-500/40 [data-theme=light]:bg-amber-100 [data-theme=light]:text-amber-700 [data-theme=light]:border-amber-300',
+                  };
+                  return cn(base, styles[role] || 'bg-gray-500/20 text-gray-300 border-gray-500/40');
+                };
+
+                if (tool.enabled) {
+                  const content = (
+                    <>
+                      {tool.inDevelopment && (
+                        <div className="absolute top-2 right-2 bg-black/80 text-blue-500 px-2.5 py-1 rounded-md border border-blue-500/60 text-xs font-semibold z-10 whitespace-nowrap [data-theme=light]:bg-blue-50 [data-theme=light]:text-blue-600 [data-theme=light]:border-blue-400">
+                          In Development
+                        </div>
+                      )}
+                      <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{iconEl}</span>
+                      <span className="font-medium">{tool.label}</span>
+                      {restrictedRoles && (
+                        <div className="flex flex-wrap justify-center gap-1.5 mt-2" title={`Visible to: ${restrictedRoles.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(', ')}`}>
+                          {restrictedRoles.map((role) => (
+                            <span key={role} className={roleTagClass(role)}>
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+
+                  if (tool.type === 'external') {
+                    return (
+                      <a
+                        key={tool.id}
+                        href={tool.url}
+                        target={tool.openInNewTab ? '_blank' : undefined}
+                        rel={tool.openInNewTab ? 'noopener noreferrer' : undefined}
+                        className={cn(cardClass, 'cursor-pointer hover:-translate-y-1 hover:bg-teal-500/30 hover:border-teal-400/60 hover:shadow-xl [data-theme=light]:hover:bg-teal-100 [data-theme=light]:hover:border-teal-400 no-underline')}
+                      >
+                        {content}
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={tool.id}
+                      onClick={() => handleNavigation(tool.path)}
+                      className={cn(cardClass, 'border-none cursor-pointer hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl [data-theme=light]:hover:bg-gray-100')}
+                    >
+                      {content}
+                    </button>
+                  );
+                }
+
+                return (
+                  <div key={tool.id} className={disabledClass}>
+                    <div className="absolute top-2 right-2 bg-black/80 text-green-500 px-2.5 py-1 rounded-md border border-green-500/60 text-xs font-semibold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-400">
                       Coming Soon
                     </div>
-                    <span className="opacity-50">{config.icon}</span>
-                    <span className="opacity-50 font-medium">{config.text}</span>
+                    <span className="opacity-50">{iconEl}</span>
+                    <span className="opacity-50 font-medium">{tool.label}</span>
+                    {restrictedRoles && (
+                      <div className="flex flex-wrap justify-center gap-1.5 mt-2 opacity-70">
+                        {restrictedRoles.map((role) => (
+                          <span key={role} className={roleTagClass(role)}>
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )
-              )}
+                );
+              })}
+                    </div>
+                    )}
+                  </section>
+                );
+              })}
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8 p-4 bg-white/5 rounded-xl backdrop-blur-md [data-theme=light]:bg-gray-100 [data-theme=light]:border [data-theme=light]:border-gray-200">
@@ -206,7 +271,7 @@ const SelectScreen = () => {
                 <FaCog size={24} />
                 <span>Settings</span>
               </button>
-              {isAdmin && (
+              {canAccessAdmin && (
                 <button
                   onClick={() => handleNavigation('/admin')}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 bg-amber-500/20 text-white font-medium cursor-pointer transition-all hover:-translate-y-0.5 hover:bg-amber-500/30 [data-theme=light]:bg-amber-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-amber-300 [data-theme=light]:hover:bg-amber-200"

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../firebase/auth';
 import { FaGoogle, FaApple } from 'react-icons/fa';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/initFirebase';
+import { ensureUserDoc } from '../../../lib/userUtils';
 import Modal from '../../widgets/modals/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,21 +12,11 @@ const Register = ({ onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loginCode, setLoginCode] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState({ title: '', message: '', type: 'success' });
 
   const navigate = useNavigate();
   const { register, signInWithGoogle, signInWithApple } = useAuth();
-
-  const validateLoginCode = async (code) => {
-    const codeRef = doc(db, 'Login Codes', code);
-    const codeDoc = await getDoc(codeRef);
-    if (!codeDoc.exists()) throw new Error('Invalid login code');
-    const codeData = codeDoc.data();
-    if (!codeData.active) throw new Error('This login code is no longer active');
-    return true;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,13 +26,9 @@ const Register = ({ onClose }) => {
       return;
     }
     try {
-      await validateLoginCode(loginCode);
       const user = await register(email, password);
-      await setDoc(doc(db, user.uid, 'Total Funds'), { totalFunds: 10000 });
-      const currentDate = new Date().toISOString().split('T')[0];
-      await setDoc(doc(db, user.uid, 'Login Streak'), { lastLogin: currentDate, streak: 1 });
-      await setDoc(doc(db, 'Login Codes', loginCode), { lastUsedBy: user.uid, active: true }, { merge: true });
-      setModalConfig({ title: 'Welcome to LifeSmart!', message: 'Your account has been successfully created with £10,000 initial funds.', type: 'success' });
+      await ensureUserDoc(db, user, { email });
+      setModalConfig({ title: 'Welcome to LifeSmart!', message: 'Your account has been successfully created.', type: 'success' });
       setModalOpen(true);
       setTimeout(() => navigate('/select'), 2000);
     } catch (error) {
@@ -53,12 +39,12 @@ const Register = ({ onClose }) => {
 
   const handleSocialSignIn = async (provider) => {
     try {
-      if (!loginCode) throw new Error('Please enter a valid login code');
-      await validateLoginCode(loginCode);
       const user = provider === 'google' ? await signInWithGoogle() : await signInWithApple();
-      const currentDate = new Date().toISOString().split('T')[0];
-      await setDoc(doc(db, user.uid, 'Login Streak'), { lastLogin: currentDate, streak: 1 });
-      await setDoc(doc(db, 'Login Codes', loginCode), { lastUsedBy: user.uid, active: true }, { merge: true });
+      const isNewUser = await ensureUserDoc(db, user);
+      if (!isNewUser) {
+        const { updateLoginStreak } = await import('../../../lib/userUtils');
+        await updateLoginStreak(db, user.uid);
+      }
       setModalConfig({ title: 'Welcome!', message: `You have successfully signed in with ${provider}.`, type: 'success' });
       setModalOpen(true);
       setTimeout(() => navigate('/select'), 2000);
@@ -76,21 +62,6 @@ const Register = ({ onClose }) => {
           className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl [data-theme=light]:bg-white/95 [data-theme=light]:border-gray-200 [data-theme=light]:shadow-lg animate-in fade-in duration-500"
         >
           <h2 className="text-white text-2xl font-semibold mb-6 text-center [data-theme=light]:text-[#181a1b]">Join Us</h2>
-
-          <div className="mb-6">
-            <label htmlFor="loginCode" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
-              Login Code
-            </label>
-            <Input
-              id="loginCode"
-              type="text"
-              value={loginCode}
-              onChange={(e) => setLoginCode(e.target.value)}
-              placeholder="Enter your login code"
-              required
-              className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
-            />
-          </div>
 
           <div className="flex flex-col gap-4 mb-6">
             <button

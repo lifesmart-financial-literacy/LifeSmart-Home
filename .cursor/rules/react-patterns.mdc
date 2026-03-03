@@ -1,0 +1,37 @@
+---
+description: React component and hook patterns
+globs: "**/*.{js,jsx}"
+alwaysApply: false
+---
+
+# React Patterns
+
+## Components
+- Functional components only; no class components
+- Use hooks: `useState`, `useEffect`, `useCallback`, `useNavigate`, `useLocation`
+- Colocate component logic; extract reusable logic to custom hooks
+
+## Auth Guard
+- Call `useAuth()` at top of protected screens; redirect if `!currentUser && !loading`
+- Admin screens: check `userData.admin` or `userData.developer` before rendering
+
+## Analytics
+- Use `useAnalytics()` for tracking: `trackFeatureView`, `trackError`, `trackAdminAction`
+- Track page views via `useEffect` on `location.pathname`
+
+## UI Components
+- Use Radix primitives from `@/components/ui/` (Button, Input, Card, Dialog, etc.)
+- Merge classes with `cn()` from `@/lib/utils`
+
+## Examples
+```javascript
+// ✅ Protected screen
+const AdminScreen = () => {
+  const { currentUser, loading } = useAuth();
+  const { trackFeatureView } = useAnalytics();
+  useEffect(() => { trackFeatureView('AdminScreen'); }, []);
+  if (loading) return <Loading />;
+  if (!currentUser) return <Navigate to="/login" />;
+  return <div>...</div>;
+};
+```

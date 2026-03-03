@@ -1,0 +1,27 @@
+---
+description: Tailwind CSS and styling conventions
+globs: "**/*.{js,jsx,css}"
+alwaysApply: false
+---
+
+# Styling
+
+## Tailwind CSS
+- Use Tailwind utility classes; avoid custom CSS where possible
+- Theme: `data-theme="dark"` / `data-theme="light"` on root
+- Use design tokens: `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `ring`, etc.
+- Border radius: `rounded-lg`, `rounded-md`, `rounded-sm` (map to `--radius`)
+
+## Class Merging
+- Use `cn()` from `@/lib/utils` for conditional/merged classes:
+  ```javascript
+  <div className={cn('base-class', isActive && 'active-class', className)} />
+  ```
+
+## Animations
+- Use `tailwindcss-animate` and existing keyframes: `animate-fadeIn`, `animate-slide-up`, `animate-float`
+- Custom durations: `duration-150`, `duration-200`, etc. (see tailwind.config.js)
+
+## UI Components
+- Use Radix-based components from `@/components/ui/` (Button, Card, Input, Dialog, Tabs, etc.)
+- Extend with Tailwind; do not override Radix internals unnecessarily

@@ -1,0 +1,20 @@
+---
+description: React Router and navigation patterns
+globs: "**/App.js,**/Navigation*.js,**/screens/**/*.js"
+alwaysApply: false
+---
+
+# Routing & Navigation
+
+## React Router v6
+- Use `useNavigate()`, `useLocation()`, `Navigate` for programmatic navigation
+- Routes defined in Navigation or App; screens map to paths
+
+## Protected Routes
+- Redirect to `/login` when `!currentUser && !loading`
+- Admin routes: check `admin` or `developer` on user doc before rendering
+- Use `<Navigate to="..." replace />` for redirects
+
+## Navigation Component
+- Central nav in `components/common/Navigation.js`
+- Use `Link` or `useNavigate` for internal links; avoid raw `<a>` for SPA routes

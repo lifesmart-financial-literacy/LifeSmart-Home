@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { db } from '../../../../firebase/initFirebase';
-import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, query } from 'firebase/firestore';
 import {
   FaArrowLeft,
   FaPlus,
@@ -60,17 +60,15 @@ const AdminLoginCodes = () => {
 
         if (codeData.lastUsedBy) {
           try {
-            const loginStreakRef = collection(db, codeData.lastUsedBy, 'Login Streak');
-            const loginQuery = query(loginStreakRef, orderBy('lastLogin', 'desc'), limit(1));
-            const loginSnap = await getDocs(loginQuery);
-
-            if (!loginSnap.empty) {
-              const loginData = loginSnap.docs[0].data();
-              lastLogin = loginData.lastLogin;
-              streak = loginData.streak || 0;
+            const userRef = doc(db, 'Users', codeData.lastUsedBy);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              const ud = userSnap.data();
+              lastLogin = ud.lastLogin || null;
+              streak = ud.streak || 0;
             }
           } catch (error) {
-            console.error('Error fetching login streak for code:', codeDoc.id, error);
+            console.error('Error fetching user for code:', codeDoc.id, error);
           }
         }
 

@@ -1,0 +1,36 @@
+---
+description: JavaScript coding standards
+globs: "**/*.js"
+alwaysApply: false
+---
+
+# JavaScript Standards
+
+## Syntax
+- Use `const`/`let`; never `var`
+- Prefer arrow functions for callbacks; named functions for components/handlers
+- Use optional chaining (`?.`) and nullish coalescing (`??`) where appropriate
+- Use template literals for string interpolation
+
+## Imports
+- Group: React first, then third-party, then internal (`@/`), then relative
+- Use path alias: `import { Button } from '@/components/ui/button'`
+
+## Async / Promises
+- Prefer `async/await` over raw `.then()`
+- Always handle errors in try/catch; never swallow silently
+- Use `useCallback` for async handlers passed to children or effects
+
+## Examples
+```javascript
+// ✅ GOOD
+const fetchData = useCallback(async () => {
+  try {
+    const snap = await getDocs(collection(db, 'Users'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    trackError('FETCH_ERROR', error.message, 'ComponentName');
+    throw error;
+  }
+}, []);
+```

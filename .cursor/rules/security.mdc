@@ -1,0 +1,25 @@
+---
+description: Security, secrets, and environment handling
+alwaysApply: true
+---
+
+# Security
+
+## Environment Variables
+- All Firebase config via `REACT_APP_*` (e.g. `REACT_APP_FIREBASE_API_KEY`)
+- Never commit `.env` or `.env.local`; use `.env.example` as template
+- Required vars: `REACT_APP_FIREBASE_API_KEY`, `AUTH_DOMAIN`, `PROJECT_ID`, `STORAGE_BUCKET`, `MESSAGING_SENDER_ID`, `APP_ID`, `MEASUREMENT_ID`
+
+## Sensitive Data
+- No API keys, tokens, or passwords in source code
+- No `console.log` of credentials or PII in production builds
+- Remove debug logging of env vars before production (see initFirebase.js)
+
+## Auth & Authorisation
+- Admin/developer actions: verify `userData.admin` or `userData.developer` server-side where possible
+- Firestore rules must enforce auth; client checks are UX only
+- Use Firebase Auth for all auth; no custom JWT/session logic
+
+## Input Validation
+- Validate and sanitise user input before Firestore writes
+- Use Firestore rules to reject invalid document shapes

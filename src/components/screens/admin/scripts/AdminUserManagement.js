@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { db } from '../../../../firebase/initFirebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import {
   FaUserShield,
   FaArrowLeft,
@@ -50,36 +50,6 @@ const AdminUserManagement = () => {
       for (const userDoc of usersSnap.docs) {
         const userData = userDoc.data();
 
-        // Fetch the last login and streak from Login Streak document
-        let lastLogin = null;
-        let streak = 0;
-        try {
-          const loginStreakRef = doc(db, userDoc.id, 'Login Streak');
-          const loginSnap = await getDoc(loginStreakRef);
-
-          if (loginSnap.exists()) {
-            const loginData = loginSnap.data();
-            lastLogin = loginData.lastLogin;
-            streak = loginData.streak || 0;
-          }
-        } catch (error) {
-          console.error('Error fetching login streak for user:', userDoc.id, error);
-        }
-
-        // Fetch total funds
-        let totalFunds = 0;
-        try {
-          const fundsRef = doc(db, userDoc.id, 'Total Funds');
-          const fundsSnap = await getDoc(fundsRef);
-
-          if (fundsSnap.exists()) {
-            totalFunds = fundsSnap.data().amount || 0;
-          }
-        } catch (error) {
-          console.error('Error fetching total funds for user:', userDoc.id, error);
-        }
-
-        // Combine all data from the main document
         const user = {
           id: userDoc.id,
           email: userData.email || '',
@@ -88,15 +58,11 @@ const AdminUserManagement = () => {
           isActive: userData.isActive !== false,
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
-          school: userData.school || '',
-          class: userData.class || '',
-          groupCode: userData.groupCode || '',
           role: userData.role || 'user',
           userUID: userDoc.id,
-          lastLogin: lastLogin || userData.lastLogin || null,
-          streak: streak,
+          lastLogin: userData.lastLogin || null,
+          streak: userData.streak || 0,
           createdAt: userData.createdAt || null,
-          totalFunds: totalFunds
         };
 
         console.log('Processing user:', user); // Debug log for each user
@@ -184,16 +150,11 @@ const AdminUserManagement = () => {
 
     try {
       const userRef = doc(db, 'Users', selectedUser.id);
-      const userProfileRef = doc(db, selectedUser.id, 'Profile');
 
       switch (modalConfig.action) {
         case 'toggle-status':
           console.log('Toggling status for user:', selectedUser.id);
           await updateDoc(userRef, {
-            isActive: !selectedUser.isActive
-          });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
             isActive: !selectedUser.isActive
           });
           trackAdminAction('toggle_user_status', {
@@ -206,11 +167,6 @@ const AdminUserManagement = () => {
           console.log('Toggling admin for user:', selectedUser.id);
           const newAdminStatus = !selectedUser.admin;
           await updateDoc(userRef, {
-            admin: newAdminStatus,
-            user: !newAdminStatus
-          });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
             admin: newAdminStatus,
             user: !newAdminStatus
           });
@@ -227,11 +183,6 @@ const AdminUserManagement = () => {
             developer: newDevStatus,
             user: !newDevStatus
           });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
-            developer: newDevStatus,
-            user: !newDevStatus
-          });
           trackAdminAction('toggle_developer_status', {
             userId: selectedUser.id,
             newStatus: newDevStatus
@@ -241,10 +192,6 @@ const AdminUserManagement = () => {
         case 'delete':
           console.log('Deleting user:', selectedUser.id);
           try {
-            // Delete the Profile document first
-            await deleteDoc(userProfileRef);
-
-            // Then delete the main user document
             await deleteDoc(userRef);
 
             trackAdminAction('delete_user', {
@@ -277,9 +224,7 @@ const AdminUserManagement = () => {
 
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.school.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.class.toLowerCase().includes(searchTerm.toLowerCase())
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -316,7 +261,7 @@ const AdminUserManagement = () => {
             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 [data-theme=light]:text-zinc-400" size={24} />
             <Input
               type="text"
-              placeholder="Search by name, email, school, or class..."
+              placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 pr-4 py-3 bg-white/5 border-white/15 text-white placeholder:text-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:placeholder:text-zinc-400"
@@ -344,11 +289,8 @@ const AdminUserManagement = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">User Info</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">School</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Class & Group</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Roles</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Last Login</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Total Funds</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Actions</th>
                 </tr>
               </thead>
@@ -366,23 +308,6 @@ const AdminUserManagement = () => {
                         <span className="text-sm text-zinc-500 font-mono [data-theme=light]:text-zinc-500" title={`User ID: ${user.userUID}`}>
                           ID: {user.userUID}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <span className="block text-zinc-300 min-w-[150px] max-w-[250px] [data-theme=light]:text-zinc-600" title={user.school}>
-                        {user.school || 'Not specified'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <div className="flex flex-col gap-2 min-w-[120px]">
-                        <span className="text-base font-medium text-white [data-theme=light]:text-zinc-900" title={`Class: ${user.class}`}>
-                          {user.class || 'Not specified'}
-                        </span>
-                        {user.groupCode && (
-                          <span className="text-sm text-zinc-300 px-3 py-1 bg-white/10 rounded inline-block [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-600" title={`Group: ${user.groupCode}`}>
-                            Group: {user.groupCode}
-                          </span>
-                        )}
                       </div>
                     </td>
                     <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
@@ -407,11 +332,6 @@ const AdminUserManagement = () => {
                           </span>
                         )}
                       </div>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <span className="font-mono text-base font-semibold text-green-500 bg-green-500/10 px-3 py-1 rounded inline-block [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700">
-                        £{user.totalFunds.toFixed(2)}
-                      </span>
                     </td>
                     <td className="px-4 py-5 border-b border-white/10 min-w-[200px] [data-theme=light]:border-zinc-200">
                       <div className="flex gap-2">

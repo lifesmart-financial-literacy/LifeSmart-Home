@@ -1,0 +1,32 @@
+---
+description: Error handling and logging patterns
+alwaysApply: true
+---
+
+# Error Handling
+
+## Async Operations
+- Wrap async logic in try/catch; never leave catch empty
+- Re-throw after logging if caller should handle
+- Use `trackError(code, message, componentName)` from `useAnalytics()` for user-facing errors
+
+## User-Facing Errors
+- Map Firebase/auth error codes to friendly messages (see auth.js `getErrorMessage`)
+- Show toast or inline error state; avoid raw error objects in UI
+
+## Logging
+- Use `console.error` for unexpected errors; avoid `console.log` for sensitive data
+- Remove or gate debug logs (e.g. env var logging) before production
+- Analytics: log errors via `trackError` for monitoring
+
+## Examples
+```javascript
+// ✅ GOOD
+try {
+  await updateDoc(doc(db, 'Users', id), data);
+} catch (error) {
+  console.error('Update failed:', error);
+  trackError('UPDATE_USER_ERROR', error.message, 'AdminUserManagement');
+  setError('Failed to update user. Please try again.');
+}
+```

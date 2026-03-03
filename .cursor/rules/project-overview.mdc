@@ -1,0 +1,20 @@
+---
+description: Core project identity and tech stack
+alwaysApply: true
+---
+
+# LifeSmart OmniPlatform - Project Overview
+
+**Project**: LifeSmart educational platform (finance, life balance, quizzes, budget tools)
+**Stack**: React 18, Create React App (CRA + Craco), Firebase (Auth, Firestore, Analytics)
+
+## Tech Stack
+- **UI**: React 18, React Router v6, Radix UI primitives, Tailwind CSS, Framer Motion
+- **Backend**: Firebase Auth, Firestore, Firebase Analytics
+- **Build**: Craco (webpack alias), Babel, PostCSS
+- **Path alias**: `@/*` → `./src/*` (use `@/components/...`, `@/lib/...`)
+
+## Key Conventions
+- JavaScript (no TypeScript)
+- Functional components and hooks only
+- Single-page app with client-side routing
