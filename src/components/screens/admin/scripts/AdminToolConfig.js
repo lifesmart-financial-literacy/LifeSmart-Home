@@ -17,13 +17,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { ICON_MAP, DEFAULT_TOOL_CONFIG } from '@/lib/toolConfig';
+import { DEFAULT_TOOL_CONFIG, getIconComponent } from '@/lib/toolConfig';
 import Modal from '../../../widgets/modals/Modal';
 import ConfirmModal from '../../../widgets/modals/ConfirmModal';
+import IconPickerModal from '../../../widgets/modals/IconPickerModal';
 
 const TOOL_CONFIG_REF = { collection: 'SystemSettings', id: 'toolConfig' };
-
-const ICON_OPTIONS = Object.keys(ICON_MAP);
 
 const AdminToolConfig = () => {
   const navigate = useNavigate();
@@ -33,6 +32,7 @@ const AdminToolConfig = () => {
   const [tools, setTools] = useState([]);
   const [modal, setModal] = useState({ open: false, title: '', message: '', type: 'success' });
   const [confirmRemove, setConfirmRemove] = useState({ open: false, index: null });
+  const [iconPicker, setIconPicker] = useState({ open: false, toolIndex: null });
 
   useEffect(() => {
     trackFeatureView('admin_tool_config');
@@ -95,19 +95,14 @@ const AdminToolConfig = () => {
   };
 
   const removeTool = (index) => {
-    if (window.confirm('Remove this tool?')) {
-      setTools(prev => prev.filter((_, i) => i !== index));
-    }
+    setConfirmRemove({ open: true, index });
   };
 
-  const moveTool = (index, direction) => {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= tools.length) return;
-    setTools(prev => {
-      const arr = [...prev];
-      [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
-      return arr;
-    });
+  const confirmRemoveTool = () => {
+    if (confirmRemove.index !== null) {
+      setTools(prev => prev.filter((_, i) => i !== confirmRemove.index));
+      setConfirmRemove({ open: false, index: null });
+    }
   };
 
   const inputClasses = 'bg-white/5 border-white/20 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 [data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900';
@@ -225,15 +220,19 @@ const AdminToolConfig = () => {
                     )}
                     <div className="flex flex-col gap-1.5">
                       <Label className={labelClasses}>Icon</Label>
-                      <select
-                        value={tool.icon || 'FaLink'}
-                        onChange={(e) => updateTool(index, 'icon', e.target.value)}
-                        className={cn('px-3 py-2 rounded-md border', selectClasses)}
+                      <button
+                        type="button"
+                        onClick={() => setIconPicker({ open: true, toolIndex: index })}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-md border text-left',
+                          'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30',
+                          'focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+                          '[data-theme=light]:bg-white [data-theme=light]:border-zinc-200 [data-theme=light]:text-zinc-900 [data-theme=light]:hover:bg-zinc-50'
+                        )}
                       >
-                        {ICON_OPTIONS.map(name => (
-                          <option key={name} value={name} className="text-zinc-900 bg-white">{name}</option>
-                        ))}
-                      </select>
+                        {getIconComponent(tool.icon || 'FaLink', 24, tool.color || '#2196F3')}
+                        <span className="text-sm">{tool.icon || 'FaLink'}</span>
+                      </button>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <Label className={labelClasses}>Color (hex)</Label>
@@ -313,6 +312,19 @@ const AdminToolConfig = () => {
         title="Remove Tool"
         message="Are you sure you want to remove this tool?"
         type="danger"
+      />
+
+      <IconPickerModal
+        isOpen={iconPicker.open}
+        onClose={() => setIconPicker({ open: false, toolIndex: null })}
+        onSelect={(iconName) => {
+          if (iconPicker.toolIndex != null) {
+            updateTool(iconPicker.toolIndex, 'icon', iconName);
+          }
+          setIconPicker({ open: false, toolIndex: null });
+        }}
+        currentIcon={iconPicker.toolIndex != null ? tools[iconPicker.toolIndex]?.icon : null}
+        color={iconPicker.toolIndex != null ? tools[iconPicker.toolIndex]?.color : '#2196F3'}
       />
     </div>
   );
