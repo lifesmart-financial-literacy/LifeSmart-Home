@@ -23,7 +23,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
     admin: false,
     developer: false,
     user: true,
-    totalFunds: 0,
   });
 
   useEffect(() => {
@@ -32,10 +31,9 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
       try {
         setLoading(true);
         const userRef = doc(db, 'Users', userId);
-        const profileRef = doc(db, userId, 'Profile');
-        const [userSnap, profileSnap] = await Promise.all([getDoc(userRef), getDoc(profileRef)]);
+        const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists() && profileSnap.exists()) {
+        if (userSnap.exists()) {
           const ud = userSnap.data();
           setUserData({
             firstName: ud.firstName || '',
@@ -48,7 +46,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
             admin: ud.admin || false,
             developer: ud.developer || false,
             user: ud.user !== false,
-            totalFunds: ud.totalFunds || 0,
           });
         }
       } catch (error) {
@@ -104,10 +101,6 @@ const EditModal = ({ isOpen, onClose, userId, onSave }) => {
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-zinc-300">Email</label>
                 <Input id="email" type="email" name="email" value={userData.email} onChange={handleChange} className="bg-white/5 border-white/20 text-white" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="totalFunds" className="block text-sm font-medium text-zinc-300">Total Funds (£)</label>
-                <Input id="totalFunds" type="number" name="totalFunds" value={userData.totalFunds} onChange={handleChange} min="0" step="0.01" className="bg-white/5 border-white/20 text-white font-mono" />
               </div>
             </div>
 

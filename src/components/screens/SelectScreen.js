@@ -31,16 +31,12 @@ const SelectScreen = () => {
           navigate('/', { replace: true });
           return;
         }
-        // Profile doc is readable by user; AdminUserManagement syncs admin/developer here
-        const userDoc = await getDoc(doc(db, currentUser.uid, 'Profile'));
+        const userDoc = await getDoc(doc(db, 'Users', currentUser.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
           const hasAccess = data.admin === true || data.developer === true || data.isAdmin === true || data.role === 'admin';
           setCanAccessAdmin(hasAccess);
-        }
-        const streakDoc = await getDoc(doc(db, currentUser.uid, 'Login Streak'));
-        if (streakDoc.exists()) {
-          setStreak(streakDoc.data().streak || 0);
+          setStreak(data.streak || 0);
         }
       } catch (error) {
         console.error('Error in auth check:', error);

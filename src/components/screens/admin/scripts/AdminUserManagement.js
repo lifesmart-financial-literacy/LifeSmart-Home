@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../firebase/auth';
 import { useAnalytics } from '../../../../hooks/useAnalytics';
 import { db } from '../../../../firebase/initFirebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import {
   FaUserShield,
   FaArrowLeft,
@@ -50,36 +50,6 @@ const AdminUserManagement = () => {
       for (const userDoc of usersSnap.docs) {
         const userData = userDoc.data();
 
-        // Fetch the last login and streak from Login Streak document
-        let lastLogin = null;
-        let streak = 0;
-        try {
-          const loginStreakRef = doc(db, userDoc.id, 'Login Streak');
-          const loginSnap = await getDoc(loginStreakRef);
-
-          if (loginSnap.exists()) {
-            const loginData = loginSnap.data();
-            lastLogin = loginData.lastLogin;
-            streak = loginData.streak || 0;
-          }
-        } catch (error) {
-          console.error('Error fetching login streak for user:', userDoc.id, error);
-        }
-
-        // Fetch total funds
-        let totalFunds = 0;
-        try {
-          const fundsRef = doc(db, userDoc.id, 'Total Funds');
-          const fundsSnap = await getDoc(fundsRef);
-
-          if (fundsSnap.exists()) {
-            totalFunds = fundsSnap.data().amount || 0;
-          }
-        } catch (error) {
-          console.error('Error fetching total funds for user:', userDoc.id, error);
-        }
-
-        // Combine all data from the main document
         const user = {
           id: userDoc.id,
           email: userData.email || '',
@@ -93,10 +63,9 @@ const AdminUserManagement = () => {
           groupCode: userData.groupCode || '',
           role: userData.role || 'user',
           userUID: userDoc.id,
-          lastLogin: lastLogin || userData.lastLogin || null,
-          streak: streak,
+          lastLogin: userData.lastLogin || null,
+          streak: userData.streak || 0,
           createdAt: userData.createdAt || null,
-          totalFunds: totalFunds
         };
 
         console.log('Processing user:', user); // Debug log for each user
@@ -184,16 +153,11 @@ const AdminUserManagement = () => {
 
     try {
       const userRef = doc(db, 'Users', selectedUser.id);
-      const userProfileRef = doc(db, selectedUser.id, 'Profile');
 
       switch (modalConfig.action) {
         case 'toggle-status':
           console.log('Toggling status for user:', selectedUser.id);
           await updateDoc(userRef, {
-            isActive: !selectedUser.isActive
-          });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
             isActive: !selectedUser.isActive
           });
           trackAdminAction('toggle_user_status', {
@@ -206,11 +170,6 @@ const AdminUserManagement = () => {
           console.log('Toggling admin for user:', selectedUser.id);
           const newAdminStatus = !selectedUser.admin;
           await updateDoc(userRef, {
-            admin: newAdminStatus,
-            user: !newAdminStatus
-          });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
             admin: newAdminStatus,
             user: !newAdminStatus
           });
@@ -227,11 +186,6 @@ const AdminUserManagement = () => {
             developer: newDevStatus,
             user: !newDevStatus
           });
-          // Update Profile document
-          await updateDoc(userProfileRef, {
-            developer: newDevStatus,
-            user: !newDevStatus
-          });
           trackAdminAction('toggle_developer_status', {
             userId: selectedUser.id,
             newStatus: newDevStatus
@@ -241,10 +195,6 @@ const AdminUserManagement = () => {
         case 'delete':
           console.log('Deleting user:', selectedUser.id);
           try {
-            // Delete the Profile document first
-            await deleteDoc(userProfileRef);
-
-            // Then delete the main user document
             await deleteDoc(userRef);
 
             trackAdminAction('delete_user', {
@@ -348,7 +298,6 @@ const AdminUserManagement = () => {
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Class & Group</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Roles</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Last Login</th>
-                  <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Total Funds</th>
                   <th className="px-4 py-5 text-left bg-black/30 font-semibold text-white text-sm uppercase tracking-wider whitespace-nowrap border-b border-white/10 [data-theme=light]:bg-zinc-100 [data-theme=light]:text-zinc-900 [data-theme=light]:border-zinc-200">Actions</th>
                 </tr>
               </thead>
@@ -407,11 +356,6 @@ const AdminUserManagement = () => {
                           </span>
                         )}
                       </div>
-                    </td>
-                    <td className="px-4 py-5 border-b border-white/10 [data-theme=light]:border-zinc-200">
-                      <span className="font-mono text-base font-semibold text-green-500 bg-green-500/10 px-3 py-1 rounded inline-block [data-theme=light]:bg-green-100 [data-theme=light]:text-green-700">
-                        £{user.totalFunds.toFixed(2)}
-                      </span>
                     </td>
                     <td className="px-4 py-5 border-b border-white/10 min-w-[200px] [data-theme=light]:border-zinc-200">
                       <div className="flex gap-2">

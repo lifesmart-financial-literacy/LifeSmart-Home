@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../firebase/auth';
 import { FaGoogle, FaApple } from 'react-icons/fa';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/initFirebase';
+import { ensureUserDoc, updateLoginStreak } from '../../../lib/userUtils';
 import Modal from '../../widgets/modals/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,35 +17,12 @@ const Login = ({ onClose }) => {
   const navigate = useNavigate();
   const { signIn, signInWithGoogle, signInWithApple } = useAuth();
 
-  const updateLoginStreak = async (userId) => {
-    try {
-      const streakRef = doc(db, userId, 'Login Streak');
-      const streakDoc = await getDoc(streakRef);
-      const now = new Date();
-      const currentDate = now.toISOString();
-
-      if (streakDoc.exists()) {
-        const { lastLogin, streak } = streakDoc.data();
-        const lastLoginDate = new Date(lastLogin);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const lastDay = new Date(lastLoginDate.getFullYear(), lastLoginDate.getMonth(), lastLoginDate.getDate());
-        const daysDiff = Math.floor((today.getTime() - lastDay.getTime()) / (1000 * 3600 * 24));
-
-        const newStreak = daysDiff === 1 ? streak + 1 : daysDiff === 0 ? streak : 1;
-        await setDoc(streakRef, { lastLogin: currentDate, streak: newStreak });
-      } else {
-        await setDoc(streakRef, { lastLogin: currentDate, streak: 1 });
-      }
-    } catch (error) {
-      console.error('Error updating login streak:', error);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const user = await signIn(email, password);
-      await updateLoginStreak(user.uid);
+      await updateLoginStreak(db, user.uid);
       setModalConfig({ title: 'Welcome Back!', message: 'You have successfully signed in.', type: 'success' });
       setModalOpen(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -59,7 +36,8 @@ const Login = ({ onClose }) => {
   const handleSocialSignIn = async (provider) => {
     try {
       const user = provider === 'google' ? await signInWithGoogle() : await signInWithApple();
-      await updateLoginStreak(user.uid);
+      const isNewUser = await ensureUserDoc(db, user);
+      if (!isNewUser) await updateLoginStreak(db, user.uid);
       setModalConfig({ title: 'Welcome!', message: `You have successfully signed in with ${provider}.`, type: 'success' });
       setModalOpen(true);
       await new Promise((resolve) => setTimeout(resolve, 500));

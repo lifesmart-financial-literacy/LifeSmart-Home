@@ -35,8 +35,7 @@ const AdminHome = () => {
           return;
         }
 
-        // Profile doc is readable; AdminUserManagement syncs admin/developer here
-        const userDoc = await getDoc(doc(db, currentUser.uid, 'Profile'));
+        const userDoc = await getDoc(doc(db, 'Users', currentUser.uid));
         const data = userDoc.exists() ? userDoc.data() : {};
         const hasAccess = data.admin === true || data.developer === true || data.isAdmin === true || data.role === 'admin';
         if (!userDoc.exists() || !hasAccess) {

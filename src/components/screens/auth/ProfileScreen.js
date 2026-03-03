@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserCircle, FaLock, FaEnvelope, FaArrowLeft, FaSave, FaEye, FaEyeSlash, FaSchool, FaUserTag, FaPoundSign, FaFire } from 'react-icons/fa';
+import { FaUserCircle, FaLock, FaEnvelope, FaArrowLeft, FaSave, FaEye, FaEyeSlash, FaSchool, FaUserTag, FaFire } from 'react-icons/fa';
 import { firebaseAuth, db } from '../../../firebase/initFirebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
@@ -18,7 +18,7 @@ const ProfileScreen = () => {
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', class: '', school: '', groupCode: '',
     currentPassword: '', newPassword: '', confirmPassword: '',
-    totalFunds: 0, loginStreak: 0,
+    loginStreak: 0,
   });
 
   useEffect(() => {
@@ -27,17 +27,20 @@ const ProfileScreen = () => {
         const user = firebaseAuth.currentUser;
         if (!user) { navigate('/'); return; }
         const uid = user.userUID || user.uid;
-        const [userDoc, fundsDoc, streakDoc] = await Promise.all([
-          getDoc(doc(db, uid, 'Profile')),
-          getDoc(doc(db, uid, 'Total Funds')),
-          getDoc(doc(db, uid, 'Login Streak')),
-        ]);
+        const userDoc = await getDoc(doc(db, 'Users', uid));
         if (userDoc.exists()) {
           const ud = userDoc.data();
-          setFormData((prev) => ({ ...prev, firstName: ud.firstName || '', lastName: ud.lastName || '', email: ud.email || '', class: ud.class || ud.Y12 || '', school: ud.school || ud.WCGS || '', groupCode: ud.groupCode || ud.DEVELOPER || '' }));
+          setFormData((prev) => ({
+            ...prev,
+            firstName: ud.firstName || '',
+            lastName: ud.lastName || '',
+            email: ud.email || '',
+            class: ud.class || ud.Y12 || '',
+            school: ud.school || ud.WCGS || '',
+            groupCode: ud.groupCode || ud.DEVELOPER || '',
+            loginStreak: ud.streak || 0,
+          }));
         }
-        if (fundsDoc.exists()) setFormData((prev) => ({ ...prev, totalFunds: fundsDoc.data().totalFunds || 0 }));
-        if (streakDoc.exists()) setFormData((prev) => ({ ...prev, loginStreak: streakDoc.data().streak || 0 }));
       } catch (err) {
         setError('Error loading profile data');
         console.error(err);
@@ -60,7 +63,7 @@ const ProfileScreen = () => {
     try {
       const user = firebaseAuth.currentUser;
       if (!user) { navigate('/'); return; }
-      await updateDoc(doc(db, user.userUID || user.uid, 'Profile'), {
+      await updateDoc(doc(db, 'Users', user.userUID || user.uid), {
         firstName: formData.firstName, lastName: formData.lastName, class: formData.class,
         school: formData.school, groupCode: formData.groupCode, email: formData.email,
       });
@@ -134,10 +137,6 @@ const ProfileScreen = () => {
                   <Input name={name} value={formData[name]} onChange={handleInputChange} disabled={disabled} type={name === 'email' ? 'email' : 'text'} className={`bg-white/5 border-white/10 text-white ${disabled ? 'opacity-70 cursor-not-allowed' : ''}`} />
                 </div>
               ))}
-              <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-2 text-zinc-300"><FaPoundSign className="text-blue-400" size={18} /> Total Funds</label>
-                <Input value={`£${formData.totalFunds.toLocaleString()}`} disabled className="bg-white/5 border-white/10 text-white opacity-70 cursor-not-allowed" />
-              </div>
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2 text-zinc-300"><FaFire className="text-blue-400" size={18} /> Login Streak</label>
                 <Input value={`${formData.loginStreak} days`} disabled className="bg-white/5 border-white/10 text-white opacity-70 cursor-not-allowed" />
