@@ -42,6 +42,36 @@ export const ICON_MAP = {
 /** Role types for tool access control */
 export const USER_ROLES = ['user', 'admin', 'developer'];
 
+/** Available internal routes - used for path dropdown in tool config */
+export const AVAILABLE_PATHS = [
+  { path: '/', label: 'Home' },
+  { path: '/select', label: 'Select' },
+  { path: '/profile', label: 'Profile' },
+  { path: '/settings', label: 'Settings' },
+  { path: '/admin', label: 'Admin' },
+  { path: '/admin/analytics', label: 'Admin Analytics' },
+  { path: '/admin/users', label: 'Admin Users' },
+  { path: '/admin/system-settings', label: 'Admin System Settings' },
+  { path: '/admin/database', label: 'Admin Database' },
+  { path: '/admin/login-codes', label: 'Admin Login Codes' },
+  { path: '/admin/tool-config', label: 'Admin Tool Config' },
+  { path: '/quiz-landing', label: 'Quiz Landing' },
+  { path: '/quiz', label: 'School Quiz' },
+  { path: '/finance-quest', label: 'Finance Quest' },
+  { path: '/finance-quest-quiz', label: 'Finance Quest Quiz' },
+  { path: '/finance-quest-team-creation', label: 'Finance Quest Team Creation' },
+  { path: '/finance-quest-leaderboard', label: 'Finance Quest Leaderboard' },
+  { path: '/finance-quest-results', label: 'Finance Quest Results' },
+  { path: '/finance-quest-setup', label: 'Finance Quest Setup' },
+  { path: '/finance-quest-past-simulations', label: 'Finance Quest Past Simulations' },
+  { path: '/finance-quest-controls', label: 'Finance Quest Controls' },
+  { path: '/finance-quest-page', label: 'Finance Quest Page' },
+  { path: '/adult-quiz', label: 'Adult Quiz' },
+  { path: '/life-balance', label: 'Life Balance' },
+  { path: '/investment-calculator', label: 'Investment Calculator' },
+  { path: '/budget-tool', label: 'Budget Tool' },
+];
+
 /** Default allowedRoles when not specified - all roles can access */
 const DEFAULT_ALLOWED_ROLES = ['user', 'admin', 'developer'];
 

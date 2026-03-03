@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { DEFAULT_GROUP_CONFIG, migrateToGroups, getIconComponent, USER_ROLES } from '@/lib/toolConfig';
+import { DEFAULT_GROUP_CONFIG, migrateToGroups, getIconComponent, USER_ROLES, AVAILABLE_PATHS } from '@/lib/toolConfig';
 import Modal from '../../../widgets/modals/Modal';
 import ConfirmModal from '../../../widgets/modals/ConfirmModal';
 import IconPickerModal from '../../../widgets/modals/IconPickerModal';
@@ -303,7 +303,26 @@ const AdminToolConfig = () => {
                                 {tool.type === 'internal' ? (
                                   <div className="flex flex-col gap-1">
                                     <Label className={labelClasses}>Path</Label>
-                                    <Input value={tool.path || ''} onChange={(e) => updateTool(groupIndex, toolIndex, 'path', e.target.value)} placeholder="/path" className={inputClasses} />
+                                    <select
+                                      value={AVAILABLE_PATHS.some((p) => p.path === (tool.path || '')) ? (tool.path || '') : '__custom__'}
+                                      onChange={(e) => updateTool(groupIndex, toolIndex, 'path', e.target.value === '__custom__' ? (tool.path || '/') : e.target.value)}
+                                      className={cn('px-2 py-1.5 rounded border text-sm', selectClasses)}
+                                    >
+                                      {AVAILABLE_PATHS.map((p) => (
+                                        <option key={p.path} value={p.path}>
+                                          {p.label} ({p.path})
+                                        </option>
+                                      ))}
+                                      <option value="__custom__">Custom path...</option>
+                                    </select>
+                                    {!AVAILABLE_PATHS.some((p) => p.path === (tool.path || '')) && (
+                                      <Input
+                                        value={tool.path || ''}
+                                        onChange={(e) => updateTool(groupIndex, toolIndex, 'path', e.target.value)}
+                                        placeholder="/custom-path"
+                                        className={cn(inputClasses, 'mt-1')}
+                                      />
+                                    )}
                                   </div>
                                 ) : (
                                   <div className="flex flex-col gap-1">
