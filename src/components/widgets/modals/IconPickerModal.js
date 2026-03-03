@@ -6,18 +6,16 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ICON_MAP } from '@/lib/toolConfig';
+import { ALL_ICONS, ICON_NAMES } from '@/lib/allIcons';
 import { cn } from '@/lib/utils';
-
-const ICON_OPTIONS = Object.keys(ICON_MAP);
 
 const IconPickerModal = ({ isOpen, onClose, onSelect, currentIcon, color = '#2196F3' }) => {
   const [search, setSearch] = useState('');
 
   const filteredIcons = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return ICON_OPTIONS;
-    return ICON_OPTIONS.filter(name => name.toLowerCase().includes(q));
+    if (!q) return ICON_NAMES;
+    return ICON_NAMES.filter(name => name.toLowerCase().includes(q));
   }, [search]);
 
   const handleSelect = (iconName) => {
@@ -28,9 +26,10 @@ const IconPickerModal = ({ isOpen, onClose, onSelect, currentIcon, color = '#219
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && (setSearch(''), onClose())}>
-      <DialogContent className="max-w-[480px] max-h-[85vh] bg-zinc-900 border-zinc-700 flex flex-col">
+      <DialogContent className="max-w-[560px] max-h-[85vh] bg-zinc-900 border-zinc-700 flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-white">Choose Icon</DialogTitle>
+          <p className="text-zinc-400 text-sm mt-1">{ICON_NAMES.length.toLocaleString()} icons from Font Awesome, Material Design, Feather, Bootstrap, Heroicons & more</p>
         </DialogHeader>
         <Input
           type="text"
@@ -39,9 +38,9 @@ const IconPickerModal = ({ isOpen, onClose, onSelect, currentIcon, color = '#219
           onChange={(e) => setSearch(e.target.value)}
           className="bg-white/5 border-white/20 text-white placeholder:text-zinc-500 focus:border-blue-500"
         />
-        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 overflow-y-auto max-h-[320px] pr-2">
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 overflow-y-auto max-h-[400px] pr-2">
           {filteredIcons.map((name) => {
-            const IconComponent = ICON_MAP[name];
+            const IconComponent = ALL_ICONS[name];
             const isSelected = name === currentIcon;
             return (
               <button

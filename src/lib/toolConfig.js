@@ -3,6 +3,7 @@
  * Tools can be internal (routes in this app) or external (links to other LifeSmart sites).
  */
 
+import { ALL_ICONS } from './allIcons';
 import {
   FaWallet,
   FaClipboardList,
@@ -48,8 +49,8 @@ export const DEFAULT_TOOL_CONFIG = [
   { id: 'investment-calculator', type: 'internal', path: '/investment-calculator', label: 'Investment Calculator', icon: 'FaCalculator', color: '#9C27B0', enabled: false, inDevelopment: false, order: 6 },
 ];
 
-/** Get icon component from name */
+/** Get icon component from name - supports any icon in ALL_ICONS (fa, md, fi, bs, hi, bi, io5, tb, ri) */
 export function getIconComponent(name, size = 40, color) {
-  const Icon = ICON_MAP[name] || FaLink;
+  const Icon = ICON_MAP[name] || ALL_ICONS[name] || FaLink;
   return <Icon size={size} color={color} />;
 }
