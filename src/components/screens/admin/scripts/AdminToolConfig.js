@@ -252,14 +252,22 @@ const AdminToolConfig = () => {
                       </button>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <Label className={labelClasses}>Color (hex)</Label>
-                      <Input
-                        type="text"
-                        value={tool.color || '#2196F3'}
-                        onChange={(e) => updateTool(index, 'color', e.target.value)}
-                        placeholder="#2196F3"
-                        className={inputClasses}
-                      />
+                      <Label className={labelClasses}>Color</Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={/^#[0-9A-Fa-f]{6}$/.test(tool.color) ? tool.color : '#2196F3'}
+                          onChange={(e) => updateTool(index, 'color', e.target.value)}
+                          className="h-10 w-10 min-w-[2.5rem] cursor-pointer rounded-lg border-2 border-white/20 bg-transparent p-0.5 [data-theme=light]:border-zinc-300"
+                        />
+                        <Input
+                          type="text"
+                          value={tool.color || '#2196F3'}
+                          onChange={(e) => updateTool(index, 'color', e.target.value)}
+                          placeholder="#2196F3"
+                          className={cn(inputClasses, 'flex-1')}
+                        />
+                      </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <Label className={labelClasses}>Allowed roles</Label>
