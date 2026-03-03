@@ -104,11 +104,13 @@ const SelectScreen = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
               {tools.map((tool) => {
                 const iconEl = getIconComponent(tool.icon, 40, tool.color);
+                const isExternal = tool.type === 'external';
                 const cardClass = cn(
                   'relative flex flex-col items-center gap-4 p-8 rounded-2xl transition-all duration-300',
-                  'bg-white/10 backdrop-blur-md text-white text-xl',
-                  '[data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200',
-                  '[data-theme=light]:shadow-md'
+                  'backdrop-blur-md text-white text-xl',
+                  isExternal
+                    ? 'bg-teal-500/20 border border-teal-400/40 [data-theme=light]:bg-teal-50 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-teal-300 [data-theme=light]:shadow-md'
+                    : 'bg-white/10 [data-theme=light]:bg-white/85 [data-theme=light]:text-[#181a1b] [data-theme=light]:border [data-theme=light]:border-gray-200 [data-theme=light]:shadow-md'
                 );
                 const disabledClass = cn(
                   'relative flex flex-col items-center gap-4 p-8 rounded-2xl cursor-not-allowed opacity-70',
@@ -135,7 +137,7 @@ const SelectScreen = () => {
                         href={tool.url}
                         target={tool.openInNewTab ? '_blank' : undefined}
                         rel={tool.openInNewTab ? 'noopener noreferrer' : undefined}
-                        className={cn(cardClass, 'border-none cursor-pointer hover:-translate-y-1 hover:bg-white/20 hover:shadow-xl [data-theme=light]:hover:bg-gray-100 no-underline')}
+                        className={cn(cardClass, 'cursor-pointer hover:-translate-y-1 hover:bg-teal-500/30 hover:border-teal-400/60 hover:shadow-xl [data-theme=light]:hover:bg-teal-100 [data-theme=light]:hover:border-teal-400 no-underline')}
                       >
                         {content}
                       </a>
