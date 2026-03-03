@@ -1,0 +1,4 @@
+# Cloudflare Pages configuration
+# Deploys to: lifesmart-home.pages.dev and home.lifesmartfinance.com
+name = "lifesmart-home"
+pages_build_output_dir = "build"
