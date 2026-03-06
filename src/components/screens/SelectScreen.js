@@ -184,6 +184,7 @@ const SelectScreen = () => {
                 };
 
                 if (tool.enabled) {
+                  const linkDisplay = tool.type === 'external' ? tool.url : tool.path;
                   const content = (
                     <>
                       {tool.inDevelopment && (
@@ -193,6 +194,11 @@ const SelectScreen = () => {
                       )}
                       <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{iconEl}</span>
                       <span className="font-medium">{tool.label}</span>
+                      {linkDisplay && (
+                        <span className="text-xs opacity-70 truncate max-w-full px-2 [data-theme=light]:opacity-60" title={linkDisplay}>
+                          {linkDisplay}
+                        </span>
+                      )}
                       {restrictedRoles && (
                         <div className="flex flex-wrap justify-center gap-1.5 mt-2" title={`Visible to: ${restrictedRoles.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(', ')}`}>
                           {restrictedRoles.map((role) => (
@@ -230,6 +236,7 @@ const SelectScreen = () => {
                   );
                 }
 
+                const disabledLinkDisplay = tool.type === 'external' ? tool.url : tool.path;
                 return (
                   <div key={tool.id} className={disabledClass}>
                     <div className="absolute top-2 right-2 bg-black/80 text-green-500 px-2.5 py-1 rounded-md border border-green-500/60 text-xs font-semibold z-10 whitespace-nowrap [data-theme=light]:bg-amber-50 [data-theme=light]:text-green-600 [data-theme=light]:border-green-400">
@@ -237,6 +244,11 @@ const SelectScreen = () => {
                     </div>
                     <span className="opacity-50">{iconEl}</span>
                     <span className="opacity-50 font-medium">{tool.label}</span>
+                    {disabledLinkDisplay && (
+                      <span className="text-xs opacity-50 truncate max-w-full px-2" title={disabledLinkDisplay}>
+                        {disabledLinkDisplay}
+                      </span>
+                    )}
                     {restrictedRoles && (
                       <div className="flex flex-wrap justify-center gap-1.5 mt-2 opacity-70">
                         {restrictedRoles.map((role) => (
