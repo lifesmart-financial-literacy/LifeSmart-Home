@@ -243,9 +243,3 @@ For support:
 - Security patches
 - Feature enhancements
 - Performance optimizations
-
----
-
-<div align="center">
-  Made with ❤️ by the LifeSmart Team
-</div>
