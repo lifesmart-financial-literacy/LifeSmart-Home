@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "LifeSmart OmniPlatform — Firestore structure inferred from src/. Deploy firestore.rules with Firebase CLI. Rules are authoritative for access control.",
+  "generatedAt": "2026-03-29",
+  "collections": [
+    {
+      "path": "Users/{uid}",
+      "documentId": "Firebase Auth uid",
+      "description": "Primary user profile; created via ensureUserDoc (userUtils.js).",
+      "clientOperations": {
+        "read": ["SelectScreen", "ProfileScreen", "AdminUserManagement", "EditModal", "AdminHome", "AdminLoginCodes (related user peek)"],
+        "create": ["ensureUserDoc on register/login"],
+        "update": ["ProfileScreen (name, email)", "updateLoginStreak (lastLogin, streak)", "AdminUserManagement", "EditModal"],
+        "delete": ["AdminUserManagement"]
+      },
+      "fields": {
+        "email": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "user": "boolean",
+        "admin": "boolean",
+        "developer": "boolean",
+        "isAdmin": "boolean (optional; used in AdminHome gate)",
+        "isActive": "boolean",
+        "userUID": "string (same as doc id)",
+        "role": "string (e.g. user, admin)",
+        "createdAt": "string ISO",
+        "lastLogin": "string ISO",
+        "streak": "number"
+      }
+    },
+    {
+      "path": "SystemSettings/toolConfig",
+      "description": "Grouped tool navigation config; read by useToolConfig, written by AdminToolConfig / saveToolConfig.",
+      "fields": {
+        "groups": "array of { id, label, order, tools: [...] }",
+        "tools": "array (legacy; migrated to groups)",
+        "updatedAt": "string ISO (on save)"
+      }
+    },
+    {
+      "path": "SystemSettings/config",
+      "description": "Admin system settings blob from AdminSystemSettings.",
+      "fields": {
+        "academic": "object",
+        "security": "object",
+        "notifications": "object",
+        "analytics": "object"
+      }
+    },
+    {
+      "path": "Login Codes/{codeName}",
+      "description": "Access codes; doc id is the code string. Managed in AdminLoginCodes.",
+      "fields": {
+        "active": "boolean",
+        "lastUsedBy": "string uid (optional; referenced in admin UI)"
+      }
+    },
+    {
+      "path": "Quiz/Asset Market Simulations/Simulations/{simulationDocId}",
+      "description": "Shared simulation run metadata. simulationDocId pattern: 'Simulation {n}'. Written by SimulationControls.",
+      "fields": {
+        "createdAt": "timestamp"
+      }
+    },
+    {
+      "path": "Quiz/Asset Market Simulations/Simulations/{simulationDocId}/Simulation Controls/Controls",
+      "description": "Simulation parameters; read by Simulation.js.",
+      "fields": {
+        "years": "number",
+        "assetChanges": "array (nested quarterly % changes)",
+        "events": "map"
+      }
+    },
+    {
+      "path": "Stock Market Data/{symbol}",
+      "description": "Cached market data (initFirebase.js). No current callers besides helpers.",
+      "fields": {
+        "data": "any",
+        "lastUpdated": "timestamp"
+      }
+    },
+    {
+      "path": "simulations/{id}",
+      "description": "Past simulations list in PastSimulations.js. No writes found in codebase; schema from UI expectations.",
+      "fields": {
+        "name": "string",
+        "createdAt": "timestamp",
+        "portfolioValue": "number",
+        "groups": "array"
+      }
+    },
+    {
+      "path": "{uid}/Settings",
+      "description": "Per-user preferences. Collection id equals Auth uid; document id 'Settings'. SettingsScreen.js.",
+      "fields": {
+        "theme": "string",
+        "language": "string",
+        "currency": "string",
+        "autoSave": "boolean",
+        "downloadFormat": "string",
+        "budgetReminders": "boolean",
+        "savingsAlerts": "boolean",
+        "monthlyReports": "boolean"
+      }
+    },
+    {
+      "path": "{uid}/Profile",
+      "description": "Mirror profile doc updated with Users from EditModal (admin).",
+      "fields": "same shape as admin edit payload (firstName, lastName, email, isActive, admin, developer, user)"
+    },
+    {
+      "path": "{uid}/Quiz Simulations/Teams/{teamName}",
+      "description": "School quiz team scores; FinancialQuiz.js. Team doc id is team name.",
+      "fields": {
+        "name": "string",
+        "points": "number",
+        "taskScores": "map of task index to score"
+      }
+    },
+    {
+      "path": "{uid}/Asset Market Simulations/Simulations/Simulation 1/Results/Final",
+      "description": "Simulation.js finishSimulation.",
+      "fields": {
+        "finalValues": "array of { name, equity, bonds, realestate, commodities, other }"
+      }
+    },
+    {
+      "path": "{uid}/Asset Market Simulations/Simulations/Simulation 1/Results/Quarters",
+      "description": "Simulation.js finishSimulation.",
+      "fields": {
+        "quarterResults": "array of per-team quarterly series"
+      }
+    },
+    {
+      "path": "Profiles/{id}",
+      "description": "Referenced by AdminDatabaseManagement stats/purge only; schema not defined in app."
+    },
+    {
+      "path": "Classes/{id}",
+      "description": "AdminDatabaseManagement only."
+    },
+    {
+      "path": "Assignments/{id}",
+      "description": "AdminDatabaseManagement only."
+    },
+    {
+      "path": "Submissions/{id}",
+      "description": "AdminDatabaseManagement only."
+    },
+    {
+      "path": "Messages/{id}",
+      "description": "AdminDatabaseManagement only."
+    },
+    {
+      "path": "Analytics/{id}",
+      "description": "AdminDatabaseManagement only."
+    }
+  ],
+  "securityNotes": [
+    "Elevated privilege in rules matches AdminHome: admin, developer, isAdmin, or role == 'admin'.",
+    "Self-service user updates cannot change privilegedUserFields (see firestore.rules).",
+    "Default deny: paths not matched by firestore.rules are inaccessible.",
+    "Admin routes in React are not a security boundary; rules enforce access.",
+    "Consider Cloud Functions for Login Codes validation and stock writes if you want zero client write surface."
+  ]
+}

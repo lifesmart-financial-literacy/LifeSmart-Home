@@ -1,11 +1,163 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ============================================================
-    // VERY PERMISSIVE - Development only. Tighten before production!
-    // ============================================================
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    // -------------------------------------------------------------------------
+    // Helpers — align with client checks in AdminHome.js (admin / developer /
+    // isAdmin / role). Server-side rules are authoritative; UI checks are not.
+    // -------------------------------------------------------------------------
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function callerDocPath() {
+      return /databases/$(database)/documents/Users/$(request.auth.uid);
+    }
+
+    function callerExists() {
+      return signedIn() && exists(callerDocPath());
+    }
+
+    function callerData() {
+      return get(callerDocPath()).data;
+    }
+
+    /** Matches elevated users who may manage admin collections and other users. */
+    function hasElevatedPrivileges() {
+      return callerExists() && (
+        callerData().admin == true ||
+        callerData().developer == true ||
+        callerData().isAdmin == true ||
+        callerData().role == 'admin'
+      );
+    }
+
+    /** Fields end-users must never change on their own profile (privilege / identity). */
+    function privilegedUserFields() {
+      return [
+        'admin', 'developer', 'isAdmin', 'role', 'isActive',
+        'user', 'userUID', 'createdAt'
+      ];
+    }
+
+    function selfUserUpdateAllowed() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(privilegedUserFields());
+    }
+
+    function saneNewUserDoc() {
+      return (!('admin' in request.resource.data) || request.resource.data.admin == false)
+        && (!('developer' in request.resource.data) || request.resource.data.developer == false)
+        && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
+        && (!('role' in request.resource.data) || request.resource.data.role == 'user');
+    }
+
+    // -------------------------------------------------------------------------
+    // Users/{uid} — profiles, admin user management, login streak
+    // -------------------------------------------------------------------------
+    match /Users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || hasElevatedPrivileges());
+
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.userUID == userId
+        && saneNewUserDoc();
+
+      allow update: if hasElevatedPrivileges()
+        || (
+          signedIn()
+          && request.auth.uid == userId
+          && selfUserUpdateAllowed()
+        );
+
+      allow delete: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // SystemSettings — toolConfig (all signed-in read); config & writes admin-only
+    // -------------------------------------------------------------------------
+    match /SystemSettings/{docId} {
+      allow read: if signedIn() && docId == 'toolConfig'
+        || hasElevatedPrivileges();
+      allow write: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // Login Codes — admin UI only (no client writes found outside admin)
+    // -------------------------------------------------------------------------
+    match /Login Codes/{codeId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // Shared Finance Quest simulation definitions (SimulationControls + Simulation read)
+    // -------------------------------------------------------------------------
+    match /Quiz/Asset Market Simulations/Simulations/{simId} {
+      allow read: if signedIn();
+      allow write, delete: if signedIn();
+    }
+    match /Quiz/Asset Market Simulations/Simulations/{simId}/Simulation Controls/{controlId} {
+      allow read: if signedIn();
+      allow write, delete: if signedIn();
+    }
+
+    // -------------------------------------------------------------------------
+    // Stock Market Data — read for app features; write restricted (client helper exists)
+    // -------------------------------------------------------------------------
+    match /Stock Market Data/{symbol} {
+      allow read: if signedIn();
+      allow write, delete: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // Top-level simulations (PastSimulations.js) — no creates in app; lock down writes
+    // -------------------------------------------------------------------------
+    match /simulations/{simId} {
+      allow read: if signedIn();
+      allow create, update, delete: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // Per-user root collections named by Firebase Auth uid (Settings, Profile, quizzes, sims)
+    // Must stay after fixed collection names (Users, Quiz, SystemSettings, ...).
+    // -------------------------------------------------------------------------
+    match /{ownerId}/Settings {
+      allow read, write, delete: if signedIn() && request.auth.uid == ownerId;
+    }
+    match /{ownerId}/Profile {
+      allow read, write, delete: if signedIn()
+        && (request.auth.uid == ownerId || hasElevatedPrivileges());
+    }
+    match /{ownerId}/Quiz Simulations/Teams/{teamId} {
+      allow read, write, delete: if signedIn() && request.auth.uid == ownerId;
+    }
+    match /{ownerId}/Asset Market Simulations/{document=**} {
+      allow read, write, delete: if signedIn() && request.auth.uid == ownerId;
+    }
+
+    // -------------------------------------------------------------------------
+    // Legacy / admin-database collections (AdminDatabaseManagement.js)
+    // -------------------------------------------------------------------------
+    match /Profiles/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+    match /Classes/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+    match /Assignments/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+    match /Submissions/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+    match /Messages/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+    match /Analytics/{docId} {
+      allow read, write, delete: if hasElevatedPrivileges();
+    }
+
+    // -------------------------------------------------------------------------
+    // Default deny — anything not listed cannot be read or written.
+    // -------------------------------------------------------------------------
   }
 }
