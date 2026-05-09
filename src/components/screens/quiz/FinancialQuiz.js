@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, setDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { db, firebaseAuth } from '../../../firebase/initFirebase';
 import Question1 from './questions/Question1';
 import Question2 from './questions/Question2';
@@ -24,13 +25,20 @@ const FinancialQuiz = () => {
   const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
 
   useEffect(() => {
-    const currentUser = firebaseAuth.currentUser;
-    if (currentUser) {
-      setUid(currentUser.uid);
-    } else {
-      console.error('No user is logged in.');
-      navigate('/');
-    }
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        setUid(user.uid);
+      } else {
+        setUid(null);
+        console.error('No user is logged in.');
+        navigate('/');
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!uid) return;
 
     const searchParams = new URLSearchParams(location.search);
     const teamsParam = searchParams.get('teams');
@@ -45,7 +53,7 @@ const FinancialQuiz = () => {
     } else {
       navigate('/quiz-landing');
     }
-  }, [location.search, navigate, firebaseAuth.currentUser]);
+  }, [location.search, navigate, uid]);
 
   const handleAnswer = (answer) => {
     console.log('Team answered:', answer);
