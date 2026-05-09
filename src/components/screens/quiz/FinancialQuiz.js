@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getFirestore, collection, setDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { collection, setDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
+import { db, firebaseAuth } from '../../../firebase/initFirebase';
 import Question1 from './questions/Question1';
 import Question2 from './questions/Question2';
 import Question3 from './questions/Question3';
@@ -18,8 +18,6 @@ const FinancialQuiz = () => {
   const [quizComplete, setQuizComplete] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [uid, setUid] = useState(null);
-  const db = getFirestore();
-  const auth = getAuth();
 
   const questions = [Question1, Question2, Question3, Question4, Question5, Question6];
   const CurrentQuestionComponent = questions[currentQuestionIndex];
@@ -47,7 +45,7 @@ const FinancialQuiz = () => {
     } else {
       navigate('/quiz-landing');
     }
-  }, [location.search, navigate, auth.currentUser]);
+  }, [location.search, navigate, firebaseAuth.currentUser]);
 
   const handleAnswer = (answer) => {
     console.log('Team answered:', answer);

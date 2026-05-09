@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, setDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, setDoc, getDocs, collection } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
+import { db } from '../../../../firebase/initFirebase';
 
 const SimulationControls = () => {
   const [years, setYears] = useState(1);
@@ -25,7 +26,6 @@ const SimulationControls = () => {
   }, [years]);
 
   const getNextSimulationIndex = async () => {
-    const db = getFirestore();
     const simulationRef = collection(db, 'Quiz', 'Asset Market Simulations', 'Simulations');
     try {
       const snapshot = await getDocs(simulationRef);
@@ -101,8 +101,6 @@ const SimulationControls = () => {
       showConfirmationModalWithMessage('Error: Failed to fetch simulation index');
       return;
     }
-
-    const db = getFirestore();
 
     const mainDocRef = doc(db, 'Quiz', 'Asset Market Simulations', 'Simulations', `Simulation ${simulationIndex}`);
     const controlsDocRef = doc(db, 'Quiz', 'Asset Market Simulations', 'Simulations', `Simulation ${simulationIndex}`, 'Simulation Controls', 'Controls');

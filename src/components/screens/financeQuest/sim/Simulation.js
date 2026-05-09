@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Chart } from 'chart.js/auto';
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app, db, auth } from '../../../../firebase/initFirebase';
+import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, firebaseAuth } from '../../../../firebase/initFirebase';
 import lifesmartlogo from '../../../../assets/icons/LifeSmartLogo.png';
 
 // Custom hook for chart management
@@ -373,7 +373,6 @@ const Simulation = () => {
 
   const fetchLatestSimulationIndex = async (userId) => {
     try {
-      const db = getFirestore();
       const simulationsRef = collection(db, userId, "Asset Market Simulations", "Simulations");
       const querySnapshot = await getDocs(simulationsRef);
       return querySnapshot.empty ? 1 : querySnapshot.size;
@@ -386,7 +385,6 @@ const Simulation = () => {
 
   const fetchAssetChanges = async (userId, index) => {
     try {
-      const db = getFirestore();
       const docRef = doc(db, 'Quiz', 'Asset Market Simulations', 'Simulations', `Simulation ${index}`, 'Simulation Controls', 'Controls');
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -401,11 +399,10 @@ const Simulation = () => {
   };
 
   useEffect(() => {
-    const auth = getAuth();
     setIsLoading(true);
     setError(null);
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       try {
         if (user) {
           setUid(user.uid);
@@ -510,7 +507,6 @@ const Simulation = () => {
         other: group.quarterlyValues.other,
       }));
 
-      const db = getFirestore();
       await setDoc(doc(db, uid, 'Asset Market Simulations', 'Simulations', 'Simulation 1', "Results", "Final"), { finalValues });
       await setDoc(doc(db, uid, 'Asset Market Simulations', 'Simulations', 'Simulation 1', "Results", "Quarters"), { quarterResults });
       
