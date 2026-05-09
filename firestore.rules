@@ -82,30 +82,25 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
-    // Login Codes — admin UI only (no client writes found outside admin)
+    // Two-segment paths whose collection id contains a space (cannot use spaces in
+    // match literals in the console parser). Bind the first segment and compare.
+    // Login Codes — admin only. Stock Market Data — read signed-in, write elevated.
     // -------------------------------------------------------------------------
-    match /Login Codes/{codeId} {
-      allow read, write, delete: if hasElevatedPrivileges();
+    match /{twoSegCollection}/{twoSegDocId} {
+      allow read: if twoSegCollection == 'Login Codes' && hasElevatedPrivileges()
+        || twoSegCollection == 'Stock Market Data' && signedIn();
+      allow write, delete: if twoSegCollection == 'Login Codes' && hasElevatedPrivileges()
+        || twoSegCollection == 'Stock Market Data' && hasElevatedPrivileges();
     }
 
     // -------------------------------------------------------------------------
-    // Shared Finance Quest simulation definitions (SimulationControls + Simulation read)
+    // Quiz/{...}/Simulations/... AND {uid}/.../Simulations/... (same shape; root
+    // distinguishes shared template vs user-owned). Covers Simulation Controls docs.
     // -------------------------------------------------------------------------
-    match /Quiz/Asset Market Simulations/Simulations/{simId} {
-      allow read: if signedIn();
-      allow write, delete: if signedIn();
-    }
-    match /Quiz/Asset Market Simulations/Simulations/{simId}/Simulation Controls/{controlId} {
-      allow read: if signedIn();
-      allow write, delete: if signedIn();
-    }
-
-    // -------------------------------------------------------------------------
-    // Stock Market Data — read for app features; write restricted (client helper exists)
-    // -------------------------------------------------------------------------
-    match /Stock Market Data/{symbol} {
-      allow read: if signedIn();
-      allow write, delete: if hasElevatedPrivileges();
+    match /{simRoot}/{assetMarketSimulations}/Simulations/{document=**} {
+      allow read, write, delete: if signedIn()
+        && assetMarketSimulations == 'Asset Market Simulations'
+        && (simRoot == 'Quiz' || simRoot == request.auth.uid);
     }
 
     // -------------------------------------------------------------------------
@@ -127,11 +122,10 @@ service cloud.firestore {
       allow read, write, delete: if signedIn()
         && (request.auth.uid == ownerId || hasElevatedPrivileges());
     }
-    match /{ownerId}/Quiz Simulations/Teams/{teamId} {
-      allow read, write, delete: if signedIn() && request.auth.uid == ownerId;
-    }
-    match /{ownerId}/Asset Market Simulations/{document=**} {
-      allow read, write, delete: if signedIn() && request.auth.uid == ownerId;
+    match /{ownerId}/{quizSimulations}/Teams/{teamId} {
+      allow read, write, delete: if signedIn()
+        && request.auth.uid == ownerId
+        && quizSimulations == 'Quiz Simulations';
     }
 
     // -------------------------------------------------------------------------
