@@ -2,10 +2,9 @@ const path = require('path');
 
 module.exports = {
   webpack: {
+    // Never alias `firebase` → node_modules: CRA ModuleScopePlugin rejects resolved paths outside src/.
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      // Single firebase package instance avoids "Service firestore is not available" from duplicate registries
-      firebase: path.resolve(__dirname, 'node_modules/firebase'),
     },
   },
   jest: {
