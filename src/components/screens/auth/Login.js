@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../firebase/auth';
-import { FaGoogle, FaApple } from 'react-icons/fa';
+import { FaGoogle, FaApple, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { db } from '../../../firebase/initFirebase';
 import { ensureUserDoc, updateLoginStreak } from '../../../lib/userUtils';
 import Modal from '../../widgets/modals/Modal';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 const Login = ({ onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [modalConfig, setModalConfig] = useState({ title: '', message: '', type: 'success' });
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -103,15 +104,26 @@ const Login = ({ onClose }) => {
               <label htmlFor="password" className="block mb-2 text-sm font-medium text-white/80 [data-theme=light]:text-gray-700">
                 Password
               </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-                className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500"
-              />
+              <div className="relative flex items-center">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  autoComplete="current-password"
+                  className="bg-white/10 border-white/10 text-white placeholder:text-white/40 [data-theme=light]:bg-gray-100 [data-theme=light]:text-[#181a1b] [data-theme=light]:border-gray-200 [data-theme=light]:placeholder:text-gray-500 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 text-white/50 hover:text-white [data-theme=light]:text-gray-500 [data-theme=light]:hover:text-gray-800 p-1 cursor-pointer"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           </div>
 
