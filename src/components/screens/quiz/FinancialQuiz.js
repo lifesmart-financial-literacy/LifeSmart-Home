@@ -24,7 +24,7 @@ const FinancialQuiz = () => {
   const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
+    const currentUser = firebaseAuth.currentUser;
     if (currentUser) {
       setUid(currentUser.uid);
     } else {
